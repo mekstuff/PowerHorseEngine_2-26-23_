@@ -9,8 +9,9 @@ jobs:
   setup-node:
     runs-on: ${{ matrix.os }}
     strategy:
-      node-version: [15.x]
-      os: [ubuntu-latest, windows-latest]
+      matrix:
+        node-version: [15.x]
+        os: [ubuntu-latest, windows-latest]
 
     steps:
       - uses: actions/checkout@v3
