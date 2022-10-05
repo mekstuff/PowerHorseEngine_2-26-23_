@@ -1,0 +1,12 @@
+Packages/
+
+# Project place file
+/PowerHorseEngine.rbxlx
+
+# Roblox Studio lock files
+/*.rbxlx.lock
+/*.rbxl.lock
+
+#custom ignores
+/testing
+/testing.project.json
