@@ -1,5 +1,8 @@
-Packages/
+
 node_modules/
+Packages/
+Pseudo/
+
 # Project place file
 /PowerHorseEngine.rbxlx
 
