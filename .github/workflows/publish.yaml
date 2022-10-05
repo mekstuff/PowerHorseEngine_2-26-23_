@@ -4,7 +4,6 @@ on:
   push:
     branches: [ main ]
 
-
 jobs:
 
   setup-node:
@@ -26,11 +25,11 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
     needs: [setup-node]
-      steps:
-        - uses: actions/checkout@v3
-        - name: Use Node.js ${{ matrix.os }}
-          uses: actions/setup-node@v3
-          with:
-            node-version: ${{ matrix.node-version }}
-        - run: npm ci
-        - run: npm run semantic-release
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.os }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm ci
+    - run: npm run semantic-release
