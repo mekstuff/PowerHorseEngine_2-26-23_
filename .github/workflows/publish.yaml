@@ -20,8 +20,29 @@ jobs:
       - name: Install Aftman Toolchains
         run: aftman install
 
+      - name: Install Dependencies
+        run: wally install
+
+      - name: Create Packages Directory
+        run: mkdir -p Packages
+
       - name: Rojo output file
         run: rojo build -o PowerHorseEngine.rbxm default.project.json
+
+      - name: Get Release from wally.toml
+        uses: SebRollen/toml-action@v1.0.0
+        id: read_toml
+        with: 
+          file: 'wally.toml'
+          field: 'package.version'
+
+      - name: Publish to Wally
+        env: 
+          WALLY_TOKEN: ${{ secrets.WALLY_AUTH_TOKEN }}
+        run: |
+          mkdir =p ~/.wally
+          printf "[tokens]\n\"https://api.wally.run/\" = \"%s\"" "$WALLY_TOKEN" >> ~/.wally/auth.toml
+          wally publish
 
   publish:
     runs-on: ubuntu-latest
