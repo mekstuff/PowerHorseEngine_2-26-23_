@@ -23,7 +23,9 @@ jobs:
 
   build: 
     runs-on: ubuntu-latest
-    run: "echo building project"
+    steps:
+      - uses: actions/checkout@v3
+        run: "echo building project"
 
   publish:
     runs-on: ubuntu-latest
