@@ -1,0 +1,18 @@
+{
+  "name": "power-horse-engine",
+  "version": "0.0.0-development",
+  "author": "Olanzo James <lanzoinc@gmail.com>",
+  "scripts": {
+    "semantic-release": "semantic-release --branches main"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lanzoinc/PowerHorseEngine.git"
+  },
+  "devDependencies": {
+    "semantic-release": "^19.0.5"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  }
+}
