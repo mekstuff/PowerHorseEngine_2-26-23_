@@ -1,5 +1,5 @@
 {
-  "name": "@lanzo/power-horse-engine",
+  "name": "power-horse-engine",
   "version": "0.0.0-development",
   "author": "Olanzo James <lanzoinc@gmail.com>",
   "release": {
@@ -16,6 +16,6 @@
     "semantic-release": "^19.0.5"
   },
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   }
 }
