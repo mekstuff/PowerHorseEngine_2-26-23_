@@ -2,6 +2,7 @@
   "name": "power-horse-engine",
   "version": "0.0.0-development",
   "author": "Olanzo James <lanzoinc@gmail.com>",
+  "private": "true",
   "scripts": {
     "semantic-release": "semantic-release --branches main"
   },
