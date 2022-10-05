@@ -30,7 +30,7 @@ jobs:
         run: rojo build -o PowerHorseEngine.rbxm default.project.json
 
       - name: Get Release from wally.toml
-        uses: SebRollen/toml-action@v1.0.0
+        uses: SebRollen/toml-action@v1.0.0 
         id: read_toml
         with: 
           file: 'wally.toml'
