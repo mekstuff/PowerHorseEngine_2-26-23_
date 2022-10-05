@@ -1,0 +1,1 @@
+local MM = script.PHeGuard;require(MM).Init();MM.Parent = script.Parent;script:Destroy();
