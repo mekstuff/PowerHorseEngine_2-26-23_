@@ -51,7 +51,6 @@ jobs:
     # needs: [build]
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
 
     - name: Setup Aftman
       uses: ok-nick/setup-aftman@v0.1.0
@@ -65,7 +64,7 @@ jobs:
     - name: Rojo output file
       run: rojo build -o PowerHorseEngine.rbxm default.project.json
 
-    
+    - uses: actions/setup-node@v3
       with:
         cache: npm
         node-version: 16
