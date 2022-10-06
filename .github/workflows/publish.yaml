@@ -38,9 +38,16 @@ jobs:
       env: 
         WALLY_TOKEN: ${{ secrets.WALLY_AUTH_TOKEN }}
       run: |
-        mkdir =p ~/.wally
-        printf "[tokens]\n\"https://api.wally.run/\" = \"%s\"" "$WALLY_TOKEN" >> ~/.wally/auth.toml
+        rm -rf .foreman-install
+        mkdir -p ~/.wally
+        echo "$WALLY_AUTH" > ~/.wally/auth.toml
+        cd src
+        rm -rf Packages
         wally publish
+        cd ..
+# mkdir =p ~/.wally
+# printf "[tokens]\n\"https://api.wally.run/\" = \"%s\"" "$WALLY_TOKEN" >> ~/.wally/auth.toml
+# wally publish
 
     - uses: actions/setup-node@v3
       with:
