@@ -50,21 +50,22 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     # needs: [build]
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup Aftman
-        uses: ok-nick/setup-aftman@v0.1.0
-        with: 
-          token: ${{ secrets.GITHUB_TOKEN }}
-          trust-check: false
-
-      - name: Install Aftman Toolchains
-        run: aftman install
-
-      - name: Rojo output file
-        run: rojo build -o PowerHorseEngine.rbxm default.project.json
-
+    - uses: actions/checkout@v3
     - uses: actions/setup-node@v3
+
+    - name: Setup Aftman
+      uses: ok-nick/setup-aftman@v0.1.0
+      with: 
+        token: ${{ secrets.GITHUB_TOKEN }}
+        trust-check: false
+
+    - name: Install Aftman Toolchains
+      run: aftman install
+
+    - name: Rojo output file
+      run: rojo build -o PowerHorseEngine.rbxm default.project.json
+
+    
       with:
         cache: npm
         node-version: 16
