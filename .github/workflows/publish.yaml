@@ -6,16 +6,6 @@ on:
 
 jobs:
 
-  development:
-    runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/dev' }}
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Echo
-      run: echo Development pushed
-
   publish:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
