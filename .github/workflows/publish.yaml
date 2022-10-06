@@ -44,6 +44,14 @@ jobs:
   #         mkdir =p ~/.wally
   #         printf "[tokens]\n\"https://api.wally.run/\" = \"%s\"" "$WALLY_TOKEN" >> ~/.wally/auth.toml
   #         wally publish
+  development:
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/dev' }}
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Log info
+    - run: echo hello,world
 
   publish:
     runs-on: ubuntu-latest
