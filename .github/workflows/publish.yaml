@@ -42,8 +42,7 @@ jobs:
         mkdir =p ~/.wally
         printf "[tokens]\n\"https://api.wally.run/\" = \"%s\"" "$WALLY_TOKEN" >> ~/.wally/auth.toml
         wally publish
-
-    - name: Publish to NPM and Semantically Release
+        
     - uses: actions/setup-node@v3
       with:
         cache: npm
