@@ -13,14 +13,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Setup Aftman
-      uses: ok-nick/setup-aftman@v0.1.0
-      with: 
-        token: ${{ secrets.GITHUB_TOKEN }}
-        trust-check: false
-
-    - name: Install Aftman Toolchains
-      run: aftman install
+    - name: Echo Aftman
+      run: echo Development pushed
 
   publish:
     runs-on: ubuntu-latest
