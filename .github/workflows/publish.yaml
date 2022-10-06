@@ -38,11 +38,11 @@ jobs:
       env: 
         WALLY_TOKEN: ${{ secrets.WALLY_AUTH_TOKEN }}
       run: |
-        mkdir -p ~/.wally
+        mkdir =p ~/.wally
         echo "$WALLY_AUTH" > ~/.wally/auth.toml
         cd src
         wally publish
-# cd ..
+        cd ..
 
 # mkdir =p ~/.wally
 # printf "[tokens]\n\"https://api.wally.run/\" = \"%s\"" "$WALLY_TOKEN" >> ~/.wally/auth.toml
