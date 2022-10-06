@@ -57,7 +57,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
-    # needs: [build]
+    # needs: [build] 
     steps:
     - uses: actions/checkout@v3
 
