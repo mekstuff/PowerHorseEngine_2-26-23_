@@ -38,7 +38,7 @@ jobs:
       env: 
         WALLY_TOKEN: ${{ secrets.WALLY_AUTH_TOKEN }}
       run: |
-        rm -rf .foreman-install
+        rm -rf .aftman-install
         mkdir -p ~/.wally
         echo "$WALLY_AUTH" > ~/.wally/auth.toml
         cd src
