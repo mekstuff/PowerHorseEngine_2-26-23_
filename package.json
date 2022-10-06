@@ -3,6 +3,7 @@
   "version": "0.0.0-development",
   "author": "Olanzo James <lanzoinc@gmail.com>",
   "license": "MIT",
+  "files": ["src","LICENSE.txt"],
   "release": {
     "branches": ["main"],
     "plugins": [
