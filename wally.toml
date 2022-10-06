@@ -2,6 +2,7 @@
 name = "lanzoinc/power-horse-engine"
 version = "0.1.0"
 LICENSE = "MIT"
+authors = ["Lucien Greathouse <lucien@uplift.games>"]
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
 
