@@ -13,21 +13,13 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-<<<<<<< HEAD
     - name: Echo
-=======
     - name: Echo Aftman
->>>>>>> main
       run: echo Development pushed
 
   publish:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
-<<<<<<< HEAD
-
-=======
-    # needs: [build] 
->>>>>>> main
     steps:
     - uses: actions/checkout@v3
 
