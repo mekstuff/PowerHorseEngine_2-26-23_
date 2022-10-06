@@ -3,7 +3,16 @@
   "version": "0.0.0-development",
   "author": "Olanzo James <lanzoinc@gmail.com>",
   "release": {
-    "branches": ["main"]
+    "branches": ["main"],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      ["@semantic-release/github", {
+        "assets": [
+          {"path": "LICENSE.md", "label": "Version License"}
+        ]
+      }]
+    ]
   },
   "scripts": {
     "semantic-release": "semantic-release"
