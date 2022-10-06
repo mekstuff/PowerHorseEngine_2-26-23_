@@ -50,7 +50,7 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     # needs: [build]
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Setup Aftman
         uses: ok-nick/setup-aftman@v0.1.0
