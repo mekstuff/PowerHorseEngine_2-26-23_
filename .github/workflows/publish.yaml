@@ -42,11 +42,11 @@ jobs:
         mkdir =p ~/.wally
         printf "[tokens]\n\"https://api.wally.run/\" = \"%s\"" "$WALLY_TOKEN" >> ~/.wally/auth.toml
         wally publish
-        
+
     - uses: actions/setup-node@v3
       with:
         cache: npm
-        node-version: 16
+        node-version: 16 
     - run: npm ci
     - run: npx semantic-release
       env:
