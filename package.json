@@ -9,7 +9,7 @@
       "@semantic-release/release-notes-generator",
       ["@semantic-release/github", {
         "assets": [
-          {"path": "LICENSE.md", "label": "Version License"}
+          {"path": "PowerHorseEngine.rbxm", "label": "PowerHorseEngine.rbxm"}
         ]
       }]
     ]
