@@ -35,13 +35,13 @@ jobs:
     - name: Rojo output file
       run: rojo build -o PowerHorseEngine.rbxm default.project.json
   
-    - name: Publish to Wally
-      env: 
-        WALLY_TOKEN: ${{ secrets.WALLY_AUTH_TOKEN }}
-    - run: |
-        mkdir =p ~/.wally
-        printf "[tokens]\n\"https://api.wally.run/\" = \"%s\"" "$WALLY_TOKEN" >> ~/.wally/auth.toml
-        wally publish
+    # - name: Publish to Wally
+    #   env: 
+    #     WALLY_TOKEN: ${{ secrets.WALLY_AUTH_TOKEN }}
+    # - run: |
+    #     mkdir =p ~/.wally
+    #     printf "[tokens]\n\"https://api.wally.run/\" = \"%s\"" "$WALLY_TOKEN" >> ~/.wally/auth.toml
+    #     wally publish
 
     - uses: actions/setup-node@v3
       with:
