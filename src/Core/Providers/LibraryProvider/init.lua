@@ -10,7 +10,7 @@ local ConstantProviders = script.Parent.Constants;
 local ModuleFetcher = require(ConstantProviders.ModuleFetcher);
 local CoreLibraries = script.Parent.Parent.Libraries;
 local ErrorService = require(script.Parent.Parent.Services.ErrorService);
-local Content = script.Parent.Parent.Parent[".content"];
+local Content = require(script.Parent.Parent.Globals:WaitForChild("Engine")):RequestContentFolder();
 local libs = Content:FindFirstChild("libs");
 
 local isServer = not game.Players.LocalPlayer and true;

@@ -24,7 +24,7 @@ local PowerHorseEngineReady = game:GetService("ReplicatedStorage"):WaitForChild(
 local PowerHorseEnginePseudoReady = PowerHorseEngineReady:WaitForChild("Pseudo");
 
 local PowerHorseEngine = require(PowerHorseEngineReady);
-local ConfigFile = require(PowerHorseEngineReady:WaitForChild(".content"):WaitForChild("Config"));
+local ConfigFile = PowerHorseEngine:GetGlobal("Engine"):RequestConfig();
 local ConfigStartup = ConfigFile.Game.Startup;
 
 if(ConfigStartup.disableStartup)then

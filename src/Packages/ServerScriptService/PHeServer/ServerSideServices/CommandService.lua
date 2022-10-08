@@ -1,11 +1,12 @@
 local module = {}
 
+local PowerHorseEngine = require(game:GetService("ReplicatedStorage"):WaitForChild("PowerHorseEngine"))
 local PHeCommands = game:GetService("ServerScriptService"):WaitForChild("PHeServer"):FindFirstChild("server"):FindFirstChild("PHeCommands");
 local Commands = require(PHeCommands.Commands);
 local PHeCommandsMainModule = require(PHeCommands.MainModule);
-local Ranks = require(game:GetService("ReplicatedStorage"):WaitForChild("PowerHorseEngine")[".content"]:WaitForChild("Config")).PHePanel.Ranks;
+local Ranks = PowerHorseEngine:GetGlobal("Engine"):RequestConfig().PHePanel.Ranks;
 local PHeCommandsMainModule = require(PHeCommands.MainModule);
-local UserIdService = require(game:GetService("ReplicatedStorage"):WaitForChild("PowerHorseEngine")):GetService("UserIdService")
+local UserIdService = PowerHorseEngine:GetService("UserIdService")
 
 
 local CommandsQuickSearch = {}

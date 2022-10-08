@@ -5,7 +5,7 @@
 local CommandsModule = require(script.Parent.Commands);
 local MainModule = require(script.Parent.MainModule);
 local PowerHorseEngine = require(game:GetService("ReplicatedStorage"):WaitForChild("PowerHorseEngine"))
-local PowerHorseEngineContent = game:GetService("ReplicatedStorage").PowerHorseEngine:WaitForChild(".content");
+local PowerHorseEngineContent = PowerHorseEngine:GetGlobal("Engine"):RequestContentFolder();
 local PheCmdsFolder = PowerHorseEngineContent:FindFirstChild("PHeCommands");
 local PHeCmdsPage = PowerHorseEngineContent:WaitForChild("Config"):FindFirstChild("PHeCmdsPage");
 --//Custom Pages Wrap in pcall probably?
