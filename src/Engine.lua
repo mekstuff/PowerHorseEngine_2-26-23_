@@ -54,8 +54,10 @@ local function EstablishGlobals()
 end;
 
 local function userConfig()
+--[[
+
 	local Manifest = require(script.Parent["Manifest"]);
-	local Config = require(Engine.RequestContentFolder():FindFirstChild("Config"));
+	-- local Config = require(Engine:RequestContentFolder():FindFirstChild("Config"));
 	
 	
 	local ManifestVersion,ConfigVersion = Manifest.Upd.Version:gsub(" ",""),Config.v:gsub(" ","");
@@ -74,7 +76,6 @@ local function userConfig()
 	end
 	
 	
---[[
 	local maniV1,maniV2,maniV3 = Manifest.Upd.Version:gsub(" ",""):match("([%d]+)%.(%d+)%.(%d+)");
 	local configv1,configv2,configv3 = Config.v:gsub(" ",""):match("([%d]+)%.(%d+)%.(%d+)");
 
@@ -124,19 +125,19 @@ function Engine:InitServer(IsPlugin)
 		end;
 		return
 	end;
-	-- print(script.Parent.Parent);
 	if(script.Parent.Parent ~= game:GetService("ReplicatedStorage"))then return end;
 	if(ServerInitiated)then warn("Server Already Initiated") return end;
 	if(game.ReplicatedStorage:FindFirstChild("PHe_RS"))then return end;
 	
 	EstablishGlobals();
-	userConfig();
+	-- userConfig();
+
 	
 	if(not IsPlugin)then		
 		local POSTPHe = Instance.new("Folder",game:GetService("ReplicatedFirst"));
 		POSTPHe.Name = "PHe_POST";
 		
-		local POSTCONTENT = self.RequestContentFolder():FindFirstChild("POST");
+		local POSTCONTENT = self:RequestContentFolder():FindFirstChild("POST");
 		
 		if(POSTCONTENT)then
 			POSTCONTENT.Parent = POSTPHe;
@@ -178,20 +179,31 @@ function Engine:InitClient(Client)
 end;
 
 
-
-
-
 --[=[]=]
+local function waitForContentFolder(tries:number)
+	local folder = script.Parent:FindFirstChild(".content") or script.Parent:FindFirstChild(".lanzo");
+	if(not folder)then
+		tries = tries or 0;
+		if(tries == 20)then
+			warn("Waiting for .content or .lanzo folder to be added to root, this is taking longer than it should. Did you sync a \".content\" or \".lanzo\" folder into PowerHorseEngine's root? This folder is required. You may encounter a lag spike as scripts try to request this folder, Please end the session.");
+		end;
+		task.wait(tries/5);
+		return waitForContentFolder(tries+1);
+	end;
+	return folder;
+end;
+
 function Engine:RequestContentFolder()
-	return script.Parent:WaitForChild(".content");
-end
+	return waitForContentFolder();
+	-- return script.Parent:WaitForChild(".content");
+end;
 --[=[]=]
 function Engine:RequestConfig()
-	return require(self.RequestContentFolder():WaitForChild("Config"));
+	return require(self:RequestContentFolder():WaitForChild("Config"));
 end
 --[=[]=]
 function Engine:RequestUserGameContent()
-	return require(self.RequestContentFolder():WaitForChild("Config")).Game;
+	return require(self:RequestContentFolder():WaitForChild("Config")).Game;
 end
 --[=[]=]
 function Engine:FetchReplicatedStorage()
