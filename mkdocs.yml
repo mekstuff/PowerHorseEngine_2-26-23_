@@ -1,1 +1,9 @@
-site_name: My Docs
+site_name: PowerHorseEngine
+theme:
+  name: material
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true 
