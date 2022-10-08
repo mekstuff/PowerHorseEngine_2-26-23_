@@ -111,7 +111,7 @@ end;
 --[=[
     Tracks the connection
 ]=]
-function Servant:Connect(connection:RBXScriptSignal, handler:any,id:any)
+function Servant:Connect(connection:RBXScriptSignal, handler:any,id:any):RBXScriptConnection
     local connected = connection:Connect(function(...)
         handler(...)
     end);
