@@ -2,14 +2,17 @@ local Theme = require(script.Parent.Parent.Parent.Theme);
 local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
 local Core = require(script.Parent.Parent.Parent);
 local IsClient = game:GetService("RunService"):IsClient();
-
-
+local TweenService = game:GetService("TweenService");
+local ResponsiveScrollerTInfo = TweenInfo.new(.1)
 
 
 local ScrollingFrame = {
 	Name = "ScrollingFrame";
 	ClassName = "ScrollingFrame";
 	
+	ResponsiveScroller = false;
+	ResponsiveScrollerBreakPoint = 20;
+	ResponsiveScrollerCollapseThickness = 3;
 	AutomaticCanvasSize = Enum.AutomaticSize.XY;
 	BottomImage = "rbxasset://textures/ui/Scroll/scroll-bottom.png";
 	CanvasPosition = Vector2.new(0,0);
@@ -69,10 +72,54 @@ function ScrollingFrame:_Render(App)
 		end
 	end)
 
+	local ResponsiveScrollerConnection;
+	local ExpandedResponsiveScrollBar = false;
+	
+	local function ConnectResponsiveScroller()
+		Scroller.ScrollBarThickness = self.ResponsiveScrollerCollapseThickness;
+		ResponsiveScrollerConnection = Scroller.InputChanged:Connect(function(input)
+			if(input.UserInputType == Enum.UserInputType.MouseMovement)then
+				local xv = (Scroller.AbsoluteSize.X - input.Position.X) - self.ScrollBarThickness;
+				if(xv >= self.ResponsiveScrollerBreakPoint)then
+					if(ExpandedResponsiveScrollBar)then
+						TweenService:Create(Scroller, ResponsiveScrollerTInfo, {
+							ScrollBarThickness = self.ResponsiveScrollerCollapseThickness;
+						}):Play();
+						ExpandedResponsiveScrollBar = false;
+					end
+				else
+					if(not ExpandedResponsiveScrollBar)then
+						TweenService:Create(Scroller, ResponsiveScrollerTInfo, {
+							ScrollBarThickness = self.ScrollBarThickness;
+						}):Play();
+						ExpandedResponsiveScrollBar = true;
+					end
+				end
+			end
+		end);
+	end;
+
+	local function DisconnectResponsiveScroller()
+		if(ResponsiveScrollerConnection)then
+			ResponsiveScrollerConnection:Disconnect();
+			ResponsiveScrollerConnection = nil;
+		end
+	end;
 	
 	return {
-		["Property"] = function(Value)
-			
+		["ScrollBarThickness"] = function(v)
+			if(self.ResponsiveScroller)then
+				if(ExpandedResponsiveScrollBar)then Scroller.ScrollBarThickness = v;end;
+			else
+				Scroller.ScrollBarThickness = v;
+			end;
+		end;
+		["ResponsiveScroller"] = function(Value)
+			if(Value)then
+				ConnectResponsiveScroller();
+			else
+				DisconnectResponsiveScroller();
+			end
 		end,
 		_Components = {
 			FatherComponent = Scroller;	
@@ -86,7 +133,7 @@ function ScrollingFrame:_Render(App)
 				"AutomaticCanvasSize","BottomImage","CanvasPosition",
 				"CanvasSize","HorizontalScrollbarInset","MidImage",
 				"ScrollBarImageColor3","ScrollBarImageTransparency",
-				"ScrollBarThickness","ScrollingDirection","ScrollingEnabled",
+				"ScrollingDirection","ScrollingEnabled",
 				"TopImage","VerticalScrollBarInset","VerticalScrollBarPosition",
 				unpack(GUIProps),
 				
