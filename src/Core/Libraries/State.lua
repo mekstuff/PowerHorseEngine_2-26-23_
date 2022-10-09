@@ -64,18 +64,23 @@ end
 	```
 ]=]
 
+local function getValue(v)
+	if(v == nil)then return "**any";end;
+	return v;
+end;
+
 return function(default)
 	local res = App.new("State");
-	res.State = default;
+	res.State = getValue(default);
 
 	return res,function(newValue)
 		-- if(newValue)then
 			if(typeof(newValue) == "function")then
 				-- print(res.State);
 				local resfromstatecallback = newValue(res.State);
-				res.State = resfromstatecallback;
+				res.State = getValue(resfromstatecallback);
 			else
-				res.State = newValue;
+				res.State = getValue(newValue);
 			end;
 		end;
 	-- end
