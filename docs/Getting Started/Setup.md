@@ -70,68 +70,71 @@ The `ico` is a very important folder that is used by alot of core scripts. It is
 !!!tip
     It is recommended that all your projects should contain a mdi ico module, the mdi module is a ico module for Material Design Icons by Google (rbx img urls by qweery)
 
-    To add Material Design Icons to your project, within the `ico` folder, create a `ModuleScript` named `ico` and paste the following script into the module
+    To add Material Design Icons to your project, within the `ico` folder, create a `ModuleScript` named `mdi` and paste the following script into the module
 
-    ```lua
-    -- Written by Olanzo James @ Lanzo, Inc.
-    -- Saturday, September 24 2022 @ 08:50:06
-    -- Credit to Google Inc and Qweery
-    -- Core icons uses mdi, removing this from your experience will make some icons not be shown.
-    -- Cached.
+    ??? note "mdi source"
 
-    local mdipackage = 11024471495;
-    local InsertService = game:GetService("InsertService");
-    local package;
-    local RunService = game:GetService("RunService");
-    local IsRunning,IsClient = RunService:IsRunning(),RunService:IsClient();
+        ```lua
+        -- Written by Olanzo James @ Lanzo, Inc.
+        -- Saturday, September 24 2022 @ 08:50:06
+        -- Credit to Google Inc and Qweery
+        -- Core icons uses mdi, removing this from your experience will make some icons not be shown.
+        -- Cached.
+
+        local mdipackage = 11024471495;
+        local InsertService = game:GetService("InsertService");
+        local package;
+        local RunService = game:GetService("RunService");
+        local IsRunning,IsClient = RunService:IsRunning(),RunService:IsClient();
 
 
-    --> loads from external source to lower Engine's size (only use the package when needed, sorta better
-        local s,r = pcall(function()
-            if(IsRunning and IsClient)then 
-                return nil;
+        --> loads from external source to lower Engine's size (only use the package when needed, sorta better
+            local s,r = pcall(function()
+                if(IsRunning and IsClient)then 
+                    return nil;
+                end;
+                return InsertService:LoadAsset(mdipackage):GetChildren()[1];
+            end);
+            if(not s)then
+                warn("mdi FATAL ERROR: ",r);
+                return {} --> icons will not load, you will get warnings like: (could not find ico path ico-mdi@communication/list_alt failed @ communication)
             end;
-            return InsertService:LoadAsset(mdipackage):GetChildren()[1];
-        end);
-        if(not s)then
-            warn("mdi FATAL ERROR: ",r);
-            return {} --> icons will not load, you will get warnings like: (could not find ico path ico-mdi@communication/list_alt failed @ communication)
-        end;
-        if(IsRunning)then
-            if(IsClient)then
-                --> this module should not exist/replicate onto clients. if so then your icons will fail until the proper module is loaded
-                script.Parent = nil;
+            if(IsRunning)then
+                if(IsClient)then
+                    --> this module should not exist/replicate onto clients. if so then your icons will fail until the proper module is loaded
+                    script.Parent = nil;
+                    script:Destroy();
+                    -- print("Destroyed",script.Parent)
+                    return "$wait";
+                end
+                --> In game, we load the actual module, this way it is replicated to clients. A corescript does this for us on start.
+                local icons = r.Icons;
+                icons.Name = script.Name;
+                icons.Parent = script.Parent;
                 script:Destroy();
-                -- print("Destroyed",script.Parent)
-                return "$wait";
-            end
-            --> In game, we load the actual module, this way it is replicated to clients. A corescript does this for us on start.
-            local icons = r.Icons;
-            icons.Name = script.Name;
-            icons.Parent = script.Parent;
-            script:Destroy();
-            return require(icons);
-        end;
-        package = require(r.Icons);
-    return package;
-    ```
+                return require(icons);
+            end;
+            package = require(r.Icons);
+        return package;
+        ```
 
     Some CoreScripts may also want to use local ROBLOX icons, to add this then add another `ModuleScript` to the `ico` folder and name it `rbx` and paste the follow code inside
 
-    ```lua
-    -- Written by Olanzo James @ Lanzo, Inc.
-    -- Tuesday, September 06 2022 @ 19:41:10
-    -- This icon pack uses roblox's /content/textures folder in local directory
-    -- This icon pack can only be used in ROBLOX studio, so plugin use only.
-    -- Built mainly for PowerHorseEngine projects
+    ??? note "rbx source"
 
-    return function (uri)
-        local fileType = uri:match("%.%w+$") and "" or ".png";
-        local link = "rbxasset://textures/"..uri..fileType;
-        return link;
-    end
+        ```lua
+        -- Written by Olanzo James @ Lanzo, Inc.
+        -- Tuesday, September 06 2022 @ 19:41:10
+        -- This icon pack uses roblox's /content/textures folder in local directory
+        -- This icon pack can only be used in ROBLOX studio, so plugin use only.
+        -- Built mainly for PowerHorseEngine projects
 
-    ```
+        return function (uri)
+            local fileType = uri:match("%.%w+$") and "" or ".png";
+            local link = "rbxasset://textures/"..uri..fileType;
+            return link;
+        end
+        ```
 
 ---
 
@@ -236,7 +239,7 @@ The config `module` is used to configure settings about your project
 
 #### PHePanel Custom Commands
 
-You can also create PHePanel custom commands here aswell, to prevent cluster from the config source, you'll create a new Folder and call it `CustomCMDS`. You can then create `ModuleScripts` inside the folder with the name of the command
+You can also create PHePanel custom commands here aswell, to prevent cluster from the config source, you'll create a new Folder and call it `CustomCMDS` and place it into your Config Module. You can then create `ModuleScripts` inside the folder with the name of the command
 
 ??? abstract "Command Template"
     ```lua
