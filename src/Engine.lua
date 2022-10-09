@@ -195,7 +195,6 @@ end;
 
 function Engine:RequestContentFolder()
 	return waitForContentFolder();
-	-- return script.Parent:WaitForChild(".content");
 end;
 --[=[]=]
 function Engine:RequestConfig()
