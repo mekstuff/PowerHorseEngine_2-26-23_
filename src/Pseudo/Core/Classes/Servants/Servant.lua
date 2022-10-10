@@ -72,6 +72,7 @@ function Servant:Keep(...:any)
         for _,x in pairs(t) do
             self:_Keep(x);
         end;
+        return ...;
     end
 end;
 
