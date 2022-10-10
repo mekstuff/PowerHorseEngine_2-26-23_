@@ -47,7 +47,12 @@ end;
 return function(instance,Parent)
 	local targetClassName = instance:GetAttribute("ClassName");
 	if(not targetClassName)then
-		targetClassName = qConverts[instance.Name] or qConverts[instance.ClassName] or instance.ClassName;
+		local targetQConvert = qConverts[instance.Name] or qConverts[instance.ClassName] or instance.ClassName;
+		if(typeof(targetQConvert) == "function")then
+			targetClassName = targetQConvert(instance);
+		else
+			targetClassName = targetQConvert;
+		end
 	end;
 
 	if(instance:GetAttribute("_Native"))then targetClassName = "..." end;
