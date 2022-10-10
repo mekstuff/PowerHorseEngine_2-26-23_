@@ -5,7 +5,12 @@ local Enumeration = App:GetGlobal("Enumeration");
 
 local qConverts = {
 	["TextButton"] = "Button",
-	["ImageButton"] = "Button",
+	["ImageButton"] = function(instance:Instance)
+		if(instance:GetAttribute("Icon") == nil)then
+			instance:SetAttribute("Icon",instance.Image);
+		end
+		return "Button";
+	end,
 	["TextLabel"] = "Text",
 	["ImageLabel"] = "Image",
 	["ScreenGui"] = "Portal",
