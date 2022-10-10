@@ -23,12 +23,12 @@ It is important to know where you should place `PowerHorseEngine` into your proj
     !!! tip
         `Packages` are not released in plugin mode.
 
-=== "Miscs"
+=== "Other"
 
     PowerHorseEngine can also be used as a standalone module in runtime if you do not sync it into `ServerScriptService`
 
-    !!! bug "Unstable"
-        This is unstable and not recommended
+    !!! bug "Note"
+        You may experience errors when trying to use some features, but majority of features should work perfectly fine. We do not recommend having multiple Instances of `PowerHorseEngine` in your projects though.
 
 ---
 
@@ -57,7 +57,7 @@ Before PowerHorseEngine can work properly, it requires a `.content` folder to be
 
     Create a new folder inside the `PowerHorseEngine` module and rename it to `.content`
 
-The `.content` folder is you interact with PowerHorseEngine based on your project. Below are important folders that can be placed into the .content folder
+The `.content` folder is how you interact with PowerHorseEngine based on your project. Below are important folders that can be placed into the .content folder
 
 !!! warning
     without some of these folders you can experience warnings and errors
@@ -68,7 +68,7 @@ The `.content` folder is you interact with PowerHorseEngine based on your projec
 The `ico` is a very important folder that is used by alot of core scripts. It is a folder that the image provider uses to access images. learn about the [ImageProvider](#) here
 
 !!!tip
-    It is recommended that all your projects should contain a mdi ico module, the mdi module is a ico module for Material Design Icons by Google (rbx img urls by qweery)
+    It is recommended that all your projects should contain a mdi ico module, the mdi module is a ico module for Material Design Icons by Google (rbx img urls by Qweery)
 
     To add Material Design Icons to your project, within the `ico` folder, create a `ModuleScript` named `mdi` and paste the following script into the module
 
@@ -215,9 +215,14 @@ The config `module` is used to configure settings about your project
                     }	
                 };
             };
+            ------------------------------------ [ Theme ] ----------------------------------------------
+            --> Will call Theme.extendTheme() on start
+                Theme = {
+                    -- BackgroundColor3 = Color3.from(my,default,color3)
+                }        
 
             ------------------------------------ [ Startup ] ----------------------------------------------
-            Startup = {
+            -- Startup = {
                 disableStartup = true;
                 StartupColor = Color3.fromRGB(255, 255, 255);
                 SplashScreen = {
