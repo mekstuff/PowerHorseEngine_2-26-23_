@@ -178,25 +178,35 @@ function Button:_Render(App)
 	local MB1U = self:AddEventListener("MouseButton1Up",true);
 	local MB2D = self:AddEventListener("MouseButton2Down",true);
 	local MB2U = self:AddEventListener("MouseButton2Up",true);
+	local MB1C = self:AddEventListener("MouseButton1Click",true);
+	local MB2C = self:AddEventListener("MouseButton2Click",true);
 	
 	self:AddEventListener("MouseEnter", true, Frame:GetEventListener("MouseEnter"));
 	self:AddEventListener("MouseLeave", true, Frame:GetEventListener("MouseLeave"));
 
-	ButtonEventer.MouseButton1Down:Connect(function(...)
+	local function fireEvent(e:BindableEvent,...:any):nil
 		if(self.Disabled)then return end;
-		MB1D:Fire(...);
+		e:Fire(...);
+	end;
+
+
+	ButtonEventer.MouseButton1Click:Connect(function(...)
+		fireEvent(MB1C,...);
+	end);
+	ButtonEventer.MouseButton2Click:Connect(function(...)
+		fireEvent(MB2C,...);
+	end);
+	ButtonEventer.MouseButton1Down:Connect(function(...)
+		fireEvent(MB1D,...);
 	end);
 	ButtonEventer.MouseButton1Up:Connect(function(...)
-		if(self.Disabled)then return end;
-		MB1U:Fire(...);
+		fireEvent(MB1U,...);
 	end);
 	ButtonEventer.MouseButton2Down:Connect(function(...)
-		if(self.Disabled)then return end;
-		MB2D:Fire(...);
+		fireEvent(MB2D,...);
 	end);
 	ButtonEventer.MouseButton2Up:Connect(function(...)
-		if(self.Disabled)then return end;
-		MB2U:Fire(...);
+		fireEvent(MB2U,...);
 	end);
 --[[
 	MB1D:Connect(function()
