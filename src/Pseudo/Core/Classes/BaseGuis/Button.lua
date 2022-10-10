@@ -32,7 +32,7 @@ local TweenService = game:GetService("TweenService");
 local function generateRipple(self, noAnimate)
 
 	if(self.RippleStyle == Enumeration.RippleStyle.None)then return end;
-	local Mouse = Core_Vanilla.Mouse;
+	local Mouse = true -- Core_Vanilla.Mouse;
 	if(not Mouse)then warn("No mouse found, can't ripple") return end;
 	local component = self:GetGUIRef();
 	local RippleAssetID = "http://www.roblox.com/asset/?id=4560909609";

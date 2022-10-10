@@ -138,6 +138,7 @@ function Whiplash.New(class:string):Instance
                     -- property(Obj,value);
                     table.insert(toExecute, {property = property, value = value})
                 elseif(typeof(property) == "number" and (typeof(value) == "Instance" or typeof(value) == "table"))then
+---@diagnostic disable-next-line: invalid-class-name
                     if(Obj:IsA("Pseudo") and value:IsA("Instance"))then
                        value.Parent = getProperParent(Obj);
                     else
