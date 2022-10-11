@@ -389,7 +389,6 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 			end
 
 			--> If it's a hidden property, then just return the value that's set
-			-- print(k,propSheet.ClassName);
 			if(string.match(k,"^_"))then return propSheet[k];end;
 		
 			--> Errors if the index is not a member
@@ -580,16 +579,43 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 			elseif(typeof(renderResults) == "function")then
 				--> Functional Render
 				renderMap = nil;
-				renderAsync(nil,"Name",Pseudo.Name,_ReferenceInstance,nil,Pseudo);	
-				renderAsync(nil,"Parent",Pseudo.Parent,_ReferenceInstance,nil,Pseudo);	
+				renderAsync(nil,"Name",Pseudo.Name,_ReferenceInstance,quickMap,Pseudo);	
+				renderAsync(nil,"Parent",Pseudo.Parent,_ReferenceInstance,quickMap,Pseudo);	
 				local StateLibrary = App:Import("State");
 				local hooks = {};
-				hooks.useEffect = function(callback,dependencies)
+				--> useEffect hook
+				hooks.useEffect = function(callback:any,dependencies:table?)
 					if(not Pseudo._dev._useEffectState)then 
 						Pseudo._dev._useEffectState = StateLibrary("nil");
 					end;
 					dependencies = _organizeuseEffectHookDependencies(Pseudo,dependencies or Pseudo._getCurrentPropSheetState(true,true,nil,true))
 					return Pseudo._dev._useEffectState:useEffect(callback,dependencies)
+				end;
+				--> useMapping hook
+				hooks.useMapping = function(props:table,dependencies:table):nil
+					if(not quickMap)then
+						quickMap = {};
+						for _,dependency in pairs(dependencies) do
+							if(not quickMap[dependency])then
+								quickMap[dependency] = {};
+							end;
+						end
+					end;
+					
+					for _,g in pairs(props) do
+						for dep,x in pairs(quickMap) do
+							if(not table.find(x,g))then
+								table.insert(x,g);
+								renderAsync(nil,g,Pseudo[g],_ReferenceInstance,quickMap,Pseudo)
+							else
+								warn(debug.traceback(("Double call on useMapping hook dependency: %s || %s"):format(dep.Name,g),2))
+							end
+						end
+					end;
+
+					-- print(quickMap);
+					-- assert(res and typeof(res) == "table", ("table expected from useMapping hook, got %s"):format(typeof(res)));
+					
 				end;
 				--> returning a nested function will use the useEffect hook so this function is called whenever any component is changed
 				local nestedRenderResults = renderResults(hooks);
