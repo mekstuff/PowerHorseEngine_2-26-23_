@@ -267,7 +267,9 @@ function ChannelMethods:AddAudio(AudioName:string,AudioID:number,AudioVolume:num
 	end;
 	
 	AudioVolume = AudioVolume or self.DefaultVolume;
-	AudioID = AudioID  and "rbxassetid://"..tostring(AudioID) or "";
+	if(typeof(AudioID)~="string")then tostring(AudioID);end;
+	AudioID = AudioID and (AudioID:match("^rbxassetid://") and AudioID or "rbxassetid://"..AudioID) or ""
+	-- AudioID = AudioID and "rbxassetid://"..tostring(AudioID) or "";
 	Looped = Looped or self.DefaultLoop;
 	
 	local newAudio = Instance.new("Sound");
