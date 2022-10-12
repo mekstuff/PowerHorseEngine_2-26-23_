@@ -180,6 +180,7 @@ function Engine:InitServer(PushPackages:boolean)
 		RSLocalEvents.Parent = RSStorage;
 
 		if(PushPackages)then
+			print("Quick");
 			script.Parent.Packages.PackageController.Parent = game.ServerScriptService;
 		end
 		
