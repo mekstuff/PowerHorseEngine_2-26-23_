@@ -53,16 +53,18 @@ return function(UserId)
 	BottomRightContent.Size = UDim2.new(0,60,0,22);
 	BottomRightContent.BackgroundTransparency = 1;
 	
-	local Grid = Instance.new("UIListLayout",BottomRightContent:GetGUIRef())
+	local Grid = Instance.new("UIListLayout")
 	Grid.FillDirection = Enum.FillDirection.Horizontal;
 	Grid.VerticalAlignment = Enum.VerticalAlignment.Center;
 	Grid.HorizontalAlignment = Enum.HorizontalAlignment.Right;
+	Grid.Parent = BottomRightContent:GetGUIRef();
 	
 	
-	local RespectGridA = Instance.new("Frame",BottomRightContent:GetGUIRef());
+	local RespectGridA = Instance.new("Frame");
 	RespectGridA.AutomaticSize = Enum.AutomaticSize.XY;
 	RespectGridA.Name = "RespectGridA";
 	RespectGridA.BackgroundTransparency = 1;
+	RespectGridA.Parent = BottomRightContent:GetGUIRef();
 	local DeviceIcon = App.new("Image",RespectGridA);
 	DeviceIcon.Size = UDim2.fromOffset(BottomRightContent.Size.Y.Offset,BottomRightContent.Size.Y.Offset);
 	DeviceIcon.Image = "ico-laptop";
