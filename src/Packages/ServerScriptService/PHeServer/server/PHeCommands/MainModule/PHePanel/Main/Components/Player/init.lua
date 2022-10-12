@@ -15,7 +15,12 @@ return function(UserId)
 	Frame.StrokeTransparency = 1;
 	Frame.Name = "PlayerFrame";
 	
-	
+	local ActionButton = Instance.new("TextButton");
+	ActionButton.Text = "";
+	ActionButton.Name = "ActionButton";
+	ActionButton.Size = UDim2.fromScale(1,1);
+	ActionButton.BackgroundTransparency = 1;
+	ActionButton.Parent = Frame:GetGUIRef();
 	
 	local UserImage = App.new("Image",Frame);
 	UserImage.AnchorPoint = Vector2.new(0,.5)
@@ -63,6 +68,6 @@ return function(UserId)
 	DeviceIcon.Image = "ico-laptop";
 	DeviceIcon.BackgroundTransparency = 1;
 	
-	return GridRespect,Frame
+	return GridRespect,Frame,ActionButton
 	
 end;
