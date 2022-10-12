@@ -38,7 +38,7 @@ if _forceenv then
 else
 	if RunService:IsRunning() then
 		if RunService:IsServer() then
-			Engine:InitServer(true);
+			Engine:InitServer();
 		else
 			Engine:InitClient();
 		end
