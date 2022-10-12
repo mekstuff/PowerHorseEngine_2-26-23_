@@ -25,15 +25,27 @@ SOFTWARE.
 local Engine = require(script:WaitForChild("Engine"));
 local RunService = game:GetService("RunService");
 
-if(RunService:IsRunning())then
-	if(RunService:IsServer())then
-		Engine:InitServer();
-	else
-		Engine:InitClient();
+local Flags = require(script:WaitForChild("Util"):WaitForChild("Flags"));
+Flags:Init();
+
+local _forceenv = (Flags:GetFlag("force-env"));
+if _forceenv then
+	if _forceenv == "plugin" then
+		Engine:InitPlugin(getfenv(0).plugin or script:FindFirstAncestorWhichIsA("Plugin"));
+	elseif _forceenv == "game" then
+		Engine:InitServer(true);
 	end
 else
-	Engine:InitPlugin(getfenv(0).plugin or script:FindFirstAncestorWhichIsA("Plugin"));
-end;
+	if RunService:IsRunning() then
+		if RunService:IsServer() then
+			Engine:InitServer(true);
+		else
+			Engine:InitClient();
+		end
+	else
+		Engine:InitPlugin(getfenv(0).plugin or script:FindFirstAncestorWhichIsA("Plugin"));
+	end;
+end
 
 --//Consts
 local Providers = (script.Core.Providers);
@@ -42,7 +54,6 @@ local LibraryProvider = require(Providers.LibraryProvider);
 
 --//Consts
 local CoreEngine = script.Core;
-local CoreServices = CoreEngine.Services;
 local CoreGlobals = CoreEngine.Globals;
 local CoreProviders = CoreEngine.Providers;
 
@@ -64,7 +75,6 @@ local PowerHorseEngine = {};
 --PowerHorseEngine.Pseudo = Pseudo;
 PowerHorseEngine.Enumeration = Enumeration;
 PowerHorseEngine.Manifest = Manifest;
-_G.App = PowerHorseEngine;
 
 --[=[
 	Uses [LibraryProvider.loadLibrary] to import the library
@@ -82,9 +92,14 @@ function PowerHorseEngine:GetGlobal(GlobalName:string)
 end;
 
 --[=[
-	Uses [ServiceProvider:LoadServiceAsync] to load the service
+	@type Service
+	
 ]=]
-function PowerHorseEngine:GetService(ServiceName:string)
+type Service = {
+	ScanPosition: boolean
+}
+
+function PowerHorseEngine:GetService(ServiceName:string):Service
 	return ServiceProvider:LoadServiceAsync(ServiceName)
 	--return fetchModule(ServiceName,CoreServices, ServiceName.." Is Not A Valid Service Name");
 end;
@@ -124,22 +139,9 @@ function PowerHorseEngine.GetPseudoFromInstance(ins:any)
 	return Pseudo.getPseudo(PseudoID.Value);
 end;
 
-local _config;
 function PowerHorseEngine:GetConfig()
 	return Engine:RequestConfig()
-	-- if(_config)then return _config;end;
-	-- _config = require(script.Content:WaitForChild("Config"));return _config;
 end;
 
---[[
-local nilFold = Instance.new("Folder");
-nilFold.Name = "nilFold";
-local PHeNilFolder = script.PHeNilFolderPlaceHolder;
-PHeNilFolder.Parent = nilFold;
-local bypass = {"Replicator","Content","Packages","Engine","Enumeration"}
-for _,v in pairs(script:GetChildren()) do
-	if not (table.find(bypass, v.Name))then v.Parent=PHeNilFolder;end;
-end
-]]
 
 return PowerHorseEngine
