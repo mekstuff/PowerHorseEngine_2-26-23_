@@ -666,7 +666,7 @@ setmetatable(module.__Pseudos, {__mode="kv"})
 --> For creating custom classes
 function module.Create(Class:table,Parent:any?,...:any?):any
 	assert(Class.ClassName, "Tried to create class without a ClassName.");
-	assert(Class._Render or Class.Render, "Tried To Create Class with no form of rendering. Use :render or any older rendering");
+	assert(Class._Render or Class.Render, "Tried To Create Class with no form of rendering. All Components require a :_Render method");
 	--[[
 	if(getClassModule(Class.ClassName))then
 		error("Cannot 'Create' Class With ClassName Of "..Class.ClassName.." Because This Class Is A CoreClass");
