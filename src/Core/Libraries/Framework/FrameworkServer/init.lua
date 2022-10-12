@@ -321,7 +321,6 @@ end;
 
 --[=[]=]
 function FrameworkServer:GetComponentClass(ClassName:string)
-    print(ComponentClasses);
     if(not ServerStarted)then
         return getComponentClassAsync(ClassName);
     end
