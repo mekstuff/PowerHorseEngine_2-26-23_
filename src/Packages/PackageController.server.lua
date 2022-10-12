@@ -10,6 +10,7 @@ local rs = game:GetService("ReplicatedStorage");
 if(script.Parent == sss)then
 	task.wait(); --> Prevents module from being required recursively
 	require(rs.PowerHorseEngine.Packages.PackageControllerModule):LaunchPackages(true);
+	script:Destroy();
 	return;
 end;
 
