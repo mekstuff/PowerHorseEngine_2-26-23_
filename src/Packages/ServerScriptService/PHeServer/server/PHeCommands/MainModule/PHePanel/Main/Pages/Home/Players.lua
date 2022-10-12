@@ -37,7 +37,7 @@ local function getPlayersForTab(Canvas,Container)
 		
 		for _,v in pairs(Players:GetPlayers())do
 			if(not Container:FindFirstChild(v.Name))then
-				local newPlayer,Frame = PlayerComponent(v.UserId);
+				local newPlayer,Frame,ActionButton = PlayerComponent(v.UserId);
 				newPlayer.Name = v.Name;
 				newPlayer.Parent = Container:GetGUIRef();
 				local ActionMenu = App.new("ActionMenu", script.Parent.Parent.Parent.Components.content);
@@ -58,11 +58,11 @@ local function getPlayersForTab(Canvas,Container)
 				ActionMenu:AddAction("Send Notification","ntfy");
 				
 				
-				Frame.MouseButton2Down:Connect(function()
+				ActionButton.MouseButton2Down:Connect(function()
 					ActionMenu:Show();	
 				end);
 				
-				Frame.MouseButton1Down:Connect(function()
+				ActionButton.MouseButton1Down:Connect(function()
 					EditPlayer(v.UserId);
 				end)
 				
