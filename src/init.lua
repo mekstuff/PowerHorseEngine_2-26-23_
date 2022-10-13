@@ -62,8 +62,8 @@ local ModuleFetcher = require(CoreProviders.Constants.ModuleFetcher);
 
 --//Consts
 local Pseudo = require(script.Pseudo);
-local Enumeration = require(script.Enumeration);
-local Manifest = require(script["Manifest"]);
+-- local Enumeration = require(script.Enumeration);
+-- local Manifest = require(script["Manifest"]);
 
 --[=[
 	Main Module
@@ -72,13 +72,21 @@ local Manifest = require(script["Manifest"]);
 ]=]
 
 local PowerHorseEngine = {};
---PowerHorseEngine.Pseudo = Pseudo;
-PowerHorseEngine.Enumeration = Enumeration;
-PowerHorseEngine.Manifest = Manifest;
+--[=[
+	Uses [Pseudo.new] to create a Pseudo component
+]=]
+
+function PowerHorseEngine.new(PseudoName:string,...:any)
+	return Pseudo.new(...);
+end;
+
+-- PowerHorseEngine.Enumeration = Enumeration;
+-- PowerHorseEngine.Manifest = Manifest;
 
 --[=[
 	Uses [LibraryProvider.loadLibrary] to import the library
 ]=]
+
 function PowerHorseEngine:Import(libraryName:string)
 	return LibraryProvider.LoadLibrary(libraryName);
 end
@@ -92,16 +100,11 @@ function PowerHorseEngine:GetGlobal(GlobalName:string)
 end;
 
 --[=[
-	@type Service
-	
+	Uses ServiceProvider:LoadServiceAsync
 ]=]
-type Service = {
-	ScanPosition: boolean
-}
 
-function PowerHorseEngine:GetService(ServiceName:string):Service
+function PowerHorseEngine:GetService(ServiceName:string)
 	return ServiceProvider:LoadServiceAsync(ServiceName)
-	--return fetchModule(ServiceName,CoreServices, ServiceName.." Is Not A Valid Service Name");
 end;
 
 --[=[
@@ -109,10 +112,11 @@ end;
 ]=]
 function PowerHorseEngine:GetProvider(Provider:string)
 	return ModuleFetcher(Provider, CoreProviders, Provider.." is not a valid Provider Name");
-	--return require(Providers:FindFirstChild(Provider));
 end;
 
---//Whiplash Library Support
+--[=[
+Uses the Whiplash Library .New Constructor
+]=]
 PowerHorseEngine.New = PowerHorseEngine:Import("Whiplash").New;
 PowerHorseEngine.OnWhiplashEvent = PowerHorseEngine:Import("Whiplash").OnEvent;
 PowerHorseEngine.OnWhiplashChange = PowerHorseEngine:Import("Whiplash").OnChange;
@@ -122,26 +126,22 @@ PowerHorseEngine.WhiplashExecute = PowerHorseEngine:Import("Whiplash").Execute;
 --[=[
 	Uses [CustomClassService:CreateClassAsync] to create a custom class
 ]=]
-function PowerHorseEngine.Create(...:any)
-	return ServiceProvider:LoadServiceAsync("CustomClassService"):CreateClassAsync(...);
+function PowerHorseEngine.Create(ClassObject:table,DirectParent:any?,Arguments:any?)
+	return ServiceProvider:LoadServiceAsync("CustomClassService"):CreateClassAsync(ClassObject,DirectParent,Arguments);
 end
---[=[
-	Uses [Pseudo.new] to create a Pseudo component
-]=]
-function PowerHorseEngine.new(...:any)
-	return Pseudo.new(...);
-end;
 
-function PowerHorseEngine.GetPseudoFromInstance(ins:any)
-	local obj = typeof(ins) == "table" and ins:GetRef() or ins;
+
+function PowerHorseEngine.GetPseudoFromInstance(Instance:any)
+	local obj = typeof(Instance) == "table" and Instance:GetRef() or Instance;
 	local PseudoID = obj:FindFirstChild("_pseudoid")
 	assert(PseudoID, obj.Name.." does not have a pseudo id. could not find");
 	return Pseudo.getPseudo(PseudoID.Value);
 end;
 
-function PowerHorseEngine:GetConfig()
+function PowerHorseEngine:GetConfig():table
 	return Engine:RequestConfig()
 end;
 
 
-return PowerHorseEngine
+return PowerHorseEngine;
+

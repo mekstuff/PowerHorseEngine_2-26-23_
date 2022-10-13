@@ -64,5 +64,7 @@ function SignalProvider:IsA(Query:string):boolean
 	return false;
 end
 
+
+
 return SignalProvider;
 
