@@ -1,3 +1,5 @@
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 -- local Util = script.Parent.Util;
 
 --[=[
@@ -42,7 +44,7 @@ local StorageEvents = {
 	};
 };
 
-
+--[[
 local function EstablishGlobals()
 	local rs = game:GetService("ReplicatedStorage");
 	if(script.Parent.Parent ~= rs)then return end;
@@ -52,9 +54,10 @@ local function EstablishGlobals()
 		_G[g.Name] = require(g);
 	end
 end;
+]]
+--[[
 
 local function userConfig()
---[[
 
 	local Manifest = require(script.Parent["Manifest"]);
 	-- local Config = require(Engine:RequestContentFolder():FindFirstChild("Config"));
@@ -89,16 +92,13 @@ local function userConfig()
 	if(maniV3 > configv3)then outdated=true;levelOutdate=1 end;
 	if(maniV2 > configv2)then outdated=true;levelOutdate=2 end;
 	if(maniV1 > configv1)then outdated=true;levelOutdate=3 end;
-]]
-	
-
-	
+		
 end;
+]]
 
-local PluginInitted=false;
 
-function Engine:InitPlugin(plugin,appToken)
-	local Manifest = require(script.Parent["Manifest"]);
+function Engine:InitPlugin(plugin)
+	-- local Manifest = require(script.Parent["Manifest"]);
 	local PluginService = ServiceProvider:LoadServiceAsync("PluginService");
 	PluginService:Sync(plugin);
 	-- print("\nRunning", Manifest.Name, "v-", Manifest.Upd.Version, "for plugin \"", plugin,"\"");
@@ -118,73 +118,101 @@ function Engine:InitPlugin(plugin,appToken)
 	--local PluginService = 
 end
 
-function Engine:InitServer(IsPlugin)	
-	if(game:GetService("RunService"):IsClient())then
-		if(game:GetService("RunService"):IsRunning())then 
+function Engine:InitServer(PushPackages:boolean)	
+	if game:GetService("RunService"):IsClient() then
+		if game:GetService("RunService"):IsRunning() then 
 			warn("Server cannot be initiated from the client.");
 		end;
 		return
 	end;
-	if(script.Parent.Parent ~= game:GetService("ReplicatedStorage"))then return end;
-	if(ServerInitiated)then warn("Server Already Initiated") return end;
-	if(game.ReplicatedStorage:FindFirstChild("PHe_RS"))then return end;
-	
-	EstablishGlobals();
-	-- userConfig();
+	if script.Parent.Parent ~= game:GetService("ReplicatedStorage") then return end;
+	if ServerInitiated then
+		warn("Server Already Initiated");
+		return 
+	end;
 
 	
-	if(not IsPlugin)then		
-		local POSTPHe = Instance.new("Folder",game:GetService("ReplicatedFirst"));
+
+	if game.ReplicatedStorage:FindFirstChild("PHe_RS") then return end;
+	
+	-- EstablishGlobals();
+	-- userConfig();
+	
+		local POSTPHe = Instance.new("Folder");
 		POSTPHe.Name = "PHe_POST";
+		POSTPHe.Parent = ReplicatedFirst;
 		
 		local POSTCONTENT = self:RequestContentFolder():FindFirstChild("POST");
 		
-		if(POSTCONTENT)then
+		if POSTCONTENT then
 			POSTCONTENT.Parent = POSTPHe;
 		end
 		
-		local SSStorage = Instance.new("Folder",game:GetService("ServerStorage"));
+		local SSStorage = Instance.new("Folder");
 		SSStorage.Name = "PHe_SS";
+		SSStorage.Parent = game:GetService("ServerStorage");
 		
-		local WSStorage = Instance.new("Folder", game:GetService('Workspace'));
+		local WSStorage = Instance.new("Folder");
 		WSStorage.Name = "PHe_WS";
+		WSStorage.Parent = game:GetService('Workspace');
 	
-		local RSStorage = Instance.new("Folder", game:GetService('ReplicatedStorage'));
+		local RSStorage = Instance.new("Folder");
 		RSStorage.Name = "PHe_RS";
+		RSStorage.Parent = ReplicatedStorage;
 		
-		local RSEvents = Instance.new("Folder",RSStorage);
+		local RSEvents = Instance.new("Folder");
 		RSEvents.Name = "events";
+		RSEvents.Parent = RSStorage;
 
 		for name,all in pairs(StorageEvents)do
-			local newStore = Instance.new("Folder",RSEvents);
+			local newStore = Instance.new("Folder");
 			newStore.Name = name.."s";
+			newStore.Parent = RSEvents;
 			for _,event in pairs(all)do
-				local newEvent = Instance.new(name,newStore);
+				local newEvent = Instance.new(name);
 				newEvent.Name = event;
+				newEvent.Parent = newStore;
 			end
 		end;
 	
-		local RSLocalEvents = Instance.new("Folder",RSStorage)
+		local RSLocalEvents = Instance.new("Folder")
 		RSLocalEvents.Name = "localEvents";
+		RSLocalEvents.Parent = RSStorage;
+
+		if(PushPackages)then
+			script.Parent.Packages.PackageController.Parent = game.ServerScriptService;
+		end
 		
-	end;
-	
+		-- script.Parent.Packages.PackageController.Parent = game:GetService("ServerScriptService");
+	-- local thread = coroutine.create(function()
+	-- 	if(PushPackages)then
+	-- 	    for _,Package in pairs(script.Parent.Packages:GetChildren())do
+	-- 			if(Package:IsA("Folder") and Package.Name ~= "$Preloaders")then
+	-- 				for _,x in pairs(Package:GetChildren())do
+	-- 					x.Parent = game:FindFirstChild(Package.Name);
+	-- 				end
+	-- 			end
+	-- 		end;
+	-- 	end
+	-- end);coroutine.resume(thread);
 	
 end;
 
 --//
 function Engine:InitClient(Client)
-	if(not Client)then Client = game.Players.LocalPlayer;end;
-	EstablishGlobals();
+	if not Client then 
+		Client = game.Players.LocalPlayer;
+	end;
+	-- EstablishGlobals();
 end;
 
 
 --[=[]=]
 local function waitForContentFolder(tries:number)
 	local folder = script.Parent:FindFirstChild(".content") or script.Parent:FindFirstChild(".lanzo");
-	if(not folder)then
+	if not folder then
 		tries = tries or 0;
-		if(tries == 20)then
+		if tries == 20 then
 			warn("Waiting for .content or .lanzo folder to be added to root, this is taking longer than it should. Did you sync a \".content\" or \".lanzo\" folder into PowerHorseEngine's root? This folder is required. You may encounter a lag spike as scripts try to request this folder, Please end the session.");
 		end;
 		task.wait(tries/5);
@@ -222,7 +250,9 @@ function Engine:FetchServerStorage()
 end
 --[=[]=]
 function Engine:FetchStorageEvent(EventName:string, Type:string)
-	if(not Type)then Type = "RemoteEvents";end;
+	if not Type then
+		Type = "RemoteEvents";
+	end;
 	--Type = Type.."Events";
 	
 	local PHe_RS_events = game:GetService("ReplicatedStorage"):WaitForChild("PHe_RS",600):WaitForChild("events",600);
@@ -230,18 +260,20 @@ function Engine:FetchStorageEvent(EventName:string, Type:string)
 	--local Search 
 	
 	local TypeSearch = PHe_RS_events:FindFirstChild(Type);
-	if(not TypeSearch)then
-		local x = Instance.new("Folder", PHe_RS_events);
+	if not TypeSearch then
+		local x = Instance.new("Folder");
 		x.Name = Type;
+		x.Parent = PHe_RS_events;
 		TypeSearch = x;
 	end;
 	
 	local eventSearch = TypeSearch:FindFirstChild(EventName);
-	if(not eventSearch and game:GetService("RunService"):IsServer())then
+	if not eventSearch and game:GetService("RunService"):IsServer() then
 		local t = string.sub(TypeSearch.Name, 1, #TypeSearch.Name-1);
 
-		local x = Instance.new(t, TypeSearch);
+		local x = Instance.new(t);
 		x.Name = EventName;
+		x.Parent = TypeSearch;
 		eventSearch = x;
 		--print("Event : "..EventName.." was created because it didn't exist before.");
 	else

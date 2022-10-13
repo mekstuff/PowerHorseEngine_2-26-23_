@@ -1,7 +1,9 @@
 local module = {}
 
-local format = _G.Format; -- require(script.Parent.Parent.Globals.format);
-local Engine = _G.Engine; --require(script.Parent.Parent.Globals.Engine);
+local Globals = script.Parent.Parent.Globals;
+
+local Engine = require(Globals.Engine);
+local format = require(Globals.Format); -- require(script.Parent.Parent.Globals.format);
 local CoreGuiService = require(script.Parent.CoreGuiService);
 local SignalProvider = require(script.Parent.Parent.Providers.SignalProvider);
 local InGamePurchaseRemoteEvent = Engine:FetchStorageEvent("InGamePurchaseService");
