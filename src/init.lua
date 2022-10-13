@@ -62,8 +62,8 @@ local ModuleFetcher = require(CoreProviders.Constants.ModuleFetcher);
 
 --//Consts
 local Pseudo = require(script.Pseudo);
--- local Enumeration = require(script.Enumeration);
--- local Manifest = require(script["Manifest"]);
+local Enumeration = require(script.Enumeration);
+local Manifest = require(script["Manifest"]);
 
 --[=[
 	Main Module
@@ -79,9 +79,8 @@ local PowerHorseEngine = {};
 function PowerHorseEngine.new(PseudoName:string,...:any)
 	return Pseudo.new(PseudoName,...);
 end;
-
--- PowerHorseEngine.Enumeration = Enumeration;
--- PowerHorseEngine.Manifest = Manifest;
+PowerHorseEngine.Manifest = Manifest;
+PowerHorseEngine.Enumeration = Enumeration;
 
 --[=[
 	Uses [LibraryProvider.loadLibrary] to import the library

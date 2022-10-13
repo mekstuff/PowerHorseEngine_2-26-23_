@@ -26,7 +26,7 @@ function CloseButton:_Render(App)
 	CloseBtn.BackgroundTransparency = 1;
 	CloseBtn.StrokeTransparency = 1;
 	CloseBtn.TextTransparency = .3;
-	CloseBtn.TextAdjustment = App.Enumeration.Adjustment.Center;
+	CloseBtn.TextAdjustment = Enumeration.Adjustment.Center;
 	CloseBtn.ButtonFlexSizing = false;
 	
 	CloseBtn.Parent = self:GetRef();
