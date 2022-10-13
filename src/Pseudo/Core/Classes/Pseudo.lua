@@ -25,13 +25,6 @@ local Pseudo = {
 	__PseudoBlocked = true;
 };
 
-type table = {[any]: number}
-
-local function expect_table(t: table) 
-   
-end
-
-expect_table()
 --//
 function Pseudo:GetFullName()
 	return self:GetRef():GetFullName();

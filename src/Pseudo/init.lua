@@ -6,6 +6,7 @@ local module = {}
 local Util = require(script.Core:WaitForChild("Util"));
 
 function module.new(Pseudo:string,Parent:Instance?,...:any)
+	assert(typeof(Pseudo) == "string", ("String expectd for Pseudo name, got %s. {%s}"):format(typeof(Pseudo), tostring(Pseudo)));
 	local name,type_ = unpack(Pseudo:split("@"));
 	local Pseudo, id = Util.Produce(name,Parent,type_,...);
 	
