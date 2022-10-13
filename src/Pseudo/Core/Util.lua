@@ -583,6 +583,16 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 				renderAsync(nil,"Parent",Pseudo.Parent,_ReferenceInstance,quickMap,Pseudo);	
 				local StateLibrary = App:Import("State");
 				local hooks = {};
+				--> useComponents hook
+				hooks.useComponents = function(components:any)
+					assert(typeof(components) == "table", ("table expected from useComponents hook, got %s"):format(typeof(components)));
+					for name,value in pairs(components) do
+						if Pseudo._Components[name] then 
+							warn(("useComponents effect caught overwrite on %s"):format(name));
+							Pseudo._Components[name] = value;
+						end;
+					end;
+				end;
 				--> useEffect hook
 				hooks.useEffect = function(callback:any,dependencies:table?)
 					if(not Pseudo._dev._useEffectState)then 
@@ -612,10 +622,6 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 							end
 						end
 					end;
-
-					-- print(quickMap);
-					-- assert(res and typeof(res) == "table", ("table expected from useMapping hook, got %s"):format(typeof(res)));
-					
 				end;
 				--> returning a nested function will use the useEffect hook so this function is called whenever any component is changed
 				local nestedRenderResults = renderResults(hooks);
