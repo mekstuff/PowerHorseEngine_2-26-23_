@@ -14,7 +14,7 @@ local function createCommand(t,hover)
 	local Text = App.new("Button",f);
 	Text.ButtonFlexSizing = false;
 
-	Text.TextAdjustment = App.Enumeration.Adjustment.Center;
+	Text.TextAdjustment = App:GetGlobal("Enumeration").Adjustment.Center;
 	Text.Size = UDim2.fromScale(1,1)
 	Text.TextXAlignment = Enum.TextXAlignment.Left;
 	--Text.BackgroundColor3 = Color3.fromRGB(30, 30, 30);
