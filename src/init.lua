@@ -77,7 +77,7 @@ local PowerHorseEngine = {};
 ]=]
 
 function PowerHorseEngine.new(PseudoName:string,...:any)
-	return Pseudo.new(...);
+	return Pseudo.new(PseudoName,...);
 end;
 
 -- PowerHorseEngine.Enumeration = Enumeration;
