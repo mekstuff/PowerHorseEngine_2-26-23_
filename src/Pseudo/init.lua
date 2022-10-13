@@ -11,15 +11,11 @@ function module.new(Pseudo:string,Parent:Instance?,...:any)
 	local Pseudo, id = Util.Produce(name,Parent,type_,...);
 	
 	if(Pseudo and id)then
-		-- Pseudos[id]=Pseudo;
-		-- Total+=1;
-		
 		pcall(function()
 			if(Pseudo._init)then Pseudo:_init();end;
 		end)
-		
 	end;
-
+	
 	if(name == "RInstance" and type_)then
 		Pseudo.Instance = type_;
 	end;
