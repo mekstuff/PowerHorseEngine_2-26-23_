@@ -15,7 +15,7 @@ local IsRunning = game:GetService("RunService"):IsRunning();
 local IsServer = game:GetService("RunService"):IsServer();
 
 local ErrorService = ModuleFetcher("ErrorService",script.Parent.Parent.Parent.Core.Services);
-local warn,error,message,assert = ErrorService.tossWarn, ErrorService.tossError, ErrorService.tossMessage, ErrorService.assert;
+local warn,error,assert = ErrorService.tossWarn, ErrorService.tossError, ErrorService.assert;
 
 local function getIsComponentOf(x)
 	return x.Name:match("^%$l_") or x.name:match("$_%$l");
@@ -23,7 +23,9 @@ end
 
 local PseudoModule;
 local function getPseudo(...:any):table
-	if(not PseudoModule)then PseudoModule = require(script.Parent.Parent);end;
+	if(not PseudoModule)then 
+		PseudoModule = require(script.Parent.Parent);
+	end;
 	return PseudoModule.getPseudo(...);
 end
 
@@ -86,7 +88,7 @@ local DefaultPseudoPropResponses = {
 	["Name"] = function(Reference,v)
 		Reference.Name = v;
 	end,
-	["Parent"] = function(Reference,v,me)
+	["Parent"] = function(Reference,v)
 		Reference.Parent = _getParent(v);
 	end,
 	["Archivable"] = function(Reference,v)
@@ -159,7 +161,9 @@ local function _getDependencyUID(dependencytable)
 	for _,x in pairs(dependencytable) do
 		local str;
 		if(typeof(x) == "string")then
-			if(not table.find(uids,x))then str = x;end;
+			if(not table.find(uids,x))then 
+				str = x;
+			end;
 		elseif(typeof(x) == "table")then
 			if(x.IsA and x:IsA("Pseudo"))then
 				str = x.__id;
@@ -167,7 +171,9 @@ local function _getDependencyUID(dependencytable)
 				str = tostring(x);
 			end
 		end;
-		if(str)then table.insert(uids,str);end;
+		if(str)then
+			table.insert(uids,str);
+		end;
 	end;
 	
 	--> sorts the table so the string uid will be the same even if we list dependencies in different orders
@@ -207,7 +213,9 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 		if(not table.find(ClassNamesContainer, _mod.ClassName))then
 			table.insert(ClassNamesContainer, _mod.ClassName);
 		end;
-		if(_mod)then getModuleProps(_mod, propSheet);end;
+		if(_mod)then
+			getModuleProps(_mod, propSheet);
+		end;
 	end;
 
 
@@ -231,9 +239,10 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 	local id = propSheet["ClassName"]..(Core.generateRanCod(6));
 
 	--> _pseudoid inside reference to identify folder as Pseudo
-	local idString = Instance.new("StringValue",_ReferenceInstance);
+	local idString = Instance.new("StringValue");
 	idString.Name = "_pseudoid";
 	idString.Value = id;
+	idString.Parent = _ReferenceInstance;
 
 	--> Core properties and functions of Util. Can be considered properties and functions of "Pseudo" but hidden.
 	propSheet["_classes"] = ClassNamesContainer; --<Support IsA()
@@ -255,10 +264,7 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 				local v;
 				if(serializeUnsupportedROBLOXProps and not onlykeys)then
 					if(typeof(b) == "table")then
-						if(b["_isEnumObject?_$"])then
-							local Serialized = SerializationService:SerializeTable({b});
-							v = "pheSerialized-"..Serialized
-						elseif(b._dev and b._dev.__id)then
+						if(b["_isEnumObject?_$"] or (b._dev and b.__dev.__id))then
 							local Serialized = SerializationService:SerializeTable({b});
 							v = "pheSerialized-"..Serialized
 						else
@@ -285,7 +291,9 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 		ReplicationStatus.ReplicateObject = true;
 		ReplicationStatus.ReplicateProperties = true;
 	end;
-	if(ReplicationStatus.ReplicateObject)then propSheet["_REPLICATED"] = id;end;
+	if(ReplicationStatus.ReplicateObject)then 
+		propSheet["_REPLICATED"] = id;
+	end;
 
 	local _allowPassForAny = {};
 	local _renderCausedByState = false;
@@ -328,7 +336,7 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 			return a == b;
 		end,
 		
-		__index = function(t,k)
+		__index = function(_,k)
 		--> Parent indexed
 			if(k == "Parent")then
 				local ReferenceInstanceParent = _ReferenceInstance.Parent;
@@ -396,7 +404,7 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 		end,
 
 		
-		__newindex = function(t,k,v)
+		__newindex = function(_,k,v)
 
 		--> Handles if the value is a state, uses it's effect if it is
 			if(typeof(v) == "table" and v.IsA and v:IsA("State"))then
@@ -468,7 +476,10 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 			if(propSheet[k] ~= nil)then
 				
 				--> Prevent assigning global readOnly properties
-				if(table.find(readOnlyProperties, k))then warn(k.." cannot be assigned to.") return end;
+				if(table.find(readOnlyProperties, k))then 
+					warn(k.." cannot be assigned to.") 
+					return 
+				end;
 				
 				if (typeof(propSheet[k]) ~= typeof(v) and k ~= "Parent" or (typeof(propSheet[k]) == "string" and propSheet[k]:match("^%*%*")))then
 					local allowpass = false;
@@ -502,7 +513,7 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 				propSheet[k]=v;
 			
 				--> Triggers render
-				renderAsync(renderMap,k,v,_ReferenceInstance, quickMap, Pseudo,propSheet);
+				renderAsync(renderMap,k,v,_ReferenceInstance, quickMap, Pseudo);
 
 				--> Replicate Change
 				if(game:GetService("RunService"):IsServer()  and ReplicationStatus.ReplicateProperties)then
@@ -555,14 +566,19 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 			if(typeof(renderResults) == "table")then
 				renderMap = renderResults;
 				--< Passing QuickMapping
-				if(renderMap._Mapping)then quickMap = renderMap._Mapping;end;
+				if(renderMap._Mapping)then
+					quickMap = renderMap._Mapping;
+				end;
 				--< Passing _Components;
-				if(renderMap._Components)then Pseudo._Components = renderMap._Components;end;
+				if(renderMap._Components)then 
+					Pseudo._Components = renderMap._Components;
+				end;
 				
 				if(renderMap._AfterRender)then --after renders are ran on a different thread
 					local septhread = coroutine.create(function()
 						renderMap._AfterRender();
-					end)coroutine.resume(septhread);
+					end);
+					coroutine.resume(septhread);
 				end;
 				--< Initial Property Rendering (map)
 				for prop,v in pairs(propSheet) do
@@ -589,8 +605,8 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 					for name,value in pairs(components) do
 						if Pseudo._Components[name] then 
 							warn(("useComponents effect caught overwrite on %s"):format(name));
-							Pseudo._Components[name] = value;
 						end;
+						Pseudo._Components[name] = value;
 					end;
 				end;
 				--> useEffect hook
@@ -611,7 +627,6 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 							end;
 						end
 					end;
-					
 					for _,g in pairs(props) do
 						for dep,x in pairs(quickMap) do
 							if(not table.find(x,g))then
@@ -635,8 +650,7 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 	--> Creating Prop Attributes;
 	for prop,val in pairs(propSheet) do
 		if(not string.match(prop, "^_")) then
-			if(prop == "Parent" or prop == "Archivable")then
-			else
+			if not (prop == "Parent" or prop == "Archivable")then
 				if(table.find(CurrentlySupportedDATATYPES, typeof(val)) )then
 					_ReferenceInstance:SetAttribute(prop,val);
 				else
@@ -647,7 +661,7 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 	end;
 	
 	--> Updating Property for Pseudo if Attribute was changed without __newindex 
-	_ReferenceInstance.AttributeChanged:Connect(function(Attribute,x)
+	_ReferenceInstance.AttributeChanged:Connect(function(Attribute)
 		if(attributelocked[Attribute])then  return; end;
 		attributelocked[Attribute]=true;
 		Pseudo[Attribute] = _ReferenceInstance:GetAttribute(Attribute);
@@ -696,8 +710,14 @@ end;
 function module.Produce(n:string,Parent:Instance?,...:any?):any
 	local ClassModule = getClassModule(n);
 	
-	if(not ClassModule)then handleClassDoesntExist(n);return end;
-	if(ClassModule.__PseudoBlocked)then handleClassBlocked(n);return end;
+	if(not ClassModule)then
+		handleClassDoesntExist(n);
+		return 
+	end;
+	if(ClassModule.__PseudoBlocked)then 
+		handleClassBlocked(n);
+		return ;
+	end;
 
 	local Pseudo, returnedID = createPseudoObject(ClassModule,Parent,nil,...);
 	
