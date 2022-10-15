@@ -7,11 +7,11 @@ local TweenService = require(Services.TweenService);
 local ThemeDefault = PluginService:IsPluginMode() and 
 {
 
-	Alert = Color3.fromRGB(),
-	Warning = Color3.fromRGB(),
-	Danger = Color3.fromRGB(),
-	Success = Color3.fromRGB(),
-	Info = Color3.fromRGB(),
+	Alert = Color3.fromRGB(0,0,0),
+	Warning = Color3.fromRGB(0,0,0),
+	Danger = Color3.fromRGB(0,0,0),
+	Success = Color3.fromRGB(0,0,0),
+	Info = Color3.fromRGB(0,0,0),
 
 	Active = Color3.fromRGB(66, 135, 245);
 	Unactive = Color3.fromRGB(87, 87, 87);
@@ -40,7 +40,6 @@ local ThemeDefault = PluginService:IsPluginMode() and
 	ForegroundText = Color3.fromRGB(30, 30, 30);
 	ForegroundTextLite = Color3.fromRGB(30, 30, 30);
 	Font = Enum.Font.SourceSans;
-	-- FontSize = 16;
 }
 or {
 
@@ -72,55 +71,25 @@ or {
 	ForegroundTextLite = Color3.fromRGB(236, 236, 236);
 
 	Font = Enum.Font.SourceSans;
-	-- FontSize = 30;
 }
 
--- local GlobalThemes = {
--- 	Primary = Color3.fromRGB(66, 135, 245);
--- 	Secondary = Color3.fromRGB(255, 32, 32);
--- 	Disabled = Color3.fromRGB(57, 57, 57);
--- 	Background = Color3.fromRGB(29, 29, 29);
--- 	Text = Color3.fromRGB(236, 236, 236);
--- 	Border = Color3.fromRGB(50, 115, 199);
--- 	Foreground = Color3.fromRGB(63, 66, 68);
--- 	ForegroundText = Color3.fromRGB(236, 236, 236);
--- 	Font = Enum.Font.FredokaOne;
--- }
 
--- module.Themes = {
--- 	["Default"] = {
--- 		Active = GlobalThemes.Primary;
--- 		NonActive = Color3.fromRGB(43, 43, 43);
--- 		Primary = GlobalThemes.Primary;
--- 		Secondary = GlobalThemes.Secondary;
--- 		Disabled = GlobalThemes.Disabled;
--- 		Background = GlobalThemes.Background;
--- 		Text = GlobalThemes.Text;
--- 		Border = GlobalThemes.Border;
--- 		Foreground = GlobalThemes.Foreground;
--- 		ForegroundText = GlobalThemes.ForegroundText;
--- 		Font = Enum.Font.SourceSans;
--- 	};
--- }
-
-
-local ThemeObject;
-
--- local AppModule;
 local function getApp()
 	return require(Services.Parent.Parent)
-	-- if(AppModule)then return AppModule;end;
-	-- if(PluginService:IsPluginMode())then
-	-- 	return PluginService:ReadSync().app;
-	-- end;
-	-- return 
-	-- return require(game:GetService("ReplicatedStorage"):WaitForChild("PowerHorseEngine"))
 end;
 
+--> Support for Config.Theme
+local Config = getApp():GetGlobal("Engine"):RequestConfig();
+if(Config.Theme)then
+	for a,b in pairs(Config.Theme) do
+		ThemeDefault[a] = b;
+	end;
+end;
+
+local ThemeObject;
 function module.buildTheme()
 	if(ThemeObject)then return ThemeObject;end;
 	local App = getApp();
-	-- local App = require(game:GetService("ReplicatedStorage"):WaitForChild("PowerHorseEngine"));
 	local CustomClassService = App:GetService("CustomClassService");
 	local ThemeClass = {
 		Name = "UseTheme";
@@ -131,7 +100,6 @@ function module.buildTheme()
 		return {};
 	end;
 	ThemeObject = CustomClassService:Create(ThemeClass);
-	-- ThemeObject.Parent = workspace;
 	for a,b in pairs(ThemeDefault) do
 		local newState = App.new("State",ThemeObject);
 		newState.Name = a.."-Theme";
@@ -143,9 +111,13 @@ end
 
 function module.extendTheme(t,uniqueThemeIdentifier)
 	local App = getApp();
-	if(not ThemeObject)then module.buildTheme();end;
+	if(not ThemeObject)then
+		module.buildTheme();
+	end;
 	for a,b in pairs(t) do
-		if(uniqueThemeIdentifier)then a = uniqueThemeIdentifier..a;end;
+		if(uniqueThemeIdentifier)then 
+			a = uniqueThemeIdentifier..a;
+		end;
 
 		if(ThemeObject.Themes[a])then 
 			-- ThemeDefault[a] = b;
@@ -242,7 +214,7 @@ function module.ThemeToggler()
 	};
 
 	for _,v in pairs(studioThemes) do
-		local b = New "$Button" {
+		New "$Button" {
 			Size = UDim2.fromScale(1,1);
 			BackgroundTransparency = .4;
 			BackgroundColor3 = v:GetColor(Enum.StudioStyleGuideColor.MainBackground);
@@ -282,7 +254,11 @@ function module.ThemeToggler()
 	end
  
 	ToolTipShowing:useEffect(function(showing)
-		if(showing)then ToolTipObject:Show(); else ToolTipObject:Hide();end;
+		if(showing)then 
+			ToolTipObject:Show(); 
+		else 
+			ToolTipObject:Hide();
+		end;
 	end);
 
 	return Button;
@@ -290,126 +266,11 @@ end;
 
 function module.getDefaultTheme()
 	return ThemeDefault;
-	--[[
-	return PluginService:IsPluginMode() and 
-	{
-	
-		Alert = Color3.fromRGB(233, 223, 81),
-		Warning = Color3.fromRGB(240, 173, 78),
-		Danger = Color3.fromRGB(217, 83, 79),
-		Success = Color3.fromRGB(92, 184, 92),
-		Info = Color3.fromRGB(91, 192, 222),
-	
-		Active = Color3.fromRGB(66, 135, 245);
-		Unactive = Color3.fromRGB(87, 87, 87);
-	
-		Primary = settings().Studio.Theme:GetColor(Enum.StudioStyleGuideColor.MainButton);
-		PrimaryLite = settings().Studio.Theme:GetColor(Enum.StudioStyleGuideColor.MainButton);
-	
-		Secondary = Color3.fromRGB(61, 66, 72);
-		SecondaryLite = Color3.fromRGB(61, 66, 72);
-	
-		Disabled = Color3.fromRGB(44, 44, 44);
-		DisabledLite = Color3.fromRGB(44, 44, 44);
-	
-		Background = settings().Studio.Theme:GetColor(Enum.StudioStyleGuideColor.MainBackground);
-		BackgroundLite = settings().Studio.Theme:GetColor(Enum.StudioStyleGuideColor.Border);
-	
-		Text = settings().Studio.Theme:GetColor(Enum.StudioStyleGuideColor.MainText);
-		TextLite = settings().Studio.Theme:GetColor(Enum.StudioStyleGuideColor.MainText);
-	
-		Border = settings().Studio.Theme:GetColor(Enum.StudioStyleGuideColor.Border);
-		BorderLite = settings().Studio.Theme:GetColor(Enum.StudioStyleGuideColor.Border);
-	
-		Foreground = Color3.fromRGB(222, 233, 239);
-		ForegroundLite = Color3.fromRGB(222, 233, 239);
-	
-		ForegroundText = Color3.fromRGB(30, 30, 30);
-		ForegroundTextLite = Color3.fromRGB(30, 30, 30);
-		Font = Enum.Font.SourceSans;
-		-- FontSize = 16;
-	}
-	or {
-		Alert = Color3.fromRGB(233, 223, 81),
-		Warning = Color3.fromRGB(240, 173, 78),
-		Danger = Color3.fromRGB(217, 83, 79),
-		Success = Color3.fromRGB(92, 184, 92),
-		Info = Color3.fromRGB(91, 192, 222),
-		
-		Active = Color3.fromRGB(66, 135, 245);
-		Unactive = Color3.fromRGB(87, 87, 87);
-	
-		Primary = Color3.fromRGB(66, 135, 245);
-		PrimaryLite = Color3.fromRGB(66, 135, 245);
-	
-		Secondary = Color3.fromRGB(255, 32, 32);
-		SecondaryLite = Color3.fromRGB(255, 32, 32);
-	
-		Disabled = Color3.fromRGB(57, 57, 57);
-		DisabledLite = Color3.fromRGB(57,57,57);
-	
-		Background = Color3.fromRGB(29, 29, 29);
-		BackgroundLite = Color3.fromRGB(29, 29, 29);
-	
-		Text = Color3.fromRGB(236, 236, 236);
-		TextLite = Color3.fromRGB(236, 236, 236);
-	
-		Border = Color3.fromRGB(50, 115, 199);
-		BorderLite = Color3.fromRGB(50, 115, 199);
-	
-		Foreground = Color3.fromRGB(63, 66, 68);
-		ForegroundLite = Color3.fromRGB(63, 66, 68);
-	
-		ForegroundText = Color3.fromRGB(236, 236, 236);
-		ForegroundTextLite = Color3.fromRGB(236, 236, 236);
-	
-		Font = Enum.Font.SourceSans;
-		-- FontSize = 30;
-	}
-	
-	-- local PluginService = require(script.Parent.Parent.Parent.Core.Services.PluginService);
-	-- return ThemeDefault;
-	]]
 end;
-
---[[
-function module.getCurrentTheme()
-	local App = require(game:GetService("ReplicatedStorage"):WaitForChild("PowerHorseEngine"));
-	if(PluginService:IsPluginMode())then
-		local StudioTheme = settings().Studio.Theme;
-		return {
-			Primary = StudioTheme:GetColor(Enum.StudioStyleGuideColor.MainButton);
-			Secondary = Color3.fromRGB(61, 66, 72);
-			Disabled = Color3.fromRGB(44, 44, 44);
-			Background = StudioTheme:GetColor(Enum.StudioStyleGuideColor.MainBackground);
-			Text = StudioTheme:GetColor(Enum.StudioStyleGuideColor.MainText);
-			Border = StudioTheme:GetColor(Enum.StudioStyleGuideColor.Border);
-			Foreground = Color3.fromRGB(222, 233, 239);
-			ForegroundText = Color3.fromRGB(30, 30, 30);
-			--Font = settings().Studio.Font;
-			Font = Enum.Font.SourceSans;
-			FontSize = 16;
-		}
-	else
-		return {
-			Active = GlobalThemes.Primary;
-			NonActive = Color3.fromRGB(43, 43, 43);
-			Primary = GlobalThemes.Primary;
-			Secondary = GlobalThemes.Secondary;
-			Disabled = GlobalThemes.Disabled;
-			Background = GlobalThemes.Background;
-			Text = GlobalThemes.Text;
-			Border = GlobalThemes.Border;
-			Foreground = GlobalThemes.Foreground;
-			ForegroundText = GlobalThemes.ForegroundText;
-			Font = Enum.Font.SourceSans;
-		}
-	end
-end;
-]]
-
 
 function module.getCurrentTheme()
 	return module.getDefaultTheme();
-end
+end;
+
+
 return module
