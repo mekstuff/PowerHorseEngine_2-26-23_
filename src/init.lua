@@ -113,9 +113,6 @@ function PowerHorseEngine:GetProvider(Provider:string)
 	return ModuleFetcher(Provider, CoreProviders, Provider.." is not a valid Provider Name");
 end;
 
---[=[
-Uses the Whiplash Library .New Constructor
-]=]
 PowerHorseEngine.New = PowerHorseEngine:Import("Whiplash").New;
 PowerHorseEngine.OnWhiplashEvent = PowerHorseEngine:Import("Whiplash").OnEvent;
 PowerHorseEngine.OnWhiplashChange = PowerHorseEngine:Import("Whiplash").OnChange;

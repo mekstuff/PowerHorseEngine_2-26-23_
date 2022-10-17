@@ -177,7 +177,6 @@ function TweenService:Create(instance:Instance, tweenInfo:TweenInfo, propertyTab
 		ActiveTweens[instance]={cc};
 	end;
 
----@diagnostic disable-next-line: invalid-class-name
 	if(typeof(instance) == "table" and instance.IsA and instance:IsA("Pseudo"))then
 		cc._tweenDestroyingConnection = instance:GetPropertyChangedSignal("Destroying"):Connect(function()
 			if(cc and cc.Destroy)then cc:Destroy();end;
