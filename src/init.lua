@@ -74,6 +74,7 @@ local Manifest = require(script["Manifest"]);
 local PowerHorseEngine = {};
 --[=[
 	Uses [Pseudo.new] to create a Pseudo component
+	@return Pseudo
 ]=]
 
 function PowerHorseEngine.new(PseudoName:string,...:any)
@@ -121,8 +122,9 @@ PowerHorseEngine.WhiplashExecute = PowerHorseEngine:Import("Whiplash").Execute;
 
 --[=[
 	Uses [CustomClassService:CreateClassAsync] to create a custom class
+	@return Pseudo
 ]=]
-function PowerHorseEngine.Create(ClassObject:table,DirectParent:any?,Arguments:any?)
+function PowerHorseEngine.Create(ClassObject:table,DirectParent:Instance?,Arguments:any?)
 	return ServiceProvider:LoadServiceAsync("CustomClassService"):CreateClassAsync(ClassObject,DirectParent,Arguments);
 end
 
