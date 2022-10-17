@@ -5,7 +5,7 @@ local IsClient = game:GetService("RunService"):IsClient();
 
 --[=[
 @class Accordion
---]=]
+]=]
 local Accordion = {
 	Name = "Accordion";
 	ClassName = "Accordion";

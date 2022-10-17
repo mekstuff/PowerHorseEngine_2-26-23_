@@ -1,6 +1,11 @@
 local RobloxTweenService = game:GetService("TweenService");
 local CustomClassService = require(script.Parent.CustomClassService);
 
+--[=[
+	@class TweenService
+
+	Class Similar To ROBLOX's TweenService
+]=]
 local TweenService = {};
 
 local ProxyConvert = {
@@ -22,20 +27,22 @@ local ProxyConvertUnsupported = {
 	["Vector2"] = "Vector3Value",
 }
 
-local TweenObjectClass = {
+--[=[
+	@class Tween
+]=]
+local Tween = {
 	Name = "Tween";
 	ClassName = "Tween";
 };
 
 local ActiveTweens = {};
 
-function TweenObjectClass:_Render()
-	-- print(self._dev.args);
+function Tween:_Render()
 	return {};
 end;
 
-function TweenObjectClass:Play()
-	-- print(ActiveTweens)
+--[=[]=]
+function Tween:Play()
 	local others = (ActiveTweens[self._dev.args.instance]);
 	if(others)then
 		for _,x in pairs(others) do
@@ -50,19 +57,19 @@ function TweenObjectClass:Play()
 	end;
 end;
 
-function TweenObjectClass:Pause()
+function Tween:Pause()
 	for _,v in pairs(self._dev.args.proxies) do
 		v:Pause();
 	end;
 end;
 
-function TweenObjectClass:Stop()
+function Tween:Stop()
 	for _,v in pairs(self._dev.args.proxies) do
 		v:Stop();
 	end;
 end;
 
-function TweenObjectClass:Destroy()
+function Tween:Destroy()
 	ActiveTweens[self._dev.args.instance]=nil;
 	for _,v in pairs(self._dev.args.proxies) do
 		v:Destroy();
@@ -84,27 +91,11 @@ local handleTweenType = {
 	},
 };
 
+--[=[
+	If `Instance` IsA `Instance` and not a `Pseudo`, It will call Native TweenService:Create
 
---//
-function TweenService:CreateNewTween(instance:Instance, tweenInfo:TweenInfo, propertyTable:table)
-	--[[
-	for propname,propvalue in pairs(propertyTable) do
-		local handlerType = handleTweenType[typeof(propvalue)];
-		local dtp = {};
-		local signal = self:_GetAppModule():GetProvider("SignalProvider").new();
-		for _,x in pairs(handlerType.createDataType) do
-			local n = Instance.new(x);
-			table.insert(dtp,n);
-		end;
-		signal:Connect(function()
-			print("got it");
-		end);
-		handlerType.handler(signal,unpack(dtp));
-		
-	end;
-	]]
-end;
---//
+	@return Tween
+]=]
 function TweenService:Create(instance:Instance, tweenInfo:TweenInfo, propertyTable:table)
 
 	if(typeof(instance) == "Instance")then
@@ -161,7 +152,7 @@ function TweenService:Create(instance:Instance, tweenInfo:TweenInfo, propertyTab
 	end;
 
 
-	local cc = CustomClassService:Create(TweenObjectClass,nil,
+	local cc = CustomClassService:Create(Tween,nil,
 	{
 		proxies = Proxies.proxy,
 		instances = Proxies.instances,
@@ -184,9 +175,6 @@ function TweenService:Create(instance:Instance, tweenInfo:TweenInfo, propertyTab
 	end
 
 	return cc;
-	-- local i = 0;
-	-- local duration = 1;
-	
 end;
 
 
