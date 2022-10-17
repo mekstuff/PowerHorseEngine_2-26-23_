@@ -206,8 +206,6 @@ function Engine:InitClient(Client)
 	-- EstablishGlobals();
 end;
 
-
---[=[]=]
 local function waitForContentFolder(tries:number)
 	local folder = script.Parent:FindFirstChild(".content") or script.Parent:FindFirstChild(".lanzo");
 	if not folder then
