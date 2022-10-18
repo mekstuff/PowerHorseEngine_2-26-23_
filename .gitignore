@@ -1,9 +1,8 @@
 
 node_modules/
 
-
 # Project place file
-/PowerHorseEngine.rbxlx
+/PowerHorseEngine.rbxm
 
 # Roblox Studio lock files
 /*.rbxlx.lock
