@@ -5,12 +5,9 @@
 local App;
 local SignalProvider = require(script.Parent.Parent.Parent.Parent.Core.Providers["SignalProvider"]);
 local IsClient = game.Players.LocalPlayer and true or false;
-
 local PseudoService = require(script.Parent.Parent.Parent.Parent.Core.Services.PseudoService);
 
---[=[
-	@class Pseudo
-]=]
+
 local Pseudo = {
 	Archivable = true;
 	Name = "Pseudo";
@@ -25,11 +22,29 @@ local Pseudo = {
 	__PseudoBlocked = true;
 };
 
---//
+--[=[
+	@class Pseudo
+]=]
+
+--[=[
+	@prop Name string
+	@within Pseudo
+]=]
+--[=[
+	@prop ClassName string
+	@within Pseudo
+	@readonly
+]=]
+--[=[
+	@prop Parent any
+	@within Pseudo
+]=]
+
+--[=[]=]
 function Pseudo:GetFullName()
 	return self:GetRef():GetFullName();
 end;
---//
+--[=[]=]
 function Pseudo:WaitForChild(n:string,onlyPseudo:boolean,tries:number?):any?
 	local c = self:FindFirstChild(n,false,onlyPseudo);
 	if(not c)then
@@ -42,7 +57,6 @@ function Pseudo:WaitForChild(n:string,onlyPseudo:boolean,tries:number?):any?
 	end;
 	return c;
 end;
-
 --[=[]=]
 function Pseudo:FindFirstAncestor(n:string,level:number)
 	self:_GetAppModule():GetService("ErrorService").assert(n, "Argument 1 missing or nil");
@@ -67,7 +81,7 @@ function Pseudo:FindFirstAncestorOfClass(n:string,level:number)
 		return self.Parent:FindFirstAncestorOfClass(n,level);
 	end
 end;
---//
+--[=[]=]
 function Pseudo:FindFirstAncestorWhichIsA(n:string,level:number)
 	self:_GetAppModule():GetService("ErrorService").assert(n, "Argument 1 missing or nil");
 	local Parent = self.Parent;
@@ -79,7 +93,7 @@ function Pseudo:FindFirstAncestorWhichIsA(n:string,level:number)
 		return self.Parent:FindFirstAncestorWhichIsA(n,level);
 	end
 end;
---//
+--[=[]=]
 function Pseudo:FindFirstChild(n:string,recursive:boolean?,onlyPseudo:boolean?):any?
 	local children = self:GetChildren(onlyPseudo)
 	for _,x in ipairs(children)do
@@ -93,46 +107,20 @@ function Pseudo:FindFirstChild(n:string,recursive:boolean?,onlyPseudo:boolean?):
 	end;
 	return nil;
 end;
---//
+--[=[]=]
 function Pseudo:FindFirstChildOfClass(n:string)
 	for _,x in pairs(self:GetChildren())do
 		if(x.ClassName == n)then return x;end;
 	end
 	return nil;
 end;
---//
+--[=[]=]
 function Pseudo:FindFirstChildWhichIsA(n:string)
 	for _,x in pairs(self:GetChildren())do	
 		if(x:IsA(n))then return x;end;
 	end;
 	return nil;
 end;
-
---//Value that is stored on both the server and the client, sharedValues can only be set on the server
-function Pseudo:ShareValue(Key:string,Value:any)
-	local App = self:_GetAppModule();
-	local ErrorService = App:GetService("ErrorService");
-	ErrorService.assert(typeof(Key) == "string", "String expected as share value key");
-	if(IsClient)then return ErrorService.tossWarn("Sharing a value can only be done by the server...");end;
-	local PHe_RS = App:GetGlobal("Engine"):FetchReplicatedStorage();
-	local PHe_RS_SharedKeyValues = PHe_RS:FindFirstChild("PHe_RS_SharedKeyValues");
-	if(not PHe_RS_SharedKeyValues)then
-		PHe_RS_SharedKeyValues = Instance.new("Folder",PHe_RS);
-		PHe_RS_SharedKeyValues.Name = "PHe_RS_SharedKeyValues";
-	end;
-	local SerializationService = App:GetService("SerializationService");
-	
-	local ExistingKey = PHe_RS_SharedKeyValues:FindFirstChild(Key);
-	if(not ExistingKey)then 
-		ExistingKey = Instance.new("StringValue");
-		ExistingKey.Name = Key;
-	end;
-	local Serialized = SerializationService:SerializeTable({
-		Value = Value; 
-	});
-	ExistingKey.Value = Serialized;	
-end
-
 --//
 function Pseudo:GetDescendants(onlyPseudo:boolean):table
 	--[[
@@ -157,8 +145,7 @@ function Pseudo:GetDescendants(onlyPseudo:boolean):table
 	end
 	]]
 end;
-
---//
+--[=[]=]
 function Pseudo:GetChildren(onlyPseudo:boolean):table
 	local PseudoService = self:_GetAppModule():GetService("PseudoService");
 	local Children = self:_GetCompRef():GetChildren();
@@ -190,26 +177,9 @@ function Pseudo:GetChildren(onlyPseudo:boolean):table
 	return onlyPseudo and onlyPseudoTable or ChildrenReturn;
 end;
 
---//
-function Pseudo:UseVar(Variable:string, newValue:any):nil
-	local hasVar = self[Variable];
-	if(self._activeStateController)then
-		self._activeStateController:Terminate(self,Variable,"UseState")
-		self._activeStateController:Terminate(self,Variable,"ExtenderState");
-		self._activeStateController = nil;
-	end
-	self[Variable] = newValue;
-end;
-function Pseudo:_usenestvar(Variable,newValue)
-	local hasVar = self[Variable];
-	if(self._activeStateController)then
-		self._activeStateController:Terminate(self,Variable,"UseState")
-		-- self._activeStateController:Terminate(self,Variable,"ExtenderState");
-		self._activeStateController = nil;
-	end
-	self[Variable] = newValue;
-end;
---//
+--[=[
+	@private
+]=]
 function Pseudo:_pseudoInit()
 
 	self:AddEventListener("Destroying",true,self:GetPropertyChangedSignal("Destroying"));
@@ -351,14 +321,13 @@ function Pseudo:_destroy()
 		setmetatable(self, {_mode="kv"});
 	end)
 end;
---//
+--[=[]=]
 function Pseudo:SerializePropsAsync()
 	local SerializationService = self:_GetAppModule():GetService("SerializationService");
 	local propSheet = (self._getCurrentPropSheetState(true,true));
 	return  (SerializationService:SerializeTable(propSheet));
 end;
-
---//
+--[=[]=]
 function Pseudo:DeserializePropsAsync(Serialized:string,Apply:boolean):table
 	assert(Serialized, "DeserializeSelfPropsAsync requires a serialized key to deserialize");
 	local SerializationService = self:_GetAppModule():GetService("SerializationService");
@@ -370,12 +339,13 @@ function Pseudo:DeserializePropsAsync(Serialized:string,Apply:boolean):table
 	end
 	return t;
 end
---//
+--[=[]=]
 function Pseudo:GET(Comp:string):any?
 	return self._Components[Comp];
 end;
-
---//
+--[=[
+	@return Pseudo
+]=]
 function Pseudo:Clone()
 	local App = self:_GetAppModule();
 	local ErrorService = App:GetService("ErrorService");
@@ -403,15 +373,13 @@ function Pseudo:Clone()
 
 	return new;
 end;
---//
+--[=[]=]
 function Pseudo:Destroy()
 	self:GetRef():Destroy();
 end
-
---//
 local ROBLOXPropChangedSignals = {"Name","Parent"};
-function Pseudo:GetPropertyChangedSignal(Prop)
-	
+--[=[]=]
+function Pseudo:GetPropertyChangedSignal(Prop:string)
 	if(not self._ChangedSignals)then self._ChangedSignals = {};end;
 	
 	local e = table.find(ROBLOXPropChangedSignals, Prop);
@@ -420,7 +388,6 @@ function Pseudo:GetPropertyChangedSignal(Prop)
 	end;
 	
 	local TargetProp;
-	
 
 	if(Prop == "Destroying")then
 		TargetProp = "Destroying";
@@ -431,64 +398,45 @@ function Pseudo:GetPropertyChangedSignal(Prop)
 		TargetProp = Prop;
 	end
 
-
 	local signal = self._ChangedSignals[TargetProp];
 	if(not signal)then
 		local App = self:_GetAppModule();
-		--local SignalProvider = App:GetProvider("SignalProvider");
 		signal = SignalProvider.new("SignalChanged "..TargetProp);
 		self._ChangedSignals[TargetProp]=signal;
-		--print("Added Signal : ", String, self._ChangedSignals)
 	end;
 	return signal;
 end
-
---//
+--[=[]=]
 function Pseudo:IsA(Class:string)
-	
 	if(self.ClassName == Class)then return true;end;
-
 	if(table.find(self._classes,Class))then
 		return true;
 	end
-	
 	local ran,res = pcall(function()
 		return self._RBXClassName == Class;
 	end);
-	
 	return res;
 end
-
---//
+--[=[
+	@return PowerHorseEngine
+]=]
 function Pseudo:_GetAppModule()
 	if(App)then return App 
 	else 
 		App = require(script.Parent.Parent.Parent.Parent);
 		return App;
-		--[[
-		local pluginService = require(script.Parent.Parent.Parent.Parent.Core.Services.PluginService);
-		local readsync = (pluginService:ReadSync());
-		if(readsync)then
-			App = readsync.app;
-			return App;
-		end
-		App=require(game:GetService("ReplicatedStorage"):WaitForChild("PowerHorseEngine"));
-		return App;
-		]]
 	end;
 end;
-
---//
-
+--[=[]=]
 function Pseudo:_GetCompRef()
 	return self:GET("_Appender") or self:GET("FatherComponent") or self:GetRef();
 end;
-
+--[=[]=]
 function Pseudo:GetRef()
 	return self._referenceInstance
 end
---//
-function Pseudo:AddEventListener(EventName, CreatingEvent, BindCreateToEvent, SharedSignal)
+--[=[]=]
+function Pseudo:AddEventListener(EventName:string, CreatingEvent:boolean, BindCreateToEvent:BindableEvent, SharedSignal:boolean):BindableEvent
 	SharedSignal = SharedSignal and "_SharedSignals" or "_Signals";
 
 	--if(not self._Signals)then self._Signals = {};end;
@@ -514,8 +462,8 @@ function Pseudo:AddEventListener(EventName, CreatingEvent, BindCreateToEvent, Sh
 	end;
 
 end;
---//
-function Pseudo:RemoveEventListener(...)
+--[=[]=]
+function Pseudo:RemoveEventListener(...:any)
 	local Events = {...};
 	local Signals = self._Signals
 	--local Signals = self.__dev.Signals;
@@ -527,19 +475,22 @@ function Pseudo:RemoveEventListener(...)
 		end
 	end;
 end;
---//
+--[=[]=]
 function Pseudo:RemoveEventListeners()
 	local Signals = self._Signals;
 	for _,Signal in pairs(Signals)do
 		Signal:Destroy();Signal=nil;
 	end
 end;
-
-function Pseudo:GetEventListener(Listener)
+--[=[
+	@param Listener PHeEvent
+]=]
+function Pseudo:GetEventListener(Listener:Instance)
 	return self._Signals[Listener]
 end
-
---//
+--[=[
+	@private
+]=]
 function Pseudo:_lockProperty(propertyName:string, propertyCallback:string)
 	local CoreGuiService = self:_GetAppModule():GetService("CoreGuiService");
 	if not(CoreGuiService:GetIsCoreScript())then
@@ -549,14 +500,18 @@ function Pseudo:_lockProperty(propertyName:string, propertyCallback:string)
 	local Prop = self[propertyName];
 	self.__lockedProperties[propertyName]=propertyCallback or "\""..propertyName.."\" property is locked for "..self.Name;
 end;
---//
-function Pseudo:_lockProperties(...)
+--[=[
+	@private
+]=]
+function Pseudo:_lockProperties(...:any)
 	for _,v in pairs({...}) do
 		self:_lockProperty(v);
 	end;
 end;
---//
-function Pseudo:_unlockProperty(...)
+--[=[
+	@private
+]=]
+function Pseudo:_unlockProperty(...:any)
 	local CoreGuiService = self:_GetAppModule():GetService();
 	if not(CoreGuiService:GetIsCoreScript())then
 		self:_GetAppModule():GetService("ErrorService").tossError("_unlockProperty can only be performed by select script sources.");
@@ -568,5 +523,55 @@ function Pseudo:_unlockProperty(...)
 end;
 --//
 
+--[=[
+	@deprecated v0.2.0 -- This Method was deprecated early in development, but still accessible. We really do not recommend using it.
+	Value that is stored on both the server and the client, sharedValues can only be set on the server
+]=]
+function Pseudo:ShareValue(Key:string,Value:any)
+	local App = self:_GetAppModule();
+	local ErrorService = App:GetService("ErrorService");
+	ErrorService.assert(typeof(Key) == "string", "String expected as share value key");
+	if(IsClient)then return ErrorService.tossWarn("Sharing a value can only be done by the server...");end;
+	local PHe_RS = App:GetGlobal("Engine"):FetchReplicatedStorage();
+	local PHe_RS_SharedKeyValues = PHe_RS:FindFirstChild("PHe_RS_SharedKeyValues");
+	if(not PHe_RS_SharedKeyValues)then
+		PHe_RS_SharedKeyValues = Instance.new("Folder",PHe_RS);
+		PHe_RS_SharedKeyValues.Name = "PHe_RS_SharedKeyValues";
+	end;
+	local SerializationService = App:GetService("SerializationService");
+	
+	local ExistingKey = PHe_RS_SharedKeyValues:FindFirstChild(Key);
+	if(not ExistingKey)then 
+		ExistingKey = Instance.new("StringValue");
+		ExistingKey.Name = Key;
+	end;
+	local Serialized = SerializationService:SerializeTable({
+		Value = Value; 
+	});
+	ExistingKey.Value = Serialized;	
+end
+--[=[
+	@deprecated v0.2.0 -- This Method was deprecated early in development, but still accessible. We really do not recommend using it.
+]=]
+function Pseudo:UseVar(Variable:string, newValue:any):nil
+	local hasVar = self[Variable];
+	if(self._activeStateController)then
+		self._activeStateController:Terminate(self,Variable,"UseState")
+		self._activeStateController:Terminate(self,Variable,"ExtenderState");
+		self._activeStateController = nil;
+	end
+	self[Variable] = newValue;
+end;
+--[=[
+	@deprecated v0.2.0 -- This Method was deprecated early in development, but still accessible. We really do not recommend using it.
+]=]
+function Pseudo:_usenestvar(Variable:string,newValue:any)
+	local hasVar = self[Variable];
+	if(self._activeStateController)then
+		self._activeStateController:Terminate(self,Variable,"UseState")
+		self._activeStateController = nil;
+	end
+	self[Variable] = newValue;
+end;
 
 return Pseudo

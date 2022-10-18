@@ -205,7 +205,7 @@ return CustomClassService:CreateClassAsync(TeleportClass);
 
 --[=[
 	Creates a custom class
-	@return Pseudo
+	@return CustomClass
 ]=]
 function CustomClassService:CreateClassAsync(ClassData:table,Parent:any,...:any)
 	return require(script.Parent.Parent.Parent.Pseudo)._create(ClassData,Parent,...);
@@ -213,6 +213,7 @@ end
 
 --[=[
 	Alias for :CreateClassAsync
+	@return CustomClass
 ]=]
 function CustomClassService:Create(...:any) return self:CreateClassAsync(...);end;
 

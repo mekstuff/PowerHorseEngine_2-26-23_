@@ -5,6 +5,9 @@ local IsClient = game:GetService("RunService"):IsClient();
 
 local TweenService = game:GetService("TweenService");
 
+--[=[
+	@class FadeTransition
+]=]
 local FadeTransition = {
 	Name = "FadeTransition";
 	ClassName = "FadeTransition";
@@ -13,6 +16,25 @@ local FadeTransition = {
 	TransitionEndSpeed = 1;
 	ShowIndicator = false;
 };
+
+--[=[
+	@prop Color Color3 
+	@within FadeTransition
+]=]
+--[=[
+	@prop TransitionSpeed number 
+	@within FadeTransition
+]=]
+--[=[
+	@prop TransitionEndSpeed number 
+	@within FadeTransition
+]=]
+--[=[
+	@prop ShowIndicator boolean 
+	@within FadeTransition
+]=]
+
+
 FadeTransition.__inherits = {"Transition","BaseGui"}
 
 function FadeTransition:_TransitionIn()
@@ -37,6 +59,9 @@ function FadeTransition:_TransitionOut(Destroy)
 	end
 end;
 
+--[=[
+	Destroying will cause the Transition to FadeOut then its [Pseudo] Frame will be Destroyed aswell.
+]=]
 function FadeTransition:Destroy()
 	self:_TransitionOut(true);
 end

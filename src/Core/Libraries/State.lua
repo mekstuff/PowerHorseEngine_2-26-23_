@@ -1,30 +1,4 @@
 local App = require(script.Parent.Parent.Parent);
---[[
-local State = {};
-
-function State.new(default)
-	local s = App.new("State");
-	if(default)then s.State = default;end;
-	return s;
-end;
-
-function State.useState(...)
-	local res = State.new(...);
-
-	return res,function(newValue)
-		if(newValue)then
-			if(typeof(newValue) == "function")then
-				-- print(res.State);
-				local resfromstatecallback = newValue(res.State);
-				res.State = resfromstatecallback;
-			else
-				res.State = newValue;
-			end;
-		end;
-	end
-end
--- State.useState = State.new;
-]]
 
 --[=[
 	@class StateLibrary
@@ -74,14 +48,11 @@ return function(default)
 	res.State = getValue(default);
 
 	return res,function(newValue)
-		-- if(newValue)then
-			if(typeof(newValue) == "function")then
-				-- print(res.State);
-				local resfromstatecallback = newValue(res.State);
-				res.State = getValue(resfromstatecallback);
-			else
-				res.State = getValue(newValue);
-			end;
+		if(typeof(newValue) == "function")then
+			local resfromstatecallback = newValue(res.State);
+			res.State = getValue(resfromstatecallback);
+		else
+			res.State = getValue(newValue);
 		end;
-	-- end
+	end;
 end

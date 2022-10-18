@@ -1,7 +1,4 @@
-local Theme = require(script.Parent.Parent.Parent.Theme);
-local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
 local Core = require(script.Parent.Parent.Parent);
-local IsClient = game:GetService("RunService"):IsClient();
 local TweenService = game:GetService("TweenService");
 
 local safeNumber = 0;
@@ -11,24 +8,30 @@ local Navigator = {
 	ClassName = "Navigator";
 	NavigationSpeed = .45;
 };
+
 Navigator.__inherits = {"BaseGui"}
 
---//
-function Navigator:Back(inHistory)
-	local NavigatedEvent = self:GetEventListener("Navigated");
-	local Component = self:GetGUIRef();
-	local currentIndex = self._dev.__nav.currentIndex;
+--[=[
+	@class Navigator
 
+	Inherits [BaseGui]
+]=]
+--[=[
+	@prop NavigationSpeed number
+	@within Navigator
+]=]
+
+--[=[]=]
+function Navigator:Back()
+	local NavigatedEvent = self:GetEventListener("Navigated");
+	local currentIndex = self._dev.__nav.currentIndex;
 	local currentPage, TargetPage = self._dev.__nav.pages[currentIndex],self._dev.__nav.pages[currentIndex-1];
 
-	
 	local targetpageid = TargetPage and TargetPage.id;
 
 	currentPage,TargetPage = Core.getElementObject(currentPage and currentPage.page), Core.getElementObject(TargetPage and TargetPage.page);
 
-
 	NavigatedEvent:Fire(targetpageid, TargetPage, "Back", currentIndex-1);
-
 
 	if(currentPage)then
 		local TweenPageOut = TweenService:Create(currentPage,TweenInfo.new(self.NavigationSpeed,Enum.EasingStyle.Quart),{Position = UDim2.new(1,0,0,0)});
@@ -42,7 +45,6 @@ function Navigator:Back(inHistory)
 	end;
 
 	self._dev.__nav.currentIndex-=1;
-	-- if(not TargetPage)then return false; end;
 
 	if(TargetPage)then
 		TargetPage.Visible = true;
@@ -51,32 +53,26 @@ function Navigator:Back(inHistory)
 	end;
 
 	return true;
-	--self.CurrentPage = self._dev.__nav.currentIndex;
-
 end;
---//
-function Navigator:Next(initial)
-	local Component = self:GetGUIRef();
+--[=[]=]
+function Navigator:Next(initial:boolean?)
 	local currentIndex = self._dev.__nav.currentIndex;
 	local NavigatedEvent = self:GetEventListener("Navigated");
 
 	local currentPage, TargetPage = self._dev.__nav.pages[currentIndex],self._dev.__nav.pages[currentIndex+1];
 
-	--local currpageid_ = currentPage and currentPage.id;
 	local targetpageid = TargetPage and TargetPage.id;
 
 	currentPage,TargetPage = Core.getElementObject(currentPage and currentPage.page), Core.getElementObject(TargetPage and TargetPage.page);
-
-	-- local _offsetvalue
-
-	if(not TargetPage)then return false end;
 	
-
+	if(not TargetPage)then 
+		return false 
+	end;
+	
 	if(not initial)then
 		NavigatedEvent:Fire(targetpageid, TargetPage ,"Next",currentIndex+1);
 	end;
 	
-
 	if(currentPage)then
 		local TweenPageOut = TweenService:Create(currentPage,TweenInfo.new(self.NavigationSpeed,Enum.EasingStyle.Quart),{Position = UDim2.new(-1,0,0,0)});
 		TweenPageOut:Play();
@@ -91,7 +87,6 @@ function Navigator:Next(initial)
 	end;
 
 	if(TargetPage)then
-		--TargetPage.Parent = Component;
 		TargetPage.Visible = true;
 		local TweenPageIn = TweenService:Create(TargetPage,TweenInfo.new(self.NavigationSpeed,Enum.EasingStyle.Quart),{Position = UDim2.new(0,0,0,0)});
 		TweenPageIn:Play();
@@ -101,11 +96,9 @@ function Navigator:Next(initial)
 
 	self._dev.__nav.currentIndex+=1;
 	return true;
-	--self.CurrentPage = self._dev.__nav.currentIndex;
-
 end;
---//
-function Navigator:NavigateTo(index,initial)
+--[=[]=]
+function Navigator:NavigateTo(index:number|string,initial:boolean)
 	if(typeof(index) ~= "number")then
 		for _i,x in pairs(self._dev.__nav.pages) do
 			if(x.id == index)then
@@ -115,8 +108,6 @@ function Navigator:NavigateTo(index,initial)
 		end
 	end
 	local targetDifference = index-self._dev.__nav.currentIndex;
-	
-	--print("navigating to: ",index, "with difference of ", targetDifference)
 	
 	if(targetDifference == 0)then return end;
 
@@ -154,8 +145,10 @@ function Navigator:_getTableLength(t)
 		c+=1;
 	end;return c;
 end
---//
-function Navigator:AddNavigation(Page:any, id:any, Number:number)
+--[=[
+	@param Page Instance | Pseudo
+]=]
+function Navigator:AddNavigation(Page:Instance, id:string|number, Number:number)
 	Page = Core.getElementObject(Page);
 	if(not Number)then Number = #self._dev.__nav.pages+1;end;
 
@@ -166,8 +159,6 @@ function Navigator:AddNavigation(Page:any, id:any, Number:number)
 	Page.Visible = false;
 
 	if(self:_getTableLength() == 1)then
-		-- print(#self._dev.__nav.pages, self._dev.__nav.pages, id)
-		--self._dev.__nav.currentIndex = Number;
 		self:NavigateTo(id,false);
 	end;
 end;

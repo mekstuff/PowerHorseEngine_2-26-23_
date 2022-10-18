@@ -1,7 +1,7 @@
 local Theme = require(script.Parent.Parent.Parent.Theme);
 local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
-local Core = require(script.Parent.Parent.Parent);
-local IsClient = game:GetService("RunService"):IsClient();
+
+
 
 local Checkbox = {
 	Name = "Checkbox";
@@ -13,14 +13,39 @@ local Checkbox = {
 	AutoToggle = true;
 };
 Checkbox.__inherits = {"BaseGui","Frame"}
+--[=[
+	@class Checkbox
 
-function Checkbox:Link(Pseudo)
+	Inherits [BaseGui], [Frame]
+]=]
+
+--[=[
+	@prop Icon string
+	@within Checkbox
+]=]
+--[=[
+	@prop Toggle boolean
+	@within Checkbox
+]=]
+--[=[
+	@prop AutoToggle boolean
+	@within Checkbox
+]=]
+
+
+--[=[
+	@param Pseudo Pseudo
+
+	Useful for linking a component to the checkbox. For example
+	having a Checkbox followed by a license agreement, you may want to allow
+	the user to click the license agreeement text and trigger the toggle on the checkbox
+]=]
+function Checkbox:Link(Pseudo:Instance):nil
 	local function trigger()
 		if(not self.AutoToggle)then return end;
 		self.Toggle = not self.Toggle;
 	end
-	
-	
+
 	local success, MouseButton1DownEvent = pcall(function()
 		return Pseudo.MouseButton1Down
 	end);

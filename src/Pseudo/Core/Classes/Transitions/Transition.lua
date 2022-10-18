@@ -3,6 +3,9 @@ local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
 local Core = require(script.Parent.Parent.Parent);
 local IsClient = game:GetService("RunService"):IsClient();
 
+--[=[
+	@class Transition
+]=]
 local Transition = {
 	__PseudoBlocked = true;
 	Name = "Transition";
@@ -12,7 +15,10 @@ local Transition = {
 };
 Transition.__inherits = {}
 
-function Transition:CreateTransitionPortal(parent)
+--[=[
+	@return Portal
+]=]
+function Transition:CreateTransitionPortal(parent:Instance)
 	local App = self:_GetAppModule();
 	local Portal = App.new("Portal");
 	Portal.ZIndex = 999;
