@@ -1,4 +1,17 @@
-local formatMethods = {}
+--[=[
+	@class Format
+	@tag Global
+
+	```lua
+	format(1200):toNumberCommas():End() --> 1,200
+	format(1000):toNumberAbbreviation():End() --> 1k
+	format(1200):toNumberCommas():toNumberAbbreviation():End() --> 1.2k
+	```
+]=]
+
+
+
+local Format = {}
 local ErrorService = require(script.Parent.Parent.Services.ErrorService);
 
 local months,weekdays = {'January',
@@ -16,31 +29,47 @@ local months,weekdays = {'January',
 	'Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'
 };
 
-function formatMethods:concat(ConcatVal)
+--[=[
+	@tag Chainable
+	@return Format
+]=]
+function Format:concat(ConcatVal:any)
 	self.Value = tostring(self.Value)..tostring(ConcatVal);
 	
 	return self;
 end;
-
-function formatMethods:toNumber()
+--[=[
+	@tag Chainable
+	@return Format
+]=]
+function Format:toNumber()
 	self.Value = tonumber(self.Value);
 	return self;
 end
---//
-function formatMethods:toString()
+--[=[
+	@tag Chainable
+	@return Format
+]=]
+function Format:toString()
 	self.Value = tostring(self.Value);
 	return self;
 end
---//
-function formatMethods:atStart(State)
+--[=[
+	@tag Chainable
+	@return Format
+]=]
+function Format:atStart(State:any)
 	if(not self._startstatements)then self._startstatements={};end;
 	--local i = ( #self._startstatements+1);
 	table.insert(self._startstatements, State);
 	print(self._startstatements)
 	return self;
 end;
---//
-function formatMethods:toTimeDifference(format)
+--[=[
+	@tag Chainable
+	@return Format
+]=]
+function Format:toTimeDifference(format:string)
 	--format = format or ""
 	if(format)then
 		if(format == true)then
@@ -97,8 +126,8 @@ function formatMethods:toTimeDifference(format)
 	return ts,proper;
 	--return s;
 end
---//
-function formatMethods:toDateFormat(useString, shortenStrings, indicateDayAsNumber)
+--[=[]=]
+function Format:toDateFormat(useString:boolean, shortenStrings:boolean, indicateDayAsNumber:boolean)
 	if(shortenStrings == true)then shortenStrings = 3;end;
 	if(not useString and shortenStrings)then
 		shortenStrings = nil;
@@ -133,16 +162,19 @@ function formatMethods:toDateFormat(useString, shortenStrings, indicateDayAsNumb
 
 	--return self.Value;	
 end
---//
-function formatMethods:toTimeFormat()
+--[=[]=]
+function Format:toTimeFormat()
 	assert(self._fromUnixStamp,"toTimeFormat() requires format to be fromUnixStamp(). format(os.time()):fromUnixStamp():toTimeFormat()");
 	local Stamp = self._fromUnixStamp;
 	--self.Value = string.format("%02d:%02d:%02d", Stamp.hour,Stamp.min,Stamp.sec);
 	
 	return string.format("%02d:%02d:%02d", Stamp.hour,Stamp.min,Stamp.sec)	
 end
---//
-function formatMethods:fromUnixStamp(is12Hour)
+--[=[
+	@tag Chainable
+	@return Format
+]=]
+function Format:fromUnixStamp(is12Hour:boolean)
 	local timeStamp = self.default;
 	
 	
@@ -155,26 +187,25 @@ function formatMethods:fromUnixStamp(is12Hour)
 	self._fromUnixStamp = date;
 	
 	self.Value = date
-	
-	--print(date);
-	
-	--local seconds = (timeStamp/60*2%60)
-	--local minutes = (timeStamp/60%60);
+
 	return self;
 end;
---//
-function formatMethods:atEnd(State, rep)
-	--self.Value = tostring(self.Value)..State;
-	
+--[=[
+	@tag Chainable
+	@return Format
+]=]
+function Format:atEnd(State:any)
 	if(not self._endstatements)then self._endstatements={};end;
 	
 	table.insert(self._endstatements, State);
 	
 	return self;
 end
---//
-function formatMethods:toNumberCommas()
-	
+--[=[
+	@tag Chainable
+	@return Format
+]=]
+function Format:toNumberCommas()
 	local str = tostring(self.Value);
 	
 	local v = str:reverse():gsub("...","%0,",math.floor((#str-1)/3)):reverse();
@@ -182,8 +213,8 @@ function formatMethods:toNumberCommas()
 	self.Value = v;
 	return self;
 end;
---//
-function formatMethods:End()
+--[=[]=]
+function Format:End()
 	local val = self.Value;
 	if(self._endstatements)then
 		for _,statement in pairs(self._endstatements) do
@@ -199,8 +230,11 @@ function formatMethods:End()
 	setmetatable(self,{});self=nil;
 	return val;
 end
---//
-function formatMethods:toNumberAbbreviation(...)
+--[=[
+	@tag Chainable
+	@return Format
+]=]
+function Format:toNumberAbbreviation(...:any)
 	local abvs = {
 		"K","M","B","T","QA","QI","SX","SP","OC"
 	};
@@ -254,12 +288,12 @@ return function(...)
 		__index = function(t,k) 
 			--print("Indexed");
 			
-			if(not formatMethods[k])then
+			if(not Format[k])then
 				--print(k);
 				if(proxy[k])then return proxy[k];end;
 				--return proxy.Value;
 			else
-				return formatMethods[k];
+				return Format[k];
 			end;
 	end; });
 end;

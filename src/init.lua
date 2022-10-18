@@ -76,17 +76,25 @@ local PowerHorseEngine = {};
 	Uses [Pseudo.new] to create a Pseudo component
 	@return Pseudo
 ]=]
-
 function PowerHorseEngine.new(PseudoName:string,...:any)
 	return Pseudo.new(PseudoName,...);
 end;
+--[=[
+	@prop Manifest table
+	@readonly
+	@within PowerHorseEngine
+]=]
 PowerHorseEngine.Manifest = Manifest;
+--[=[
+	@prop Enumeration table
+	@readonly
+	@within PowerHorseEngine
+]=]
 PowerHorseEngine.Enumeration = Enumeration;
 
 --[=[
 	Uses [LibraryProvider.loadLibrary] to import the library
 ]=]
-
 function PowerHorseEngine:Import(libraryName:string)
 	return LibraryProvider.LoadLibrary(libraryName);
 end
@@ -114,10 +122,40 @@ function PowerHorseEngine:GetProvider(Provider:string)
 	return ModuleFetcher(Provider, CoreProviders, Provider.." is not a valid Provider Name");
 end;
 
+--[=[
+	@function New
+	@within PowerHorseEngine
+	Uses the [Whiplash] .New function
+	@return Whiplash
+]=]
 PowerHorseEngine.New = PowerHorseEngine:Import("Whiplash").New;
+--[=[
+	@function OnWhiplashEvent
+	@within PowerHorseEngine
+	Uses the [Whiplash] library
+	@return Whiplash
+]=]
 PowerHorseEngine.OnWhiplashEvent = PowerHorseEngine:Import("Whiplash").OnEvent;
+--[=[
+	@function OnWhiplashChange
+	@within PowerHorseEngine
+	Uses the [Whiplash] library
+	@return Whiplash
+]=]
 PowerHorseEngine.OnWhiplashChange = PowerHorseEngine:Import("Whiplash").OnChange;
+--[=[
+	@function WhiplashForEach
+	@within PowerHorseEngine
+	Uses the [Whiplash] library
+	@return Whiplash
+]=]
 PowerHorseEngine.WhiplashForEach = PowerHorseEngine:Import("Whiplash").ForEach;
+--[=[
+	@function WhiplashExecute
+	@within PowerHorseEngine
+	Uses the [Whiplash] library
+	@return Whiplash
+]=]
 PowerHorseEngine.WhiplashExecute = PowerHorseEngine:Import("Whiplash").Execute;
 
 --[=[

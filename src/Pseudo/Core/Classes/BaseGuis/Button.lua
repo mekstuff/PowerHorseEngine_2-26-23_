@@ -1,7 +1,7 @@
 local Theme = require(script.Parent.Parent.Parent.Theme);
 local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
 local Core = require(script.Parent.Parent.Parent);
--- local Core_Vanilla = require(script.Parent.Parent.Parent.Vanilla);
+
 
 local Button = {
 	Name = "Button";
@@ -24,7 +24,79 @@ local Button = {
 	Size = UDim2.fromOffset(120,35);
 	Padding = Vector2.new(5,5);
 };
+
 Button.__inherits = {"Frame","GUI","BaseGui","Text"};
+--[=[
+	@class Button
+
+	Inherits [Frame], [GUI], [BaseGui], [Text]
+]=]
+
+--[=[
+	@prop Icon string
+	@within Button
+
+	Set as empty string to display no Icon.
+	:::note "Supports ico- Icons"
+	:::note
+
+]=]
+--[=[
+	@prop IconSize UDim2
+	@within Button
+]=]
+--[=[
+	@prop IconAdaptsTextColor boolean
+	@within Button
+]=]
+--[=[
+	@prop IconColor3 Color3
+	@within Button
+]=]
+--[=[
+	@prop Loading boolean
+	@within Button
+]=]
+--[=[
+	@prop TextAdjustment Enumeration
+	@within Button
+]=]
+--[=[
+	@prop IconAdjustment Enumeration
+	@within Button
+]=]
+--[=[
+	@prop ButtonFlexSizing boolean
+	@within Button
+]=]
+--[=[
+	@prop Roundness UDim
+	@within Button
+]=]
+--[=[
+	@prop RippleColor Color3
+	@within Button
+]=]
+--[=[
+	@prop RippleTransparency number
+	@within Button
+]=]
+--[=[
+	@prop RippleStyle Enumeration
+	@within Button
+]=]
+--[=[
+	@prop RippleLifeTime number
+	@within Button
+]=]
+--[=[
+	@prop ClickEffect boolean
+	@within Button
+]=]
+--[=[
+	@prop Padding Vector2
+	@within Button
+]=]
 
 local TweenService = game:GetService("TweenService");
 --//

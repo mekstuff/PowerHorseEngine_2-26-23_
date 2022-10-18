@@ -1,38 +1,47 @@
 local CollectionService = game:GetService("CollectionService");
 local CustomClassService = require(script.Parent.Parent.Services.CustomClassService);
 local PseudoService = require(script.Parent.Parent.Services.PseudoService);
-local CollectorClass = {
+
+--[=[
+    @class Collector
+]=]
+
+local Collector = {
     Name = "Collector",
     ClassName = "Collector",
 };
 
-function CollectorClass:_GetTagInstanceObject(instance:any)
+function Collector:_GetTagInstanceObject(instance:any)
     if(instance:IsA("Pseudo"))then
         instance = instance:GetRef();
     end
     return instance;
 end
 
-function CollectorClass:Create()
+function Collector:Create()
     -- return CollectionService:GetTags
 end;
 
-function CollectorClass:_Tag(instance:any,tagname:string):nil
+function Collector:_Tag(instance:any,tagname:string):nil
     instance = self:_GetTagInstanceObject(instance);
     CollectionService:AddTag(instance,tagname);
 end;
 
-function CollectorClass:_RemoveTag(instance:any,tagname:string):nil
+function Collector:_RemoveTag(instance:any,tagname:string):nil
     instance = self:_GetTagInstanceObject(instance);
     CollectionService:RemoveTag(instance,tagname);
 end
---//
-function CollectorClass:HasTag(instance:any,tagname:string):boolean
+--[=[
+    @param instance Pseudo | Instance
+]=]
+function Collector:HasTag(instance:any,tagname:string):boolean
     instance = self:_GetTagInstanceObject(instance);
     return CollectionService:HasTag(instance,tagname)
 end;
---//
-function CollectorClass:Tag(instances,tagname)
+--[=[
+    @param instances table | Pseudo | Instance
+]=]
+function Collector:Tag(instances:table|Instance,tagname:string):nil
     if(typeof(instances) == "table" and not instances.IsA)then
         for _,x in pairs(instances) do
             self:_Tag(x,tagname);
@@ -41,12 +50,14 @@ function CollectorClass:Tag(instances,tagname)
         self:_Tag(instances,tagname);
     end;
 end;
---
-function CollectorClass:AddTag(...:any)
+--[=[]=]
+function Collector:AddTag(...:any)
     return self:Tag(...);
 end;
---
-function CollectorClass:RemoveTag(instances,tagname)
+--[=[
+    @param instances table | Instance | Pseudo
+]=]
+function Collector:RemoveTag(instances:table|Instance,tagname:string):nil
     if(typeof(instances) == "table")then
         for _,x in pairs(instances) do
             self:_RemoveTag(x,tagname);
@@ -55,8 +66,10 @@ function CollectorClass:RemoveTag(instances,tagname)
         self:_RemoveTag(instances,tagname);
     end;
 end;
---//
-function CollectorClass:Bind(Tag,Callback)
+--[=[
+    @return Servant
+]=]
+function Collector:Bind(Tag:string,Callback:any)
     local App = self:_GetAppModule();
     local BindID = tostring(Callback);
     local BindServant = App.new("Servant");
@@ -100,16 +113,18 @@ function CollectorClass:Bind(Tag,Callback)
     return BindServant;
 end;
 
-
-function CollectorClass:Unbind(Binded)
+--[=[
+    @param Binded Servant
+]=]
+function Collector:Unbind(Binded:Instance):nil
     Binded:Destroy();
 end
 
-function CollectorClass:_Render(App)
+function Collector:_Render(App)
     local MainServant = App.new("Servant");
     self._dev.MainServant = MainServant;
     self._dev.Servants = {};
     return {};
 end;
 
-return CustomClassService:Create(CollectorClass);
+return CustomClassService:Create(Collector);

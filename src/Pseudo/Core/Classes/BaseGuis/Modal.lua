@@ -1,8 +1,6 @@
 local Theme = require(script.Parent.Parent.Parent.Theme);
 local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
-local Core = require(script.Parent.Parent.Parent);
 local TweenService = game:GetService("TweenService");
-local IsClient = game:GetService("RunService"):IsClient();
 
 local Modal = {
 	Name = "Modal";
@@ -23,13 +21,75 @@ local Modal = {
 	HeaderAdjustment = Enumeration.Adjustment.Center;
 	ButtonsAdjustment = Enumeration.Adjustment.Center;
 	ButtonsScaled = true;
-	-- ModalSize = Vector2.new(350,0);
 	Blurred = false;
 	Highlighted = false;
 	Body = "";
 	CloseButtonBehaviour = Enumeration.CloseButtonBehaviour.Display;
 };
 Modal.__inherits = {"BaseGui","GUI"};
+
+--[=[
+	@class Modal
+
+	Inherits [BaseGui], [GUI]
+]=]
+
+--[=[
+	@prop Header string
+	@within Modal
+]=]
+--[=[
+	@prop HeaderIcon string
+	@within Modal
+]=]
+--[=[
+	@prop HeaderTextSize number
+	@within Modal
+]=]
+--[=[
+	@prop HeaderTextFont Enum.Font
+	@within Modal
+]=]
+--[=[
+	@prop HeaderTextColor3 Color3
+	@within Modal
+]=]
+--[=[
+	@prop BodyTextSize number
+	@within Modal
+]=]
+--[=[
+	@prop BodyTextFont Enum.Font
+	@within Modal
+]=]
+--[=[
+	@prop HeaderAdjustment Enumeration.Adjustment
+	@within Modal
+]=]
+--[=[
+	@prop ButtonsAdjustment Enumeration.Adjustment
+	@within Modal
+]=]
+--[=[
+	@prop ButtonsScaled boolean
+	@within Modal
+]=]
+--[=[
+	@prop Blurred boolean
+	@within Modal
+]=]
+--[=[
+	@prop Highlighted boolean
+	@within Modal
+]=]
+--[=[
+	@prop Body string
+	@within Modal
+]=]
+--[=[
+	@prop CloseButtonBehaviour Enumeration.CloseButtonBehaviour
+	@within Modal
+]=]
 
 --//
 function Modal:CaptureUserFocus(Pulse:number)
@@ -40,14 +100,13 @@ function Modal:CaptureUserFocus(Pulse:number)
 	local HighlightFrame = self._dev.__HighlightFrame;
 
 	task.spawn(function()
-		-- for i = 1,Pulse do
-		if(not PreviousHighlighted)then self._dev.__HighlightFrame.BackgroundTransparency = .4;end
-		-- self._dev.__HighlightFrame.BackgroundTransparency = .8;
-			local t = TweenService:Create(HighlightFrame, TweenInfo.new(.1,Enum.EasingStyle.Linear,Enum.EasingDirection.InOut,Pulse,true), {BackgroundTransparency = 1});
-			t:Play();
-			t.Completed:Wait();
-			self.Highlighted = PreviousHighlighted;
-		-- end;
+		if(not PreviousHighlighted)then
+			self._dev.__HighlightFrame.BackgroundTransparency = .4;
+		end;
+		local t = TweenService:Create(HighlightFrame, TweenInfo.new(.1,Enum.EasingStyle.Linear,Enum.EasingDirection.InOut,Pulse,true), {BackgroundTransparency = 1});
+		t:Play();
+		t.Completed:Wait();
+		self.Highlighted = PreviousHighlighted;
 	end)
 end;
 --//
@@ -57,7 +116,6 @@ function Modal:AddButton(Text,styles,ID)
 	if(not btns)then
 		self._dev.__btns = {};
 		btns = self._dev.__btns;
-		--self:AddEventListener("ButtonClicked",true);
 	end;
 
 	local Bottom = self:GET("Bottom");
@@ -73,28 +131,12 @@ function Modal:AddButton(Text,styles,ID)
 			newButton[a]=b;
 		end
 	end
-	-- newButton.TextSize = TextSize or newButton.TextSize;
-	-- newButton.Size
-	
 	newButton.MouseButton1Up:Connect(function()
 		self.ButtonClicked:Fire(newButton,ID);
 	end)
 	
 	newButton.Text = Text or "";
 	table.insert(btns,newButton)
-	
-	-- newButton.StrokeTransparency = 1;
-	--[[
-	if(#self._dev.__btns > 1)then
-		
-		newButton.BackgroundColor3 = Color3.fromRGB(86, 90, 93);
-		newButton.TextColor3 = Theme.getCurrentTheme().ForegroundText;
-
-	else
-		newButton.BackgroundColor3 = Theme.getCurrentTheme().ForegroundText;
-		newButton.TextColor3 = Theme.getCurrentTheme().Foreground;
-	end;
-	]]
 
 	newButton.ZIndex = self.ZIndex;
 
@@ -103,16 +145,11 @@ function Modal:AddButton(Text,styles,ID)
 	end);
 
 	newButton.Parent = Bottom;
-	--RespectGrid.Parent = Bottom;
 
-	-- self:_AdjustButtons();
-	
 	self:GetEventListener("ButtonAdded"):Fire(newButton);
-	
 	return newButton;
 end;
 
---//
 --//
 function Modal:_Blur()
 	if(not workspace.CurrentCamera)then return end;
@@ -123,8 +160,6 @@ function Modal:_Blur()
 		blur = newBlur;
 		self._dev.__HighlightBlur = newBlur;
 	end;
-	--self.Blurred=true;
-	
 	TweenService:Create(blur,TweenInfo.new(.4), {Size = 20}):Play();
 end
 --//
@@ -174,8 +209,6 @@ function Modal:_Highlight()
 	end;
 	
 	TweenService:Create(HighlightFrame, TweenInfo.new(.4), {BackgroundTransparency = .25}):Play();
-	--self.Highlighted = true;
-	--HighlightFrame.Visible = true;
 end;
 
 --//
@@ -184,7 +217,6 @@ function Modal:_Unhighlight()
 
 	if(HighlightFrame)then
 		TweenService:Create(HighlightFrame, TweenInfo.new(.4), {BackgroundTransparency = 1}):Play();
-		--HighlightFrame.Visible = false;
 	end;
 end;
 
@@ -201,11 +233,9 @@ function Modal:_AdjustButtons()
 			if(Value == true) then
 				btn.TextAdjustment = Enumeration.Adjustment.Center;
 				btn.ButtonFlexSizing = false;
-				btn.Size = UDim2.new(0,(Bottom.AbsoluteSize.X/total)-Bottom_List.Padding.Offset,0,35);
-				
+				btn.Size = UDim2.new(0,(Bottom.AbsoluteSize.X/total)-Bottom_List.Padding.Offset,0,35);	
 			else
 				btn.ButtonFlexSizing = true;
-				--btn.TextAdjustment = Enumeration.Adjustment.Flex;
 			end
 
 		end
@@ -213,75 +243,6 @@ function Modal:_AdjustButtons()
 end;
 
 --//
-function Modal:_updateVectorSize(Value) 
-	local x,y = Value.X, Value.Y;
-	local modal = self:GET("Modal");
-	local Center = self:GET("Center");
-	local bodyText = self._dev.__ModalBody;
-	
-	modal.Size = UDim2.fromOffset(x,y);
-	
---[[
-	if(x <= 0)then
-		if(y <= 0)then
-			Center.AutomaticSize = Enum.AutomaticSize.XY;
-		else
-			Center.AutomaticSize = Enum.AutomaticSize.X;
-			if(bodyText)then
-				bodyText.Size = UDim2.fromOffset(300);
-			end
-
-		end
-	elseif(y <= 0)then
-		Center.AutomaticSize = Enum.AutomaticSize.Y;
-		if(bodyText)then
-			bodyText.Size = UDim2.fromOffset(300);
-		end;
-	else
-		Center.AutomaticSize = Enum.AutomaticSize.None;
-		if(bodyText)then
-			bodyText.Size = UDim2.fromOffset(300);
-		end
-	end;
-]]
---[[ 
-	// Switched to using ModalSize X as the base size since automatic size and UIIList layouts don't work properly
-	// 15/11/2021
-	
-	Value = Value or self.ModalSize;
-	local Bottom = self:GET("Bottom");
-	local Center = self:GET("Center");
-	local Header = self:GET("Header");
-	local x,y = Value.X, Value.Y;
-	local m = (self._dev.__btns and 36 or 0);
-	local bodyText = self._dev.__ModalBody;
-	Center.Size = UDim2.fromOffset(x,y-Header:GetAbsoluteSize().Y-m);
-	if(x <= 0)then
-		if(y <= 0)then
-			Center.AutomaticSize = Enum.AutomaticSize.XY;
-		else
-			Center.AutomaticSize = Enum.AutomaticSize.X;
-			if(bodyText)then
-				bodyText.Size = UDim2.fromOffset(300);
-			end
-			
-		end
-	elseif(y <= 0)then
-		Center.AutomaticSize = Enum.AutomaticSize.Y;
-		if(bodyText)then
-			bodyText.Size = UDim2.fromOffset(300);
-		end;
-	else
-		Center.AutomaticSize = Enum.AutomaticSize.None;
-		if(bodyText)then
-			bodyText.Size = UDim2.fromOffset(300);
-		end
-	end;
-]]
-end
-
---//
-
 function Modal:_Render(App)
 	
 	local Modal = App.new("Frame", self:GetRef());
@@ -441,9 +402,6 @@ function Modal:_Render(App)
 				self:_Unhighlight();
 			end
 		end,
-		-- ["ModalSize"] = function(Value)
-		-- 	self:_updateVectorSize(Value);
-		-- end,
 		["Header"] = function(Value)
 			Header.Text = Value;
 		end,["HeaderIcon"] = function(Value)

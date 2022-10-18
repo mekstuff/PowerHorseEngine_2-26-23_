@@ -3,7 +3,6 @@ gitRepoUrl = "https://github.com/lanzoinc/PowerHorseEngine" # From Git
 
 gitSourceBranch = "main"
 changelog = false
-classOrder = []
 
 [docusaurus]
 onBrokenLinks = "throw"

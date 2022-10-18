@@ -1,8 +1,8 @@
 local Theme = require(script.Parent.Parent.Parent.Theme);
-local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
-local Core = require(script.Parent.Parent.Parent);
-local IsClient = game:GetService("RunService"):IsClient();
 
+--[=[
+    @class AppBar
+]=]
 local AppBar = {
 	Name = "AppBar";
 	ClassName = "AppBar";   
@@ -13,14 +13,37 @@ local AppBar = {
     BackgroundTransparency = 1;
     BackgroundColor3 = Theme.getCurrentTheme().Primary;
 };
-AppBar.__inherits = {"BaseGui"}
+--[=[
+    @prop Text string
+    @within AppBar
+]=]
+--[=[
+    @prop TextColor3 color3
+    @within AppBar
+]=]
+--[=[
+    @prop Icon string
+    @within AppBar
+]=]
+--[=[
+    @prop Size UDim2
+    @within AppBar
+]=]
+--[=[
+    @prop BackgroundTransparency number
+    @within AppBar
+]=]
+--[=[
+    @prop BackgroundColor3 color3
+    @within AppBar
+]=]
 
+AppBar.__inherits = {"BaseGui"};
 
 function AppBar:_Render(App)
 
     local Enumeration = App:GetGlobal("Enumeration");
     local Container = App.new("Frame",self:GetRef());
-    -- Container.BackgroundTransp
 
     local Btn = App.new("Button",Container);
     Btn.ButtonFlexSizing = false;

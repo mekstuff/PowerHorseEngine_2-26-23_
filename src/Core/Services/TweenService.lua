@@ -93,7 +93,6 @@ local handleTweenType = {
 
 --[=[
 	If `Instance` IsA `Instance` and not a `Pseudo`, It will call Native TweenService:Create
-
 	@return Tween
 ]=]
 function TweenService:Create(instance:Instance, tweenInfo:TweenInfo, propertyTable:table)
