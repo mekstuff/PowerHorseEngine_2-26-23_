@@ -166,7 +166,9 @@ function PowerHorseEngine.Create(ClassObject:table,DirectParent:Instance?,Argume
 	return ServiceProvider:LoadServiceAsync("CustomClassService"):CreateClassAsync(ClassObject,DirectParent,Arguments);
 end
 
-
+--[=[
+	@param Instance Pseudo | Instance | string
+]=]
 function PowerHorseEngine.GetPseudoFromInstance(Instance:any)
 	local obj = typeof(Instance) == "table" and Instance:GetRef() or Instance;
 	local PseudoID = obj:FindFirstChild("_pseudoid")
@@ -174,7 +176,8 @@ function PowerHorseEngine.GetPseudoFromInstance(Instance:any)
 	return Pseudo.getPseudo(PseudoID.Value);
 end;
 
-function PowerHorseEngine:GetConfig():table
+--[=[]=]
+function PowerHorseEngine:GetConfig():table?
 	return Engine:RequestConfig()
 end;
 
