@@ -24,7 +24,7 @@ function CoreGuiService:GetCoreGuiEnabled(n:string)
 	return CoreGuiData[n];
 end
 --[=[]=]
-function CoreGuiService:GetIsCoreScript(src:LocalScript|Script|CoreGuiServiceScript):boolean
+function CoreGuiService:GetIsCoreScript(src:LocalScript|Script|ModuleScript):boolean
 	src = src or getfenv(0).script;
 	local p = game:GetService("Players").LocalPlayer;
 	local x = false;
