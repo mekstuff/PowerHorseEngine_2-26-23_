@@ -1,7 +1,10 @@
-local module = {}
+--[=[
+	@class ErrorService
+	@tag Service
+]=]
+
+local ErrorService = {}
 local TestService = game:GetService("TestService");
-
-
 
 local tossEW = {
 	{error = "Failed To Create Element <t1>. \"<t1> Is Not A Valid Vanilla Element\"",short = "ftc",};
@@ -13,7 +16,7 @@ local tossEW = {
 }
 
 
-local function getErrorFromDataAndTranslate(errorshort, ...)
+local function getErrorFromDataAndTranslate(errorshort:string, ...:any):string
 	local Strings = {...}
 	for _,x in pairs(tossEW)do
 		if(x.short == errorshort)then
@@ -52,32 +55,33 @@ local function sendOwnerErrorDebugMessage(n,c)
 	end
 end;
 
-
-
-function module.tossError(errorshort, ...)
+--[=[]=]
+function ErrorService.tossError(errorshort:string, ...:any):nil
 	--error(getErrorFromDataAndTranslate(errorshort, ...));
 	local e = getErrorFromDataAndTranslate(errorshort,...);
 	--sendOwnerErrorDebugMessage(e, Color3.fromRGB(241, 40, 40));
 	error(e,0);
 end;
-function module.tossWarn(errorshort, ...)
+--[=[]=]
+function ErrorService.tossWarn(errorshort:string, ...:any):nil
 	--warn(getErrorFromDataAndTranslate(errorshort,...));
 	local e = getErrorFromDataAndTranslate(errorshort,...);
 	--sendOwnerErrorDebugMessage(e, Color3.fromRGB(241, 182, 32))
 	warn(e)
 end;
-function module.tossMessage(errorshort, ...)
+--[=[]=]
+function ErrorService.tossMessage(errorshort:string, ...:any):nil
 	--TestService:Message(getErrorFromDataAndTranslate(errorshort,...));
 	local e = getErrorFromDataAndTranslate(errorshort,...);
 	--sendOwnerErrorDebugMessage(e, Color3.fromRGB(65, 174, 241))
 	TestService:Message(e);
 end;
-
-function module.assert(condition, errorshort,...)
+--[=[]=]
+function ErrorService.assert(condition:any, errorshort:string,...:any):nil
 	if(not condition)then
 		local e = getErrorFromDataAndTranslate(errorshort,...);
 		error(e);
 	end
 end
 
-return module
+return ErrorService

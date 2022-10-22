@@ -83,6 +83,7 @@ Enumeration.Device = {};
 Enumeration.Device.XBOX = {Name="XBOX",EnumType="Device",};
 Enumeration.Device.Mobile = {Name="Mobile",EnumType="Device"};
 Enumeration.Device.PC = {Name="PC",EnumType="Device"};
+
 -- [ ProximityPromptExclusivity ] --
 
 Enumeration.Exclusivity = {};
@@ -112,6 +113,7 @@ Enumeration.NotificationPriority.Class10 = {Name="Class10",EnumType = "Notificat
 Enumeration.NotificationPriority.Medium = {Name="Medium",EnumType = "NotificationPriority",prNumber = 3};
 Enumeration.NotificationPriority.High = {Name="High",EnumType = "NotificationPriority",prNumber = 2};
 Enumeration.NotificationPriority.Critical = {Name="Critical",EnumType = "NotificationPriority",prNumber = 1};
+
 -- [ ActionMenuAutomaticHide ] --
 Enumeration.ActionMenuAutomaticHide = {};
 Enumeration.ActionMenuAutomaticHide.None = {Name="None",EnumType = "ActionMenuAutomaticHide"};

@@ -1,4 +1,7 @@
-local module = {}
+--[=[
+	@class PseudoService
+]=]
+local PseudoService = {}
 local Pseudo = script.Parent.Parent.Parent.Pseudo;
 local ErrorService = require(script.Parent.ErrorService);
 
@@ -8,7 +11,8 @@ local Conversions = {
 	["TextButton"] = "Button";
 }
 
-function module:FromROBLOXObject(Instance,dontdeleteInstance,p)
+--[=[]=]
+function PseudoService:FromROBLOXObject(Instance:Instance,dontdeleteInstance:boolean,p:Instance?):Instance|table
 	local InstanceClass = Instance.ClassName;
 	local x={};
 	if(Conversions[InstanceClass])then
@@ -47,7 +51,7 @@ function module:FromROBLOXObject(Instance,dontdeleteInstance,p)
 		
 	end;
 	for _,v in pairs(Instance:GetChildren()) do
-		local r = module:FromROBLOXObject(v,dontdeleteInstance,parent);
+		local r = PseudoService:FromROBLOXObject(v,dontdeleteInstance,parent);
 		table.insert(x,r);
 	end;
 	if(not dontdeleteInstance)then
@@ -55,8 +59,8 @@ function module:FromROBLOXObject(Instance,dontdeleteInstance,p)
 	end;
 	return parent, x;
 end;
-
-function module:GetPseudoFromId(id)
+--[=[]=]
+function PseudoService:GetPseudoFromId(id:Instance|StringValue|string)
 	if(typeof(id) == "Instance")then
 		if(id.ClassName == "StringValue")then
 			id = id.Value;
@@ -69,7 +73,8 @@ function module:GetPseudoFromId(id)
 end;
 
 local PseudoCache;
-function module:GetPseudoObjects(Specific)
+--[=[]=]
+function PseudoService:GetPseudoObjects(Specific:table?):table
 	local Classes = Pseudo.Core.Classes:GetChildren();
 	if(not PseudoCache )then
 		PseudoCache = {};
@@ -88,4 +93,4 @@ function module:GetPseudoObjects(Specific)
 end;
 
 
-return module
+return PseudoService

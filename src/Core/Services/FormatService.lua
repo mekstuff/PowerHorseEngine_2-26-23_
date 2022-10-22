@@ -1,24 +1,34 @@
 local Format = require(script.Parent.Parent.Globals.Format);
 
-local module = {}
+--[=[
+	@class FormatService
+	@tag Service
+	Uses the Format Global.
+]=]
 
-function module:toNumberAbbreviation(n,...)
+
+local FormatService = {}
+
+--[=[]=]
+function FormatService:toNumberAbbreviation(n:number,...:any):string
 	return Format(n):toNumberAbbreviation(...);
-end
-function module:toNumberCommas(n,...)
+end;
+--[=[]=]
+function FormatService:toNumberCommas(n:number,...:any):string
 	return Format(n):toNumberCommas(...);
 end
-
---
-function module:toTimeFormat(timeStamp,is12Hour)
+--[=[]=]
+function FormatService:toTimeFormat(timeStamp:number,is12Hour:boolean):string
 	return Format(timeStamp):fromUnixStamp(is12Hour):toTimeFormat();
-end
-function module:toDateFormat(timeStamp,useString,shortenString,indicateDayAsNumber)
+end;
+--[=[]=]
+function FormatService:toDateFormat(timeStamp:number,useString:boolean,shortenString:boolean,indicateDayAsNumber:boolean):string
 	return Format(timeStamp):fromUnixStamp(true):toDateFormat(useString,shortenString,indicateDayAsNumber);
-end
-function module:toTimeDifference(t1,t2,...)
+end;
+--[=[]=]
+function FormatService:toTimeDifference(t1:number,t2:number,...:any):string
 	return Format(t1,t2):toTimeDifference(...);
 end
 
 
-return module
+return FormatService

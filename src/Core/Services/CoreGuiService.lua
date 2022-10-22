@@ -1,4 +1,9 @@
-local module = {}
+--[=[
+	@class CoreGuiService
+	@tag Service
+]=]
+
+local CoreGuiService = {}
 
 local ErrorService = require(script.Parent.ErrorService);
 
@@ -6,22 +11,20 @@ local Shared = {};
 local CoreGuiData = {
 	PurchaseCallbackPrompts = true,
 }
---//
-function module:SetCoreGuiEnabled(n,v)
+--[=[]=]
+function CoreGuiService:SetCoreGuiEnabled(n:string,v:any):nil
 	if(not CoreGuiData[n])then
 		ErrorService.tossWarn("Cannot set value "..n.." to ".." because you don't have permission to do so.");
 		return;
 	end
 	CoreGuiData[n]=v;
 end;
---//
-function module:GetCoreGuiEnabled(n)
+--[=[]=]
+function CoreGuiService:GetCoreGuiEnabled(n:string)
 	return CoreGuiData[n];
 end
---//
-
-
-function module:GetIsCoreScript(src)
+--[=[]=]
+function CoreGuiService:GetIsCoreScript(src:LocalScript|Script|CoreGuiServiceScript):boolean
 	src = src or getfenv(0).script;
 	local p = game:GetService("Players").LocalPlayer;
 	local x = false;
@@ -34,13 +37,14 @@ function module:GetIsCoreScript(src)
 	return x;
 end;
 
-function module.GetCoreGuiRepository()
+--[=[]=]
+function CoreGuiService.GetCoreGuiRepository():ScreenGui
 	return game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("PHeGui");
 end;
 
 local function try(n)
 	local ran,results = pcall(function()
-		return module:GetCoreGui(n);
+		return CoreGuiService:GetCoreGui(n);
 	end)
 	if(ran)then
 		return results
@@ -49,7 +53,10 @@ local function try(n)
 	end
 end
 
-function module:WaitFor(CoreGuiName:string,TIME)
+--[=[
+	@return Pseudo
+]=]
+function CoreGuiService:WaitFor(CoreGuiName:string,TIME:number?)
 	local waits = 0;
 	TIME = TIME or 60;
 	--local totalwaits = TIME or 120;
@@ -74,7 +81,7 @@ function module:WaitFor(CoreGuiName:string,TIME)
 	--end;
 end
 
-function module.RemoveObject(Name)
+function CoreGuiService.RemoveObject(Name)
 	if(Shared[Name])then
 		Shared[Name]=nil;
 	else
@@ -82,7 +89,7 @@ function module.RemoveObject(Name)
 	end	
 end
 
-function module.ShareObject(Name,Value)
+function CoreGuiService.ShareObject(Name,Value)
 	if(not Shared[Name])then
 		Shared[Name]=Value;
 	else
@@ -90,7 +97,7 @@ function module.ShareObject(Name,Value)
 	end
 end;
 
-function module:GetCoreGui(Name)
+function CoreGuiService:GetCoreGui(Name)
 	if(Shared[Name])then
 		return Shared[Name];
 	else
@@ -98,4 +105,4 @@ function module:GetCoreGui(Name)
 	end
 end
 
-return module
+return CoreGuiService

@@ -2,6 +2,7 @@
 	Provider of libraries for live games (does not work for plugins and command)
 
 	@class LibraryProvider
+	@tag Provider
 ]=]
 
 local LibraryProvider = {}

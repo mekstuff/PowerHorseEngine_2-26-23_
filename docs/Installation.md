@@ -1,5 +1,8 @@
-# Installation
+---
+sidebar_position: 2
+---
 
+# Installation
 
 ## npm
 

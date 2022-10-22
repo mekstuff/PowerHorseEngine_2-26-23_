@@ -1,14 +1,38 @@
 
+--[=[
+	@interface TradeConstructorResults
+	@within TradeService
+	.success boolean -- whether the trade was accepted or declined/failed
+	.response string? -- response from the trade. accepted,declined,failed
+	.error string? -- if declined or failed, reason will be shown here
+
+]=]
 
 if(game.Players.LocalPlayer)then
 	return require(script.Parent.ClientTradeService);
 end;
 
 local SignalProvider = require(script.Parent.Parent.Providers.SignalProvider);
-local module = {}
-module.TradeRequest = SignalProvider.new("TradeRequest");
-module.TradeStarted = SignalProvider.new("TradeStarted");
-module.TradeEnded = SignalProvider.new("TradeEnded");
+--[=[
+	@class TradeService
+	@tag Service
+]=]
+local TradeService = {}
+--[=[
+	@prop TradeRequest PHeSignal
+	@within TradeService
+]=]
+TradeService.TradeRequest = SignalProvider.new("TradeRequest");
+--[=[
+	@prop TradeStarted PHeSignal
+	@within TradeService
+]=]
+TradeService.TradeStarted = SignalProvider.new("TradeStarted");
+--[=[
+	@prop TradeEnded PHeSignal
+	@within TradeService
+]=]
+TradeService.TradeEnded = SignalProvider.new("TradeEnded");
 local PromptService = require(script.Parent.PromptService);
 local CustomClassService = require(script.Parent.CustomClassService);
 local Engine = require(script.Parent.Parent.Parent.Engine);
@@ -84,8 +108,8 @@ local function fetchIsRecSen(a,b)
 	end;
 	return false;
 end
---//
-function module:GetTradeActive(TradeId,Player2)
+--[=[]=]
+function TradeService:GetTradeActive(TradeId:string,Player2:Player):Player|boolean
 	if(not Player2)then
 		return true or false;
 	end
@@ -98,17 +122,22 @@ function module:GetTradeActive(TradeId,Player2)
 	end
 	return false;
 end
---//
-function module.new(Sender,Reciever,Header,Body,Blurred,Button1,Button2)
+
+
+
+--[=[
+	@return TradeConstructorResults
+]=]
+function TradeService.new(Sender:Player,Reciever:Player,Header:string?,Body:string?,Blurred:boolean?,Button1:string?,Button2:string?):table
 	
-	local inActiveTradeSearch = module:GetTradeActive(Sender,Reciever)
+	local inActiveTradeSearch = TradeService:GetTradeActive(Sender,Reciever)
 	if(inActiveTradeSearch)then
 		local x = {
 			success = false;
 			response = "failed";
 			error = inActiveTradeSearch.Name.." is already on an active trade channel";
 		}
-		module.TradeRequest:Fire(Sender,Reciever,x);
+		TradeService.TradeRequest:Fire(Sender,Reciever,x);
 		return x;
 	end
 	
@@ -121,14 +150,14 @@ function module.new(Sender,Reciever,Header,Body,Blurred,Button1,Button2)
 	
 	local ResponseID = TradeInboundRequest.Response:Wait();
 	
-	local inActiveTradeSearch = module:GetTradeActive(Sender,Reciever)
+	local inActiveTradeSearch = TradeService:GetTradeActive(Sender,Reciever)
 	if(inActiveTradeSearch)then
 		local x = {
 			success = false;
 			response = "failed";
 			error = inActiveTradeSearch.Name.." is already on an active trade channel";
 		}
-		module.TradeRequest:Fire(Sender,Reciever,x);
+		TradeService.TradeRequest:Fire(Sender,Reciever,x);
 		return x;
 	end
 	
@@ -167,9 +196,9 @@ function module.new(Sender,Reciever,Header,Body,Blurred,Button1,Button2)
 		});
 		--//Send To Reciever
 		
-		module.TradeStarted:Fire(newTrade);
+		TradeService.TradeStarted:Fire(newTrade);
 		newTrade.Ended:Connect(function(...)
-			module.TradeEnded:Fire(newTrade,...);
+			TradeService.TradeEnded:Fire(newTrade,...);
 		end);
 		TradeChannel.OnServerEvent:Connect(function(Player,State,...)
 			local Args = {...};
@@ -177,16 +206,16 @@ function module.new(Sender,Reciever,Header,Body,Blurred,Button1,Button2)
 				local ContentInfo = Args[1];
 				local ContentId = Args[2];
 				local TradeSearch = Trades[newTrade.TradeId];
-				if(module.ValidateContentAdded)then
-					module.ValidateContentAdded(TradeSearch,Player,ContentInfo);
+				if(TradeService.ValidateContentAdded)then
+					TradeService.ValidateContentAdded(TradeSearch,Player,ContentInfo);
 				else
 					TradeSearch:AddContent(Player,ContentInfo,ContentId);
 				end
 			elseif(State == "remove-content")then
 				local ContentId = Args[1];
 				local TradeSearch = Trades[newTrade.TradeId];
-				if(module.ValidateContentAdded)then
-					module.ValidateContentRemoved(TradeSearch,Player,ContentId);
+				if(TradeService.ValidateContentAdded)then
+					TradeService.ValidateContentRemoved(TradeSearch,Player,ContentId);
 				else
 					TradeSearch:RemoveContent(Player,ContentId);
 				end;
@@ -209,10 +238,8 @@ function module.new(Sender,Reciever,Header,Body,Blurred,Button1,Button2)
 		}
 	end
 	
-	module.TradeRequest:Fire(Sender,Reciever,Content);
+	TradeService.TradeRequest:Fire(Sender,Reciever,Content);
 	return Content;
-	
-	
 end
 
-return module
+return TradeService

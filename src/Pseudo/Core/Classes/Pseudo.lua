@@ -38,86 +38,105 @@ local Pseudo = {
 --[=[
 	@prop Parent any
 	@within Pseudo
+
+	:::warning
+	If a Pseudo is Parented to another Pseudo, then .Parent will return the `Pseudo`, whereas if it's parented to an `Instance` you will get the ROBLOX Instance.
+	:::
 ]=]
 
 --[=[]=]
-function Pseudo:GetFullName()
+function Pseudo:GetFullName():string
 	return self:GetRef():GetFullName();
 end;
---[=[]=]
-function Pseudo:WaitForChild(n:string,onlyPseudo:boolean,tries:number?):any?
-	local c = self:FindFirstChild(n,false,onlyPseudo);
+--[=[
+	@return Pseudo | Instance | nil
+]=]
+function Pseudo:WaitForChild(name:string,onlyPseudo:boolean,tries:number?):any?
+	local c = self:FindFirstChild(name,false,onlyPseudo);
 	if(not c)then
 		tries = tries or 0;
 		if(tries == 10)then
-			self:_GetAppModule():GetService("ErrorService").tossWarn("Infinite Possible Yield On :"..self.Name..":WaitForChild(\""..n.."\")");
+			self:_GetAppModule():GetService("ErrorService").tossWarn("Infinite Possible Yield On :"..self.Name..":WaitForChild(\""..name.."\")");
 		end;
 		task.wait(tries/7);
-		return self:WaitForChild(n,onlyPseudo,tries+1)
+		return self:WaitForChild(name,onlyPseudo,tries+1)
 	end;
 	return c;
 end;
---[=[]=]
-function Pseudo:FindFirstAncestor(n:string,level:number)
-	self:_GetAppModule():GetService("ErrorService").assert(n, "Argument 1 missing or nil");
+--[=[
+	This will call :FindFirstAncestor on it's parent, so if the parent is a ROBLOX Instance, it will then use FindFirstAncestor of `Instances` not `Pseudos`.
+	@return Pseudo | Instance | nil
+]=]
+function Pseudo:FindFirstAncestor(name:string,level:number)
+	self:_GetAppModule():GetService("ErrorService").assert(name, "Argument 1 missing or nil");
 	local Parent = self.Parent;
 	if(not Parent)then return nil;end;
 	level = level and level+1 or 1;
-	if(self.Parent.Name == n)then
+	if(self.Parent.Name == name)then
 		return self.Parent,level;
 	else
-		return self.Parent:FindFirstAncestor(n,level);
+		return self.Parent:FindFirstAncestor(name,level);
 	end
 end;
---[=[]=]
-function Pseudo:FindFirstAncestorOfClass(n:string,level:number)
-	self:_GetAppModule():GetService("ErrorService").assert(n, "Argument 1 missing or nil");
+--[=[
+	@return Pseudo | Instance | nil
+]=]
+function Pseudo:FindFirstAncestorOfClass(name:string,level:number)
+	self:_GetAppModule():GetService("ErrorService").assert(name, "Argument 1 missing or nil");
 	local Parent = self.Parent;
 	if(not Parent)then return nil;end;
 	level = level and level+1 or 1;
-	if(self.Parent.ClassName == n)then
+	if(self.Parent.ClassName == name)then
 		return self.Parent,level;
 	else
-		return self.Parent:FindFirstAncestorOfClass(n,level);
+		return self.Parent:FindFirstAncestorOfClass(name,level);
 	end
 end;
---[=[]=]
-function Pseudo:FindFirstAncestorWhichIsA(n:string,level:number)
-	self:_GetAppModule():GetService("ErrorService").assert(n, "Argument 1 missing or nil");
+--[=[
+	@return Pseudo | Instance | nil
+]=]
+function Pseudo:FindFirstAncestorWhichIsA(name:string,level:number)
+	self:_GetAppModule():GetService("ErrorService").assert(name, "Argument 1 missing or nil");
 	local Parent = self.Parent;
 	if(not Parent)then return nil;end;
 	level = level and level+1 or 1;
-	if(self.Parent:IsA(n))then
+	if(self.Parent:IsA(name))then
 		return self.Parent,level;
 	else
-		return self.Parent:FindFirstAncestorWhichIsA(n,level);
+		return self.Parent:FindFirstAncestorWhichIsA(name,level);
 	end
 end;
---[=[]=]
-function Pseudo:FindFirstChild(n:string,recursive:boolean?,onlyPseudo:boolean?):any?
+--[=[
+	@return Pseudo | Instance | nil
+]=]
+function Pseudo:FindFirstChild(name:string,recursive:boolean?,onlyPseudo:boolean?):any?
 	local children = self:GetChildren(onlyPseudo)
 	for _,x in ipairs(children)do
-		if(x.Name == n)then return x;end;
+		if(x.Name == name)then return x;end;
 	end;
 	if(recursive)then
 		for _,x in ipairs(children) do
-			local c = x:FindFirstChild(n,recursive,onlyPseudo);
+			local c = x:FindFirstChild(name,recursive,onlyPseudo);
 			if(c)then return c;end;
 		end
 	end;
 	return nil;
 end;
---[=[]=]
-function Pseudo:FindFirstChildOfClass(n:string)
+--[=[
+	@return Pseudo | Instance | nil
+]=]
+function Pseudo:FindFirstChildOfClass(name:string)
 	for _,x in pairs(self:GetChildren())do
-		if(x.ClassName == n)then return x;end;
+		if(x.ClassName == name)then return x;end;
 	end
 	return nil;
 end;
---[=[]=]
-function Pseudo:FindFirstChildWhichIsA(n:string)
+--[=[
+	@return Pseudo | Instance | nil
+]=]
+function Pseudo:FindFirstChildWhichIsA(name:string)
 	for _,x in pairs(self:GetChildren())do	
-		if(x:IsA(n))then return x;end;
+		if(x:IsA(name))then return x;end;
 	end;
 	return nil;
 end;
@@ -344,6 +363,8 @@ function Pseudo:GET(Comp:string):any?
 	return self._Components[Comp];
 end;
 --[=[
+	Clones the `Pseudo`. It also will clone Instances inside the Pseudo that wasn't created by the Pseudo itself. Pseudo's must follow
+	a naming convention to properly support cloning.
 	@return Pseudo
 ]=]
 function Pseudo:Clone()
@@ -373,12 +394,19 @@ function Pseudo:Clone()
 
 	return new;
 end;
---[=[]=]
+--[=[
+	Destroys the Reference, You can overwrite this by creating your own :Destroy method but make sure to include:
+	```lua
+	self:GetRef():Destroy()
+	```
+]=]
 function Pseudo:Destroy()
 	self:GetRef():Destroy();
 end
 local ROBLOXPropChangedSignals = {"Name","Parent"};
---[=[]=]
+--[=[
+	@return PHeSignal
+]=]
 function Pseudo:GetPropertyChangedSignal(Prop:string)
 	if(not self._ChangedSignals)then self._ChangedSignals = {};end;
 	
@@ -407,7 +435,7 @@ function Pseudo:GetPropertyChangedSignal(Prop:string)
 	return signal;
 end
 --[=[]=]
-function Pseudo:IsA(Class:string)
+function Pseudo:IsA(Class:string):boolean
 	if(self.ClassName == Class)then return true;end;
 	if(table.find(self._classes,Class))then
 		return true;
@@ -427,15 +455,22 @@ function Pseudo:_GetAppModule()
 		return App;
 	end;
 end;
---[=[]=]
-function Pseudo:_GetCompRef()
+--[=[
+	Some Pseudo's may have `_Appender` Instances or `FatherComponent`'s :_GetCompRef will return those. If they don't exist then
+	it return the Ref.
+]=]
+function Pseudo:_GetCompRef():any
 	return self:GET("_Appender") or self:GET("FatherComponent") or self:GetRef();
 end;
---[=[]=]
-function Pseudo:GetRef()
+--[=[
+	Returns the Reference Instance of the Pseudo, this will most likely be a `Folder` containing the attributes. Whenever this Ref is destroyed, the Pseudo is destroyed aswell.
+]=]
+function Pseudo:GetRef():Folder|any
 	return self._referenceInstance
 end
---[=[]=]
+--[=[
+	@return PHeSignal
+]=]
 function Pseudo:AddEventListener(EventName:string, CreatingEvent:boolean, BindCreateToEvent:BindableEvent, SharedSignal:boolean):BindableEvent
 	SharedSignal = SharedSignal and "_SharedSignals" or "_Signals";
 
@@ -463,7 +498,7 @@ function Pseudo:AddEventListener(EventName:string, CreatingEvent:boolean, BindCr
 
 end;
 --[=[]=]
-function Pseudo:RemoveEventListener(...:any)
+function Pseudo:RemoveEventListener(...:any):nil
 	local Events = {...};
 	local Signals = self._Signals
 	--local Signals = self.__dev.Signals;
@@ -476,16 +511,16 @@ function Pseudo:RemoveEventListener(...:any)
 	end;
 end;
 --[=[]=]
-function Pseudo:RemoveEventListeners()
+function Pseudo:RemoveEventListeners():nil
 	local Signals = self._Signals;
 	for _,Signal in pairs(Signals)do
 		Signal:Destroy();Signal=nil;
 	end
 end;
 --[=[
-	@param Listener PHeEvent
+	@return PHeSignal
 ]=]
-function Pseudo:GetEventListener(Listener:Instance)
+function Pseudo:GetEventListener(Listener:string):Instance
 	return self._Signals[Listener]
 end
 --[=[

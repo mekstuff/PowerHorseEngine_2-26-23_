@@ -1,8 +1,5 @@
-local Pseudo = require(script.Parent.Parent.Parent.Pseudo);
-local Engine = require(script.Parent.Parent.Parent.Engine);
 local SignalProvider = require(script.Parent.Parent.Providers.SignalProvider);
 local CoreGuiService = require(script.Parent.CoreGuiService);
-local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
 local Engine = require(script.Parent.Parent.Parent.Engine);
 local MessagingService = require(script.Parent.MessagingService);
 local SerializationService = require(script.Parent.SerializationService);
@@ -15,16 +12,18 @@ local NotificationsEnabled = true;
 
 local AudioChannel = AudioService:CreateSoundEffectsChannel();
 
-local module = {};
+--[=[
+	@class NotificationService
+]=]
+local NotificationService = {};
 
 
 if(game:GetService("RunService"):IsClient())then
-	module.OnNotification = SignalProvider.new("NotificationInbound");
+	NotificationService.OnNotification = SignalProvider.new("NotificationInbound");
 end;
 
-
---//
-function module:SetNotificationsEnabled(State)
+--[=[]=]
+function NotificationService:SetNotificationsEnabled(State:boolean)
 	State = State or false;
 	if(State == NotificationsEnabled)then return end;
 	if(State)then
@@ -36,29 +35,47 @@ function module:SetNotificationsEnabled(State)
 end;
 
 local BroadcastSubscriber;
-function module:BroadcastNotification(Data,BroadCastToThisServer)
+--[=[
+	Sends A notification to everyone in every server
+
+	:::warning
+	Limited to [MessagingService] limits
+	:::
+]=]
+function NotificationService:BroadcastNotification(Data:table)
 	if(not BroadcastSubscriber)then
 		BroadcastSubscriber = MessagingService:SubscribeAsync("NotificationBroadcast",function(serial)
-			module:SendNotificationToAllPlayers(SerializationService:DeserializeTable(serial));
+			NotificationService:SendNotificationToAllPlayers(SerializationService:DeserializeTable(serial));
 		end);
 	end
 	if(game.Players.LocalPlayer)then ErrorService.tossError("Broadcasting Notifications can only be performed by the server.");end;
 	MessagingService:PublishAsync("NotificationBroadcast",SerializationService:SerializeTable(Data));
 end;
---//
-function module:SendNotificationToAllPlayers(Data,...)
+
+--[=[
+	Sends A notification to everyone in the current server
+]=]
+function NotificationService:SendNotificationToAllPlayers(Data:table,...:any)
 	Engine:FetchStorageEvent("NotificationService_SendNotificationAsync"):FireAllClients(Data,...);
 end;
 
---//
-function module:SendNotification(...) return module:SendNotificationAsync(...);end;
+--[=[
+	Alias for [SendNotificationAsync]
+]=]
+function NotificationService:SendNotification(...:any) 
+	return NotificationService:SendNotificationAsync(...);
+end;
 
-local NotificationResponseClass = {
+--[=[
+	@class NotificationResponse
+	Pseudo that is returned from Sending a notification
+]=]
+local NotificationResponse = {
 	Name = "NotificationResponse",
 	ClassName = "NotificationResponse",
 };
 
-function NotificationResponseClass:Destroy()
+function NotificationResponse:Destroy()
 	local args = self._dev.args;
 	if(args.TargetPlayer)then
 		args.Channel:FireClient(args.TargetPlayer,"dismiss");
@@ -67,12 +84,14 @@ function NotificationResponseClass:Destroy()
 	self:GetRef():Destroy();
 end
 
-function NotificationResponseClass:Dismiss()
+--[=[
+	Destroys the notification
+]=]
+function NotificationResponse:Dismiss()
 	self:Destroy();
 end;
 
-
-function NotificationResponseClass:_Render()
+function NotificationResponse:_Render()
 	
 	local AttachButtonDown,AttachButton2Down,Dismissed = self:AddEventListener("AttachButtonDown",true),self:AddEventListener("AttachButton2Down",true),self:AddEventListener("Dismissed",true)
 	
@@ -99,7 +118,10 @@ function NotificationResponseClass:_Render()
 	}
 end
 
-function module:SendNotificationAsync(Plr,Data,...)
+--[=[
+	@return NotificationResponse
+]=]
+function NotificationService:SendNotificationAsync(Plr:Player,Data:table,...:any)
 	local passed = (...);
 	local Player = Plr;
 	
@@ -107,7 +129,7 @@ function module:SendNotificationAsync(Plr,Data,...)
 	if(typeof(Player) == "Instance")then
 		if(Player ~= game.Players.LocalPlayer)then
 			local TempCommunicationChannel = Engine:FetchStorageEvent("%Temp"..tostring(math.random(1,100)).."%CommunicationChannel-Server->"..Plr.UserId);
-			local NotificationResponse = CustomClassService:Create(NotificationResponseClass,nil,{TargetPlayer = Player, Channel = TempCommunicationChannel});
+			local NotificationResponse = CustomClassService:Create(NotificationResponse,nil,{TargetPlayer = Player, Channel = TempCommunicationChannel});
 			
 			Engine:FetchStorageEvent("NotificationService_SendNotificationAsync"):FireClient(Player,TempCommunicationChannel,Data,...);
 			--print("Send Notification To Seperate Client -> From Server?");
@@ -119,7 +141,7 @@ function module:SendNotificationAsync(Plr,Data,...)
 		Data = Plr;
 	end
 
-	return module:HandleNotificationRequest(Data,passed);
+	return NotificationService:HandleNotificationRequest(Data,passed);
 	--local DefaultNotificationGroupForClient 
 end;
 
@@ -180,8 +202,10 @@ local function HandleMusic(p)
 
 end;
 
---//
-function module:HandleNotificationRequest(...)
+--[=[
+	@private
+]=]
+function NotificationService:HandleNotificationRequest(...:any)
 	
 	if(typeof(...) == "table")then
 		local t = ...;
@@ -236,7 +260,7 @@ function module:HandleNotificationRequest(...)
 	
 	--local defaultNotificationGroup = try();
 	local a,b,c,d = defaultNotificationGroup:Notify(...);
-	module.OnNotification:Fire(a);
+	NotificationService.OnNotification:Fire(a);
 	
 	lastNotification = {
 		t = ...;
@@ -249,6 +273,4 @@ function module:HandleNotificationRequest(...)
 	return a,b,c,d
 end;
 
-return module
-
---local key = tostring(math.random(1,400)).."key?"..tostring(math.random(1,400));
+return NotificationService;

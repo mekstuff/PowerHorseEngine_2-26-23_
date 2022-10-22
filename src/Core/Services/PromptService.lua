@@ -1,22 +1,31 @@
-local module = {}
+--[=[
+	@class PromptService
+]=]
+local PromptService = {}
 local IsServer = game:GetService("RunService"):IsServer();
 local ErrorService = require(script.Parent.ErrorService);
 local Engine = require(script.Parent.Parent.Globals.Engine);
 local CustomClassService = require(script.Parent.CustomClassService);
 local PromptUserAsyncEvent = Engine:FetchStorageEvent("PromptUserAsyncEvent");
 
-local PromptResponseClass = {
+--[=[
+	@class PromptResponse
+	Pseudo returned from [PromptService]
+]=]
+local PromptResponse = {
 	Name = "PromptResponse";
 	ClassName = "PromptResponse";
 };
 
 local PromptsStorage = {};
 
-function PromptResponseClass:_Render()
+function PromptResponse:_Render()
 	return {};
 end;
-
-function module:PromptUser(User,Header,Body,Buttons)
+--[=[
+	@return PromptResponse
+]=]
+function PromptService:PromptUser(User:Player,Header:string|table,Body:string|nil?,Buttons:table?)
 	if(not IsServer)then ErrorService.tossWarn("PromptUserAsync() can only be called by the server.");return end;
 	if(not User)then ErrorService.tossWarn(tostring(User).." is not a valid user");return;end;
 	
@@ -39,7 +48,7 @@ function module:PromptUser(User,Header,Body,Buttons)
 	
 	PromptUserAsyncEvent:FireClient(User,Header,Buttons,id);
 	
-	local newPromptResponse = CustomClassService:CreateClassAsync(PromptResponseClass);
+	local newPromptResponse = CustomClassService:CreateClassAsync(PromptResponse);
 	
 	newPromptResponse:AddEventListener("Response",true);
 	--newPromptResponse.ID = id;
@@ -75,4 +84,4 @@ end;
 
 
 
-return module
+return PromptService

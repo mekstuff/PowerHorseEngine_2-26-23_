@@ -5,11 +5,46 @@ local EngineInvoker = require(script.Parent.Parent.Parent.Engine):FetchStorageEv
 local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
 local Format = require(script.Parent.Parent.Globals.Format);
 
-local Client = {};
-local Ping;
+--[=[
+	@class PingService
 
-function Client:RequestUserPingAsync()
-	if(not Ping)then
+]=]
+
+local PingServiceServer = {};
+local PingService = {};
+
+--[=[
+	@class PingReader
+	Pseudo returned from PingService
+]=]
+local PingReader;
+--[=[
+	@client
+	@return PingReader
+]=]
+--[=[
+	@prop Enabled boolean
+	@within PingReader
+]=]
+--[=[
+	@prop ms string
+	@within PingReader
+]=]
+--[=[
+	@prop Ping number
+	@within PingReader
+]=]
+--[=[
+	@prop UpdateInterval number
+	@within PingReader
+]=]
+--[=[
+	@prop ConnectionStatus Enumeration
+	@within PingReader
+]=]
+
+function PingService:RequestUserPingAsync()
+	if(not PingReader)then
 		local c = {
 			Name = game.Players.LocalPlayer.Name.."'s Ping";
 			ClassName = "PingReader";
@@ -20,10 +55,7 @@ function Client:RequestUserPingAsync()
 			ConnectionStatus = Enumeration.ConnectionStatus.Moderate;
 		};
 		function c:_Render()
-			
 			local ConnectionStatusEnums = Enumeration:GetEnums("ConnectionStatus");
-		
-			
 			return {
 				["Enabled"] = function(v)
 					if(v)then
@@ -33,8 +65,6 @@ function Client:RequestUserPingAsync()
 								EngineInvoker:InvokeServer();
 								local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
 								local p = math.floor(((tick()-tick_)/2) *1000);
-					
-								--self.ms = tostring(p).." ms";
 								self.ms = Format(p):toNumberCommas():End().." ms";
 								local l;
 								for a,b in pairs(ConnectionStatusEnums)do
@@ -66,27 +96,20 @@ function Client:RequestUserPingAsync()
 		
 		local newClass = CustomClassService:CreateClassAsync(c);
 	
-		Ping = newClass;		
+		PingReader = newClass;		
 		
 	end
-	return Ping;
---[[
-	return {
-		ms = tostring(p).." ms";
-		ping = p;
-		ConnectionStatus = l;
-	}
-	]]
+	return PingReader;
 end
 
-local Server = {};
 
-function Server.Invoke(Player)
+function PingServiceServer.Invoke()
 	return true;
 end
 
-function Server:RequestUserPingAsync()
+
+function PingServiceServer:RequestUserPingAsync()
 	ErrorService.tossWarn("RequestUserPingAsync can only be called by the client. Use a remote event to share this information with the server.")
 end;
 
-if(__client)then return Client else return Server;end;
+if(__client)then return PingService else return PingServiceServer;end;

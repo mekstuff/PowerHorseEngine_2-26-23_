@@ -1,4 +1,7 @@
-local module = {}
+--[=[
+	@class UserIdService
+]=]
+local UserIdService = {}
 local Players = game:GetService("Players");
 local ErrorService = require(script.Parent.ErrorService);
 
@@ -7,17 +10,24 @@ local cache = {
 	name = {};
 }
 
-function module:GetUsername(obj)
+--[=[
+	Safer method than .getUsername since this will return a promise
+	@return Promise
+]=]
+function UserIdService:GetUsername(obj:Player|string|number):Instance
 	local App = require(script.Parent.Parent.Parent);
 	local Promise = App.new("Promise"):Try(function(resolve,reject)
-		local res = module.getUsername(obj);
+		local res = UserIdService.getUsername(obj);
 		resolve(res);
 	end);
 	
 	return Promise;
 end;
-
-function module:GetUserId(obj)
+--[=[
+	Safer method than .getUserId since this will return a promise
+	@return Promise
+]=]
+function UserIdService:GetUserId(obj:Player|string|number):Instance
 	local App = require(script.Parent.Parent.Parent);
 	local Promise = App.new("Promise"):Try(function(resolve,reject)
 		local res = self.getUserId(obj);
@@ -27,8 +37,11 @@ function module:GetUserId(obj)
 	end);
 	return Promise;
 end;
-
-function module.getUserId(obj)
+--[=[
+	@yields
+	@error HTTP Failure -- This function does not handle failing, use `:GetUserId` for a more safer route.
+]=]
+function UserIdService.getUserId(obj:Player|string|number):number?
 	if(cache.id[obj])then
 		return cache.id[obj];
 	end
@@ -45,7 +58,7 @@ function module.getUserId(obj)
 		end;
 		--id = results;
 	elseif(typeof(obj) == "number")then
-		if(module.getUsername(obj))then 
+		if(UserIdService.getUsername(obj))then 
 			id = obj; 
 		end
 	end;
@@ -57,8 +70,11 @@ function module.getUserId(obj)
 	end;
 	return id;
 end;
-
-function module.getUsername(obj)
+--[=[
+	@yields
+	@error HTTP Failure -- This function does not handle failing, use `:GetUsername` for a more safer route.
+]=]
+function UserIdService.getUsername(obj:Player|string|number):string?
 	if(cache.name[obj])then
 		return cache.name[obj];
 	end
@@ -74,7 +90,7 @@ function module.getUsername(obj)
 		end;
 	
 	elseif(typeof(obj) == "string")then
-		if(module.getUserId(obj))then 
+		if(UserIdService.getUserId(obj))then 
 			name = obj; 
 		end
 	end;
@@ -87,4 +103,4 @@ function module.getUsername(obj)
 	return name;
 end
 
-return module
+return UserIdService
