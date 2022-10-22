@@ -1,10 +1,11 @@
 local Theme = require(script.Parent.Parent.Parent.Theme);
 local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
-local Core = require(script.Parent.Parent.Parent);
-local IsClient = game:GetService("RunService"):IsClient();
 local ti = TweenInfo.new(.2, Enum.EasingStyle.Back);
 local TweenService = game:GetService("TweenService");
 
+--[=[
+	@class Toggle
+]=]
 local Toggle = {
 	Name = "Toggle";
 	ClassName = "Toggle";
@@ -15,10 +16,29 @@ local Toggle = {
 	Toggle = true;
 	BackgroundColor3 = Theme.getCurrentTheme().Text;
 	Size = UDim2.fromOffset(35,20);
-
-	--BackgroundTransparency = 1;
 };
-Toggle.__inherits = {"BaseGui"}
+Toggle.__inherits = {"BaseGui"};
+
+--[=[
+	@prop OnIcon string
+	@within Toggle
+]=]
+--[=[
+	@prop OffIcon string
+	@within Toggle
+]=]
+--[=[
+	@prop OnColor3 Colo3
+	@within Toggle
+]=]
+--[=[
+	@prop OffColor3 Color3
+	@within Toggle
+]=]
+--[=[
+	@prop Toggle boolean
+	@within Toggle
+]=]
 
 function Toggle:_ToggleOff()
 	
@@ -29,6 +49,11 @@ function Toggle:_Render(App)
 	
 	local Toggled = self:AddEventListener("Toggled",true)
 	
+	--[=[
+		@prop Toggled PHeSignal
+		@within Toggle
+	]=]
+
 	local Background = App.new("Frame");
 	Background.Roundness = UDim.new(0,10);
 	Background.StrokeTransparency = 1;

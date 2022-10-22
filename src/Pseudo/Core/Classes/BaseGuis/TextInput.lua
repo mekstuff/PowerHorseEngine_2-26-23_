@@ -1,12 +1,14 @@
 local Theme = require(script.Parent.Parent.Parent.Theme);
 local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
-local Core = require(script.Parent.Parent.Parent);
 local IsClient = game:GetService("RunService"):IsClient();
 local TextService = game:GetService("TextService");
 local TweenService = game:GetService("TweenService");
 
 local TweenInfo_ = TweenInfo.new(.35,Enum.EasingStyle.Back);
 
+--[=[
+	@class TextInput
+]=]
 local TextInput = {
 	Name = "TextInput";
 	ClassName = "TextInput";
@@ -27,9 +29,7 @@ local TextInput = {
 	CurrentWord = "";
 	CurrentWordStart = -1;
 	CurrentWordEnd = -1;
-	
-	--StrokeColor3 = Theme.getCurrentTheme().Disabled;
-	
+
 	MultiLine = false;
 	CursorPosition = 1;
 	ClearTextOnFocus = true;
@@ -47,6 +47,89 @@ local TextInput = {
 
 TextInput.__inherits = {"BaseGui","GUI","Frame","Text"};
 
+--[=[
+	@prop PlaceholderText string
+	@within TextInput
+]=]
+--[=[
+	@prop PlaceholderColor3 Color3
+	@within TextInput
+]=]
+--[=[
+	@prop PlaceholderTextTransparency number
+	@within TextInput
+]=]
+--[=[
+	@prop PlaceholderBehaviour Enumeration.PlaceholderBehaviour
+	@within TextInput
+]=]
+--[=[
+	@prop Margin Vector2
+	@within TextInput
+]=]
+--[=[
+	@prop Overflow boolean
+	@within TextInput
+]=]
+--[=[
+	@prop TextXAlignment Enum.TextXAlignment
+	@within TextInput
+]=]
+--[=[
+	@prop CurrentWord string
+	@readonly
+	@within TextInput
+]=]
+--[=[
+	@prop CurrentWordStart number
+	@readonly
+	@within TextInput
+]=]
+--[=[
+	@prop CurrentWordEnd number
+	@readonly
+	@within TextInput
+]=]
+--[=[
+	@prop MultiLine boolean
+	@within TextInput
+]=]
+--[=[
+	@prop CursorPosition number
+	@within TextInput
+]=]
+--[=[
+	@prop SelectionStart number
+	@within TextInput
+]=]
+--[=[
+	@prop ShowNativeInput boolean
+	@within TextInput
+]=]
+--[=[
+	@prop TextEditable boolean
+	@within TextInput
+]=]
+--[=[
+	@prop SelectedColor3 Color3
+	@within TextInput
+]=]
+--[=[
+	@prop StringCapture string
+	@within TextInput
+]=]
+--[=[
+	@prop Feedback string
+	@within TextInput
+]=]
+--[=[
+	@prop FeedbackColor3 Color3
+	@within TextInput
+]=]
+--[=[
+	@prop Text string
+	@within TextInput
+]=]
 
 function TextInput:_Render(App)
 	local App_TextService = App:GetService("TextService");
@@ -280,7 +363,8 @@ function TextInput:_Render(App)
 	};
 end;
 
-function TextInput:CaptureFocus(...)
+--[=[]=]
+function TextInput:CaptureFocus(...:any)
 	return self:GET("TextBox"):CaptureFocus(...);
 end
 

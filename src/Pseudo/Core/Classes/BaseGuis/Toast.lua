@@ -1,8 +1,9 @@
 local Theme = require(script.Parent.Parent.Parent.Theme);
 local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
-local Core = require(script.Parent.Parent.Parent);
-local IsClient = game:GetService("RunService"):IsClient();
 
+--[=[
+	@class Toast
+]=]
 local Toast = {
 	Name = "Toast";
 	ClassName = "Toast";
@@ -24,19 +25,67 @@ local Toast = {
 	StrokeTransparency = 1;
 	Roundness = UDim.new(0);
 	Padding = Vector2.new(5,5);
-	--Size =
 };
 Toast.__inherits = {"GUI","BaseGui"}
 
+--[=[
+	@prop CloseButtonVisible boolean
+	@within Toast
+]=]
+--[=[
+	@prop HeaderTextSize number
+	@within Toast
+]=]
+--[=[
+	@prop HeaderTextColor3 Color3
+	@within Toast
+]=]
+--[=[
+	@prop CanvasImage string
+	@within Toast
+]=]
+--[=[
+	@prop IconImage string
+	@within Toast
+]=]
+--[=[
+	@prop xMax number
+	@within Toast
+]=]
+--[=[
+	@prop Header string
+	@within Toast
+]=]
+--[=[
+	@prop Body string
+	@within Toast
+]=]
+--[=[
+	@prop BodyTextColor3 Color3
+	@within Toast
+]=]
+--[=[
+	@prop BodyTextSize number
+	@within Toast
+]=]
+--[=[
+	@prop Subheader string
+	@within Toast
+]=]
+--[=[
+	@prop CanCollapse boolean
+	@within Toast
+]=]
+--[=[
+	@prop CloseButtonPressed PHeSignal
+	@within Toast
+
+	:::warning
+	This event listener is only if CloseButtonVisible is set to true during its lifecycle
+	:::
+]=]
 
 function Toast:_Render(App)
-	
---[[
-	local Wrapper = Instance.new("Frame", self:GetRef());
-	Wrapper.BackgroundTransparency = 1;
-	Wrapper.AutomaticSize = Enum.AutomaticSize.XY;
-]]
-	
 	
 	local ToastWrapper = App.new("Frame");
 	ToastWrapper.ActiveBehaviour = Enumeration.ActiveBehaviour.None;
@@ -250,6 +299,7 @@ function Toast:_Render(App)
 					CloseBtn.AnchorPoint = Vector2.new(1);
 					CloseBtn.Size = UDim2.fromOffset(20,20);
 					self:AddEventListener("CloseButtonPressed",true, CloseBtn:GetEventListener("Activated"));
+
 				end;
 			end;
 			if(CloseBtn)then CloseBtn.Visible = Value;autoSize(); 
