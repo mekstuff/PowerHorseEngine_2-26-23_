@@ -36,7 +36,8 @@ classes = [
 "Modal","Navigator","NotificationResponse","PHeSignal","PingService","Promise","PromptResponse","PromptService",
 "Pseudo","PseudoService","RInstance","Servant","State","TextService","ToolTip","TradeService","UserIdService",
 "Waypoint","WaypointService","Widget",
-"NotificationService","PingReader","Transition","Tween","TweenService","TabGroup",
+"NotificationService","PingReader","Transition","Tween","TweenService","TabGroup","CoordinateService","TextComponent","Toast",
+"Toggle","TextInput","CommandService"
 ]
 
 [[classOrder]]
@@ -48,7 +49,7 @@ classes = [
 [[classOrder]]
 section = "Globals"
 classes = [
-"CutsceneConstructor","Engine","Enumeration","Format"
+"CutsceneConstructor","Engine","Enumeration","Format","Theme"
 ]
 
 [[classOrder]]

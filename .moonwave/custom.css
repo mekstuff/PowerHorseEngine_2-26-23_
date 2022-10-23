@@ -1,0 +1,98 @@
+
+/* src/css/custom.css */
+
+/* stylelint-disable docusaurus/copyright-header */
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+/* You can override the default Infima variables here. */
+:root {
+    --ifm-color-primary: #fa7548;
+    --ifm-color-primary-dark: #fa6938;
+    --ifm-color-primary-darker: #f95d29;
+    --ifm-color-primary-darkest: #f95219;
+    --ifm-color-primary-light: #fa8158;
+    --ifm-color-primary-lighter: #fb8d67;
+    --ifm-color-primary-lightest: #fb9877;
+    --ifm-code-font-size: 95%;
+  
+    --ifm-color-success: var(--ifm-color-success-light);
+    --ifm-color-info: var(--ifm-color-info-light);
+    --ifm-color-warning: var(--ifm-color-warning-light);
+    --ifm-color-danger: var(--ifm-color-danger-light);
+  
+    --ifm-global-radius: 0.2rem;
+  
+    --ra-admonition-icon-color: var(--ifm-alert-border-color);
+    --ifm-alert-color: var(--ifm-alert-border-color);
+  }
+  
+  .docusaurus-highlight-code-line {
+    background-color: rgb(72, 77, 91);
+    display: block;
+    margin: 0 calc(-1 * var(--ifm-pre-padding));
+    padding: 0 var(--ifm-pre-padding);
+  }
+  
+  .alert {
+    background-color: var(--ifm-background-surface-color);
+    border-color: var(--ifm-alert-border-color);
+    color: var(--ifm-font-color-base);
+  }
+  
+  .alert a {
+    color: var(--ifm-color-primary);
+    text-decoration: var(--ifm-link-decoration);
+  }
+  
+  .alert .admonition-heading {
+    color: var(--ifm-font-color-base);
+  }
+  
+  .admonition-icon svg {
+    fill: var(--ifm-alert-border-color);
+    stroke: var(--ifm-alert-border-color);
+    margin-right: 12px;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }
+  
+  .admonition {
+    border: none;
+    background-color: var(--ifm-color-emphasis-100);
+    border-radius: 0;
+    border-left-width: 0.3rem;
+    border-left-style: solid;
+    border-color: var(--ifm-alert-border-color);
+  }
+  
+  details {
+    background-color: var(--ifm-color-emphasis-100);
+    border-radius: 0;
+    border-left-width: 0.3rem;
+    border-left-style: solid;
+    border-color: var(--ifm-color-emphasis-900);
+    padding: var(--ifm-alert-padding-vertical) var(--ifm-alert-padding-horizontal);
+    margin-bottom: 1em;
+  }
+  
+  summary {
+    outline: none;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  details[open] summary {
+    margin-bottom: 1em;
+  }
+  
+  .alert--secondary {
+    --ifm-alert-background-color: var(--ifm-color-emphasis-900);
+    --ifm-alert-border-color: var(--ifm-color-emphasis-900);
+  }
+  

@@ -1,13 +1,19 @@
 local PowerHorseEngine = require(game:GetService("ReplicatedStorage"):WaitForChild("PowerHorseEngine"));
 local Engine = PowerHorseEngine:GetGlobal("Engine");
 local TextService = PowerHorseEngine:GetService("TextService");
-local module = {}
+
+--[=[
+	@class CommandService
+	@client
+]=]
+local CommandService = {}
 
 local Commands;
 
 --local consoleOutput = ;
 
-function module:GetCommands()
+--[=[]=]
+function CommandService:GetCommands():table
 	--return require(game.Players.LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("PHePanel"):WaitForChild("Commands"));
 	if(not Commands)then
 		Commands = Engine:FetchStorageEvent("PHePanel_CommandReciever","RemoteFunctions"):InvokeServer();
@@ -15,10 +21,11 @@ function module:GetCommands()
 	return Commands;
 end
 
-function module:ExecuteCommand(x,y,focusOnCommand)
+--[=[]=]
+function CommandService:ExecuteCommand(x:string,y:table,focusOnCommand:boolean):string?
 	--consoleOutput("> Executing command...");
 	
-	local cmd = module:GetCommand(x);
+	local cmd = CommandService:GetCommand(x);
 	if(cmd)then
 		if(cmd.__clientSided)then
 			local res = cmd.exe(unpack(y));
@@ -37,7 +44,7 @@ function module:ExecuteCommand(x,y,focusOnCommand)
 	
 	local res;
 	if(not y)then
-		res = Engine:FetchStorageEvent("PHePanel_CommandExecutor","RemoteFunctions"):InvokeServer(module:FromStringToCommand(x));
+		res = Engine:FetchStorageEvent("PHePanel_CommandExecutor","RemoteFunctions"):InvokeServer(CommandService:FromStringToCommand(x));
 	end
 	res = Engine:FetchStorageEvent("PHePanel_CommandExecutor","RemoteFunctions"):InvokeServer(x,y);
 	--print(res)
@@ -52,15 +59,17 @@ function module:ExecuteCommand(x,y,focusOnCommand)
 	return res;
 end;
 
-function module:GetCommand(name)
-	for _,x in pairs(module:GetCommands())do
+--[=[]=]
+function CommandService:GetCommand(name:string)
+	for _,x in pairs(CommandService:GetCommands())do
 		if(x.cmd:lower() == name:lower())then return x;end;
 	end
 end
 
-function module:FromStringToCommand(String)
+--[=[]=]
+function CommandService:FromStringToCommand(String:string):string|table
 	local asWords = TextService:GetWordsFromString(String, ">","<");
-	local Commands = module:GetCommands();
+	local Commands = CommandService:GetCommands();
 	local commandName = asWords[1]
 	local commandVariables = {};
 	for q = 2,#asWords do
@@ -71,10 +80,37 @@ function module:FromStringToCommand(String)
 	return commandName,commandVariables;
 end;
 
-function module:ExecuteCmdFromStr(Str)
-	return module:ExecuteCommand(module:FromStringToCommand(Str));
+--[=[]=]
+function CommandService:ExecuteCmdFromStr(Str:string)
+	return CommandService:ExecuteCommand(CommandService:FromStringToCommand(Str));
 end;
 
+-- Server Functions and props for docs
 
+--[=[
+	@function InvokeClientCommand
+	@within CommandService
+	@server
+	@param Player Player
+	@param cmdName string
+	@param ... any
+]=]
 
-return game:GetService("RunService"):IsServer() and require(game:GetService("ServerScriptService").PHeServer.ServerSideServices[script.Name]) or module
+--[=[
+	@function executeCOmmand
+	@within CommandService
+	@server
+	@param PlayerExecuter Player
+	@param commandName string
+	@param t any
+]=]
+
+--[=[
+	@function getCanExecuteCommand
+	@within CommandService
+	@server
+	@param rankNumber number
+	@param Command string
+]=]
+
+return game:GetService("RunService"):IsServer() and require(game:GetService("ServerScriptService").PHeServer.ServerSideServices[script.Name]) or CommandService;
