@@ -248,6 +248,10 @@ function FrameworkServer:PortService(Service:any)
     end;
 
     function Service:UseChannel(ChannelName:string, ...:any):RemoteEvent
+        local hasSharedContainer = self._dev.__SharedContainer;
+        if(not hasSharedContainer)then
+            error( ("Internal FrameworkError: Tried to UseChannel(\"%s\") on Service \"%s\" but no .Shared Property was provided, Services must be shared to use channel"):format(ChannelName,self.Name))
+        end;
         local hasChannelsContainer = self._dev.__SharedContainer:FindFirstChild("Channels");
         if(not hasChannelsContainer)then
             local c = Instance.new("Folder");

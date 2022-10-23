@@ -30,8 +30,8 @@ href = "https://twitter.com/lanzoinc"
 [[classOrder]]
 section = "Classes"
 classes = [
-"Accordion","ActionMenu","ActionMenuAction","AppBar","AudioService","BaseGui","BaseText",
-"Button","ChannelMethods","Checkbox","CoreGuiService","CustomClass","CustomClassService",
+"Accordion","ActionMenu","ActionMenuAction","AppBar","AudioService","AudioChannel","BaseGui","BaseText",
+"Button","Checkbox","CoreGuiService","CustomClass","CustomClassService",
 "Cutscene","ErrorService","FadeTransition","FormatService","Frame","GUI","Image","InGamePurchaseService",
 "Modal","Navigator","NotificationResponse","PHeSignal","PingService","Promise","PromptResponse","PromptService",
 "Pseudo","PseudoService","RInstance","Servant","State","TextService","ToolTip","TradeService","UserIdService",
