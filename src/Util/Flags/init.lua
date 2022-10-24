@@ -4,6 +4,11 @@ local Flags = {
 
 function Flags:Init()
     local Engine = require(script.Parent.Parent.Engine);
+    local PluginService = require(script.Parent.Parent.Core.Providers.ServiceProvider):LoadServiceAsync("PluginService");
+
+    if(PluginService:IsPluginMode())then
+        return;
+    end
     local Config = Engine:RequestConfig();
     local flags = Config["-flags"] or Config["-lanzo"] or {};
 
