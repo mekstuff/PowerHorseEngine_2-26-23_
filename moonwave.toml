@@ -17,6 +17,7 @@ tagline = "Your project's tagline"
 
 [footer]
 style = "dark"
+
 copyright = "Copyright © 2022 Lanzo"
 
 [[footer.links]]
@@ -57,3 +58,4 @@ section = "Built In Libraries"
 classes = [
 "Collector","Framework","FrameworkClient","FrameworkServer","StateLibrary","Whiplash","Array"
 ]
+

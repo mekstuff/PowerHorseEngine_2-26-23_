@@ -99,7 +99,9 @@ end;
 
 
 function Engine:InitPlugin(plugin)
+
 	local Manifest = require(script.Parent["Manifest"]);
+
 	local PluginService = ServiceProvider:LoadServiceAsync("PluginService");
 	PluginService:Sync(plugin);
 	print("\nRunning", Manifest.Name, "v-", Manifest.Upd.Version, "for plugin \"", plugin,"\"");
@@ -131,9 +133,7 @@ function Engine:InitServer(PushPackages:boolean)
 		warn("Server Already Initiated");
 		return 
 	end;
-
 	
-
 	if game.ReplicatedStorage:FindFirstChild("PHe_RS") then return end;
 	
 	-- EstablishGlobals();

@@ -38,7 +38,7 @@ local Pseudo = {
 --[=[
 	@prop Parent any
 	@within Pseudo
-
+  
 	:::warning
 	If a Pseudo is Parented to another Pseudo, then .Parent will return the `Pseudo`, whereas if it's parented to an `Instance` you will get the ROBLOX Instance.
 	:::
@@ -53,6 +53,7 @@ end;
 ]=]
 function Pseudo:WaitForChild(name:string,onlyPseudo:boolean,tries:number?):any?
 	local c = self:FindFirstChild(name,false,onlyPseudo);
+  
 	if(not c)then
 		tries = tries or 0;
 		if(tries == 10)then
@@ -92,11 +93,13 @@ function Pseudo:FindFirstAncestorOfClass(name:string,level:number)
 		return self.Parent:FindFirstAncestorOfClass(name,level);
 	end
 end;
+
 --[=[
 	@return Pseudo | Instance | nil
 ]=]
 function Pseudo:FindFirstAncestorWhichIsA(name:string,level:number)
 	self:_GetAppModule():GetService("ErrorService").assert(name, "Argument 1 missing or nil");
+
 	local Parent = self.Parent;
 	if(not Parent)then return nil;end;
 	level = level and level+1 or 1;
@@ -106,10 +109,12 @@ function Pseudo:FindFirstAncestorWhichIsA(name:string,level:number)
 		return self.Parent:FindFirstAncestorWhichIsA(name,level);
 	end
 end;
+
 --[=[
 	@return Pseudo | Instance | nil
 ]=]
 function Pseudo:FindFirstChild(name:string,recursive:boolean?,onlyPseudo:boolean?):any?
+
 	local children = self:GetChildren(onlyPseudo)
 	for _,x in ipairs(children)do
 		if(x.Name == name)then return x;end;
@@ -122,19 +127,23 @@ function Pseudo:FindFirstChild(name:string,recursive:boolean?,onlyPseudo:boolean
 	end;
 	return nil;
 end;
+
 --[=[
 	@return Pseudo | Instance | nil
 ]=]
 function Pseudo:FindFirstChildOfClass(name:string)
+
 	for _,x in pairs(self:GetChildren())do
 		if(x.ClassName == name)then return x;end;
 	end
 	return nil;
 end;
+
 --[=[
 	@return Pseudo | Instance | nil
 ]=]
 function Pseudo:FindFirstChildWhichIsA(name:string)
+
 	for _,x in pairs(self:GetChildren())do	
 		if(x:IsA(name))then return x;end;
 	end;
@@ -365,6 +374,7 @@ end;
 --[=[
 	Clones the `Pseudo`. It also will clone Instances inside the Pseudo that wasn't created by the Pseudo itself. Pseudo's must follow
 	a naming convention to properly support cloning.
+
 	@return Pseudo
 ]=]
 function Pseudo:Clone()
@@ -394,6 +404,7 @@ function Pseudo:Clone()
 
 	return new;
 end;
+
 --[=[
 	Destroys the Reference, You can overwrite this by creating your own :Destroy method but make sure to include:
 	```lua
@@ -404,6 +415,7 @@ function Pseudo:Destroy()
 	self:GetRef():Destroy();
 end
 local ROBLOXPropChangedSignals = {"Name","Parent"};
+
 --[=[
 	@return PHeSignal
 ]=]
@@ -434,6 +446,7 @@ function Pseudo:GetPropertyChangedSignal(Prop:string)
 	end;
 	return signal;
 end
+
 --[=[]=]
 function Pseudo:IsA(Class:string):boolean
 	if(self.ClassName == Class)then return true;end;
@@ -455,6 +468,7 @@ function Pseudo:_GetAppModule()
 		return App;
 	end;
 end;
+
 --[=[
 	Some Pseudo's may have `_Appender` Instances or `FatherComponent`'s :_GetCompRef will return those. If they don't exist then
 	it return the Ref.
@@ -468,6 +482,7 @@ end;
 function Pseudo:GetRef():Folder|any
 	return self._referenceInstance
 end
+
 --[=[
 	@return PHeSignal
 ]=]
@@ -517,6 +532,7 @@ function Pseudo:RemoveEventListeners():nil
 		Signal:Destroy();Signal=nil;
 	end
 end;
+
 --[=[
 	@return PHeSignal
 ]=]
