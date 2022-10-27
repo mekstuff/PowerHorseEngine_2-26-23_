@@ -122,8 +122,12 @@ function TextSlider:_Render(App)
 	local Navigator = App.new("Navigator",TextArea);
 	Navigator.Size = UDim2.fromScale(1,1);
 	
-	self._dev.__rbd = RightButton.MouseButton1Down:Connect(function()Navigator:Next()end);
-	self._dev.__lbd = LeftButton.MouseButton1Down:Connect(function()Navigator:Back()end);
+	self._dev.__rbd = RightButton.MouseButton1Down:Connect(function()
+		Navigator:Next()
+	end);
+	self._dev.__lbd = LeftButton.MouseButton1Down:Connect(function()
+		Navigator:Back()
+	end);
 	
 	
 	self:AddEventListener("SelectionChanged",true,Navigator.Navigated)
