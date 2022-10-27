@@ -35,8 +35,26 @@ local FrameworkServer = {};
     @class FrameworkServer
     @server
     Use `PowerHorseEngine:Import("Framework")` from a server script to access this library.
+
+    :::warning
+    Anything on this page tagged with `FrameworkService` refers to the [Pseudo] service that is created after porting the service module!
+    These functions/properties are not accessible from this library itself
+
+    e.g
+    ```lua
+    FrameworkService:PortService() --> Will work.
+    FrameworkService:UseChannel() --> Will not work.
+    ```
+    :::
 ]=]
 
+--[=[
+    @prop Shared table
+    @within FrameworkServer
+    @server
+
+    To create a Service that can be accessed by the client, you need to creat a `Shared` property. Leave as `nil` if you want to create a ServerSided Service.
+]=]
 
 local PortedServices = {};
 
@@ -214,6 +232,7 @@ end
     :::
 
 ]=]
+
 function FrameworkServer:PortService(Service:any)
     ErrorService.assert(not ServerStarted, "Framework: Late service port caught. You tried to port a service after frame work :Start()");
     if(typeof(Service) == "Instance")then
@@ -239,14 +258,34 @@ function FrameworkServer:PortService(Service:any)
         end
     end;
     
+    --[=[
+        @within FrameworkServer
+        @tag FrameworkService
+    ]=]
     function Service:GetService(...:any)
         return FrameworkServer:GetService(...);
     end;
 
+    --[=[
+        @within FrameworkServer
+        @tag FrameworkService
+    ]=]
     function Service:GetComponentClass(...:any)
         return FrameworkServer:GetComponentClass(...);
     end;
 
+    --[=[
+        @within FrameworkServer
+        :::warning
+        In Order for this to work the service must have a `Shared` property.
+        @tag FrameworkService
+        :::
+
+        Idealy, you would want to call this method during the services Init lifecycle. You will then be able to access
+        this Channel on the client by using `Service:UseChannel(ChannelName)`
+
+        Channels are just [RemoteEvents].
+    ]=]
     function Service:UseChannel(ChannelName:string, ...:any):RemoteEvent
         local hasSharedContainer = self._dev.__SharedContainer;
         if(not hasSharedContainer)then

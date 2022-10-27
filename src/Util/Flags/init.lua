@@ -1,7 +1,17 @@
+--[=[
+    @class Flags
+
+    List of flags:
+
+    `force-env {game|plugin|misc} -- force the environment that PowerHorseEngine will be built`
+
+]=]
+
 local Flags = {
     _flags = {};
 };
 
+--[=[]=]
 function Flags:Init()
     local Engine = require(script.Parent.Parent.Engine);
     local PluginService = require(script.Parent.Parent.Core.Providers.ServiceProvider):LoadServiceAsync("PluginService");
@@ -19,10 +29,12 @@ function Flags:Init()
     end
 end;
 
+--[=[]=]
 function Flags:GetFlag(FlagName:string):string
     return Flags._flags[FlagName];
 end;
 
+--[=[]=]
 function Flags:SetFlag(FlagName:string,Value:string,Notice:boolean):nil
     if Notice then 
         if self._flags[FlagName] then

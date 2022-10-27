@@ -104,6 +104,7 @@ local function getProperParent(x)
 end;
 
 --[=[
+    @within Whiplash
     Creates a new component based off of the class. Whiplash is not centered around Pseudo components, You can 
     build Instance as well.
 

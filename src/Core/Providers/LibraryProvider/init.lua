@@ -1,6 +1,4 @@
 --[=[
-	Provider of libraries for live games (does not work for plugins and command)
-
 	@class LibraryProvider
 	@tag Provider
 ]=]
@@ -10,7 +8,6 @@ local LibraryProvider = {}
 local ConstantProviders = script.Parent.Constants;
 local ModuleFetcher = require(ConstantProviders.ModuleFetcher);
 local CoreLibraries = script.Parent.Parent.Libraries;
-local ErrorService = require(script.Parent.Parent.Services.ErrorService);
 local Content = require(script.Parent.Parent.Globals:WaitForChild("Engine")):RequestContentFolder();
 local libs = Content:FindFirstChild("libs");
 
@@ -62,8 +59,27 @@ local function importLibraryFromCloud(name)
     -- return require(lib);
 end
 
+--[=[
+	You can Load Multiple Libraries at once
 
-function LibraryProvider.LoadLibrary(...)
+	```lua
+	local Library1,Library2 = LibraryProvider.LoadLibrary("Library1","Library2");
+	```
+
+	You can also Load `Cloud` Libraries from here. `Cloud` Libraries are just modules in your .content > libs folder. To load a
+	cloud library place `@` at the start of the library name
+
+	```lua
+	local Library1,Library2 = LibraryProvider.LoadLibrary("@Library1","@Library2");
+	```
+	
+	You can also load specific modules within a library
+
+	```lua
+	local FastSpawningModule,SlowSpawningModule = LibraryProvider.LoadLibrary("@Library1/FastSpawningModule","Library2/SlowSpawningModule");
+	```
+]=]
+function LibraryProvider.LoadLibrary(...:any)
 	local libs = {};
 	for _,LibraryName in ipairs({...}) do
 		local isCloudLibrary = LibraryName:match("^@");

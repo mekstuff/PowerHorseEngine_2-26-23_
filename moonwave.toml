@@ -43,7 +43,7 @@ classes = [
 [[classOrder]]
 section = "Providers"
 classes = [
-"LibraryProvider","ModuleFetcher","ServiceProvider","SignalProvider","UtilProvider",
+"LibraryProvider","ModuleFetcher","ServiceProvider","SignalProvider","UtilProvider","ImageProvider"
 ]
 
 [[classOrder]]
@@ -55,5 +55,5 @@ classes = [
 [[classOrder]]
 section = "Built In Libraries"
 classes = [
-"Collector","Framework","FrameworkClient","FrameworkServer","StateLibrary","Whiplash",
+"Collector","Framework","FrameworkClient","FrameworkServer","StateLibrary","Whiplash","Array"
 ]

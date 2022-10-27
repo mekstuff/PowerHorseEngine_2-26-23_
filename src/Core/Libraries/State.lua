@@ -2,15 +2,14 @@ local App = require(script.Parent.Parent.Parent);
 
 --[=[
 	@class StateLibrary
+	@tag Library
 
 	The state library is a library that manages states across your software. It elimates having the create a state with
 	the .new constructor.
 
-	Using :Import("State"); to import this library.
-
-	```lua
-		local State = :Import("State");
-	```
+	:::warning
+	This Library is only called `StateLibrary` for documentation purposes! You'll use `:Import("State")` to access this library not `:Import("StateLibrary")`.
+	:::
 
 	You can create new state by calling the state library as a function, it takes an optional argument of the default value of the state
 	```lua
