@@ -2,17 +2,96 @@
 -- Written by Olanzo James @ Lanzo, Inc.
 -- Tuesday, August 30 2022 @ 13:42:25
 
---[[
+--[=[
     @class State
-]]
+
+    It is recommended that you use the built in [State](StateLibrary) library when working with `State`
+
+    :::warning
+    Printing a State will print out the State.State, But be aware that you cannot compare States with premitives. 
+
+    ```lua
+    local State = .new("State");
+    State.State = 1;
+    print(State) --> 1
+    print(State == 1) --> false
+    ```
+    This is because the State is Pseudo, not the actually value `1`. Instead use State.State or State()
+    ```lua
+    local State = .new("State");
+    State.State = 1;
+    print(State) --> 1
+    print(State() == 1) --> true
+    ```
+
+    Comparing States with other Pseudo's may work but you should refrain from doing so if not needed.
+    ```lua
+    local State = .new("State");
+    State.State = 1;
+    local State2 = .new("State");
+    State2.State = 1;
+    print(State() == State2()) --> true | recommeded
+    print(State == State2) --> true | not recommeded
+    ```
+    :::
+]=]
 local State = {
     Name = "State",
     ClassName = "State",
     State = "**any";
 };
 
+--[=[
+    @prop State any
+    @within State
 
-function State:useEffect(callback:any,dependencies:table)
+    Calling the State as a function also returns the State value. This is the preferred way.
+    ```lua
+    print(State.State) == print(State())
+    ```
+]=]
+
+--[=[
+    @param callback function -- A function that is called when using the effect of the state
+    @param callback table -- Depedencies that will trigger the useEffect
+
+    @return Servant
+
+    If you're familiar with `React` then the useEffect is very similar.
+
+    ```lua
+    local State1 = .new("State");
+    local State2 = .new("State");
+
+    State1:useEffect(function()
+        --> This will run everytime State1.State changes
+        --> This will also run initially aswell.
+    end)
+    
+    State1:useEffect(function()
+        --> This will run everytime both State1.State and State2.State changes
+        --> This will also run initially aswell.
+    end, {State2}) --> State2 is now a dependency of this use Effect
+
+    State1:useEffect(function()
+        --> This will not run everytime State1.State changes, but will only run once which will be the initial run. (This is because the dependency list is empty)
+    end, {}) --> Empty Depedency list instead of nil
+
+    State1:useEffect(function()
+        local prev = true;
+        return function() --> Cleanup function, whenever State1.State changes, the previous useEffects cleanup function will be called
+            prev = false;
+        end;
+    end)
+
+    State1:useEffect(function()
+        return function()
+            --> This cleanup function will only run when the State is destroyed or the useEffect Servant. (This is because the dependency list is empty)
+        end;
+    end, {}) --> Empty Depedency list instead of nil
+    ```
+]=]
+function State:useEffect(callback:any,dependencies:table):Instance
     local App = self:_GetAppModule();
     local ErrorService = App:GetService("ErrorService");
     local lastrescallback;

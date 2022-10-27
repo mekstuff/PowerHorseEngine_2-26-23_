@@ -104,6 +104,7 @@ local function getProperParent(x)
 end;
 
 --[=[
+    @within Whiplash
     Creates a new component based off of the class. Whiplash is not centered around Pseudo components, You can 
     build Instance as well.
 
@@ -116,52 +117,107 @@ end;
     `TextLabel` - Roblox "TextLabel" Component
     :::info
 ]=]
+
+local function getThisValue(object:any,thispath:string):any
+    local lastDirectory = object;
+    local paths = thispath:split("&/");
+    for _,n in pairs(paths) do
+        print(n,lastDirectory);
+        lastDirectory = lastDirectory[n];
+    end;
+    return lastDirectory;
+end;
+
 function Whiplash.New(class:string):Instance
     local Obj = _getInstance(class);
     return function (props)
         local targetParent;
         local toExecute = {};
+        local infollowOrder;
         if(props)then
             for property,value in pairs(props) do
-                -- if(typeof(value) == "function")then
-                --     print("possible function");
-                -- end;
-                if(typeof(property) == "string")then
-                    if(property~="Parent")then
-                        Obj[property]=value;
-                        -->Tracking states to be deleted after;
-                        -- if(typeof(value) == "table" and value.IsA and value:IsA("Pseudo") and )
+                
+                local skipSet = false;
+
+                --> Using this()
+                if(typeof(value) == "table" and value["_%this_meta-Lanzo%"] == true)then
+                    if(value._followOrder)then
+                        infollowOrder = infollowOrder or {};
+                        table.insert(infollowOrder, {property = property, path=value._path});
+                        skipSet = true;
                     else
-                        targetParent = value;
-                    end;
-                elseif(typeof(property) == "function")then
-                    -- property(Obj,value);
-                    table.insert(toExecute, {property = property, value = value})
-                elseif(typeof(property) == "number" and (typeof(value) == "Instance" or typeof(value) == "table"))then
-                    if(Obj:IsA("Pseudo") and value:IsA("Instance"))then
-                       value.Parent = getProperParent(Obj);
-                    else
-                        value.Parent = Obj;
+                        value = getThisValue(Obj,value._path)
                     end
-                end
+                end;
+
+                if(not skipSet)then
+                    if(typeof(property) == "string")then
+                        if(property~="Parent")then
+                            Obj[property]=value;
+                            -->Tracking states to be deleted after;
+                            -- if(typeof(value) == "table" and value.IsA and value:IsA("Pseudo") and )
+                        else
+                            targetParent = value;
+                        end;
+                    elseif(typeof(property) == "function")then
+                        table.insert(toExecute, {property = property, value = value})
+                    elseif(typeof(property) == "number" and (typeof(value) == "Instance" or typeof(value) == "table"))then
+                        if(Obj:IsA("Pseudo") and value:IsA("Instance"))then
+                            value.Parent = getProperParent(Obj);
+                        else
+                            value.Parent = Obj;
+                        end
+                    end
+                end;
             end;
         end;
-        -- print("targetPARENT",targetParent);
-        -- print(targetParent.ClassName)
         Obj.Parent = targetParent;
-        -- print(targetParent,Obj)
+
         for _,x in pairs(toExecute) do
             x.property(Obj,x.value);
-        end
+        end;
+
+        if(infollowOrder)then
+            for _,x in pairs(infollowOrder) do
+                Obj[x.property] = getThisValue(Obj,x.path);
+            end;
+        end;
+      
         toExecute = nil;
         return Obj;
     end
 
 end;
 
+
+--[=[]=]
+function Whiplash.this(followOrder:boolean):table
+    if(followOrder == nil)then followOrder = true;end;
+    local _path = "";
+    local scope = {
+        ["_%this_meta-Lanzo%"] = true;
+        _followOrder = followOrder or false;
+        _path = "";
+    };
+    local meta;
+    meta = setmetatable(scope, {
+        __index = function(t:table,key:string,...)
+            if(key == "OnChange")then
+                return Whiplash.OnChange;
+            end;
+            if(key == "OnEvent")then
+                return Whiplash.OnEvent;
+            end;
+            t._path = _path == "" and key or _path.."&/"..key;
+            _path = t._path;
+            return meta;
+        end;
+    })
+    return meta;
+end
+
 --[=[]=]
 function Whiplash.Execute(a:any,b:any)
-    -- print(a,b); 
     b(a);
 end;
 

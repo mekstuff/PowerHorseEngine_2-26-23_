@@ -1,6 +1,10 @@
-local module = {}
+--[=[
+	@class TextService
+]=]
+local TextService = {}
 
-function module:GetWordsFromString(String,StartCapture,EndCapture)
+--[=[]=]
+function TextService:GetWordsFromString(String:string,StartCapture:string,EndCapture:string):table
 	if(not StartCapture)then return String:split(" ");end;
 	local Words = {};
 	local toFormatBack = {};
@@ -24,7 +28,7 @@ function module:GetWordsFromString(String,StartCapture,EndCapture)
 	--return Unpack and unpack(Words) or Words;
 end
 
-function module:GetWordAtPosition(String,i)
+function TextService:GetWordAtPosition(String:string,i:number):string|number|number
 	local ns = String:find("%s",i) or #String+1;
 	local fnsb = String:sub(1,ns-1);
 	local fnsbr = fnsb:reverse();
@@ -33,10 +37,36 @@ function module:GetWordAtPosition(String,i)
 	return nss, (ns-nspr)+1, ns-1;
 end
 
-function module:GetTags(txt,returnWithNoTags)
-	local res = {};
+--[=[
+	Gets tags from a string
 	
-	--local pattern = "()<([%a]+)%s*([%w%p%s]*)>(%w*)</(%a+)>()";
+	`<b>Hello World</b>` will return 
+	```
+	{
+	{tag = "b", props={}, value="Hello World"}
+	}
+	```
+	
+	`<b super=true>Hello World</b>` will return 
+	```
+	{
+	{tag = "b", props={super=true}, value="Hello World"}
+	}
+	```
+
+	`<b> <t>Text</t> </b>` will return 
+	```
+	{
+	{tag = "b", props={} value={
+		tag = "t", props={}, value="Text"
+	}}
+	}
+	```
+
+]=]
+function TextService:GetTags(txt:string,returnWithNoTags:boolean):table
+	local res = {};
+
 	local pattern = "()<([%a]+)%s*(.-)>(.-)</(%a+)>()";
 	
 	for tagStart,tagType,tagProps,tagValue,tagClose,tagEnd in txt:gmatch(pattern) do
@@ -69,4 +99,4 @@ function module:GetTags(txt,returnWithNoTags)
 return res,notags;
 end;
 
-return module
+return TextService

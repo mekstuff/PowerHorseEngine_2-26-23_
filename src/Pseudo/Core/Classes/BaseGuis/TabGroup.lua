@@ -5,6 +5,9 @@ local IsClient = game:GetService("RunService"):IsClient();
 
 local TweenService = game:GetService("TweenService");
 
+--[=[
+	@class TabGroup
+]=]
 local TabGroup = {
 	Name = "TabGroup";
 	ClassName = "TabGroup";
@@ -20,7 +23,11 @@ local HighlighterPadding = 3;
 
 TabGroup.__inherits = {"BaseGui"}
 
-function TabGroup:AddTab(TabContent,TabName,TabIcon,TabId)
+--[=[
+	@param TabContent BaseGui
+	@return Button
+]=]
+function TabGroup:AddTab(TabContent:Instance,TabName:string,TabIcon:string?,TabId:any?)
 	if(not TabContent)then
 		return self:_GetAppModule():GetService("ErrorService").tossError("AddTab() requires the tabs content to be the first argument");
 	end;
@@ -97,9 +104,9 @@ local function searchForInGroup(name,tabdata)
 	--print(group)
 end
 
-function TabGroup:OpenTab(TabId,GetSubTabs)
-	local found=false;
-	local foundloop = ""
+--[=[]=]
+function TabGroup:OpenTab(TabId:any)
+	local found;
 	for index,v in pairs(self._dev._tabs)do
 		if(v.TabId == TabId)then
 			self:GET("Navigator"):NavigateTo(index);

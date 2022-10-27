@@ -5,7 +5,11 @@ local CoordinateTeleporter = Engine:FetchStorageEvent("CoordinateTeleporter");
 local CoordinateCommunicator = Engine:FetchStorageEvent("CoordinateCommunicator","RemoteFunctions");
 local NotificationService = require(script.Parent.NotificationService);
 local Coordinates = {};
-local module = {}
+
+--[=[
+	@class CoordinateService
+]=]
+local CoordinateService = {}
 
 local ErrorService = require(script.Parent.ErrorService);
 
@@ -50,8 +54,8 @@ local function handleTeleportServer(Player,Name,Category,IgnoreReserved)
 		end
 	end
 	
-	if(module.ProcessTeleportation)then
-		local Process = module.ProcessTeleportation(Player,cate);
+	if(CoordinateService.ProcessTeleportation)then
+		local Process = CoordinateService.ProcessTeleportation(Player,cate);
 		if(not Process)then return end;
 	end;
 	local Character = Player and Player.Character or Player.CharacterAdded:Wait();
@@ -102,12 +106,12 @@ if(IsRunning and not IsClient)then
 	CoordinateCommunicator.OnServerInvoke = handleInvoke;
 	
 	CoordinateTeleporter.OnServerEvent:Connect(function(Player,Name,Category)
-		if(module.UserTeleportCooldown and CooldownUsers[Player.UserId])then
+		if(CoordinateService.UserTeleportCooldown and CooldownUsers[Player.UserId])then
 			NotificationService:SendNotificationAsync(Player, {
 				Header = "Teleportation Failed",
-				Body = "Slow down- Please wait"..tostring(module.UserTeleportCooldown).." (s) before trying to teleport again.";
+				Body = "Slow down- Please wait"..tostring(CoordinateService.UserTeleportCooldown).." (s) before trying to teleport again.";
 				CloseButtonVisible = true;
-				LifeTime = module.UserTeleportCooldown;
+				LifeTime = CoordinateService.UserTeleportCooldown;
 			})
 			CoordinateTeleporter:FireClient(Player,{
 				success = false;
@@ -121,17 +125,20 @@ if(IsRunning and not IsClient)then
 			success = handle.success or (handle.Category and true);
 			contentName = handle.Name;
 		})
-		if(module.UserTeleportCooldown)then
+		if(CoordinateService.UserTeleportCooldown)then
 			CooldownUsers[Player.UserId]=os.time();
-			delay(module.UserTeleportCooldown,function()
+			delay(CoordinateService.UserTeleportCooldown,function()
 				CooldownUsers[Player.UserId]=nil;
 			end)
 		end;
 	end)
 end;
---if(IsClient)then CoordinateTeleporter = script:WaitForChild("CoordinateTeleporter");end;
 
-function module:AddCoordinate(CFrameCoor,Name,Category,CoordinateId,Reserved)
+--[=[
+	
+	@param Reserved table --If you want only specific players, you can add their UserId (recommended) or Username in this table.
+]=]
+function CoordinateService:AddCoordinate(CFrameCoor:CFrame,Name:string,Category:string?,CoordinateId:string?,Reserved:table?):nil
 	assert(not IsClient, "AddCoordinate() can only be called by the server");
 	Name = Name or "Coordinate "..tostring(CFrameCoor);
 	Category = Category or "Unknown";
@@ -151,8 +158,8 @@ function module:AddCoordinate(CFrameCoor,Name,Category,CoordinateId,Reserved)
 	
 end;
 
---//
-function module:GetCoordinatesAsync(forTeleportService)
+--[=[]=]
+function CoordinateService:GetCoordinatesAsync(forTeleportService:boolean):table
 	local Player = game.Players.LocalPlayer;
 	if(Player)then
 		local fetch = CoordinateCommunicator:InvokeServer();
@@ -172,8 +179,9 @@ function module:GetCoordinatesAsync(forTeleportService)
 		return Coordinates;
 	end;
 end;
---//
-function module:TeleportAsync(Player,CoordinateName,CoordinateCategory,Transition,Notify,IgnoreReserved)
+
+--[=[]=]
+function CoordinateService:TeleportAsync(Player:Player,CoordinateName:string,CoordinateCategory:string?,Transition:boolean?,Notify:table?,IgnoreReserved:boolean?)
 	if(IsClient)then
 		if(Player ~= game.Players.LocalPlayer)then 
 			Notify = Transition;
@@ -204,4 +212,4 @@ end;
 
 
 
-return module
+return CoordinateService

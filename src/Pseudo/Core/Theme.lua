@@ -1,4 +1,7 @@
-local module = {};
+--[=[
+	@class Theme
+]=]
+local Theme = {};
 local Services = script.Parent.Parent.Parent.Core.Services;
 local PluginService = require(Services.PluginService);
 local TweenService = require(Services.TweenService);
@@ -87,7 +90,10 @@ if(Config.Theme)then
 end;
 
 local ThemeObject;
-function module.buildTheme()
+--[=[
+	@private
+]=]
+function Theme.buildTheme()
 	if(ThemeObject)then return ThemeObject;end;
 	local App = getApp();
 	local CustomClassService = App:GetService("CustomClassService");
@@ -108,13 +114,37 @@ function module.buildTheme()
 	end;
 end
 
+--[=[
+	extends the Theme
+	
+	```lua
+	Theme.extendTheme({
+		MyCustomColor = Color3.fromRGB(0,0,0);
+		--> Or overwrite default themes
+		Text = Color3.fromRGB(255,0,0)
+	})
+	Text.TextColor3 = Theme.useTheme("MyCustomColor");
+	```
 
-function module.extendTheme(t,uniqueThemeIdentifier)
+	extendTheme also extends onto stateful themes, so any component using .useTheme will update whenever the theme is extended
+
+	```lua
+	local function SwitchModes(dark:boolean)
+		Theme.extendTheme({
+			Text = dark and Color3.fromRGB(0,0,0) or Color3.fromRGB(255,255,255);
+		});
+	end;
+
+	MyTextPseudo.TextColor3 = Theme.useTheme("Text") --> My Text will show white when not in darkmode/show black when in darkmode.
+
+	```
+]=]
+function Theme.extendTheme(extension:table,uniqueThemeIdentifier:string?)
 	local App = getApp();
 	if(not ThemeObject)then
-		module.buildTheme();
+		Theme.buildTheme();
 	end;
-	for a,b in pairs(t) do
+	for a,b in pairs(extension) do
 		if(uniqueThemeIdentifier)then 
 			a = uniqueThemeIdentifier..a;
 		end;
@@ -132,8 +162,10 @@ function module.extendTheme(t,uniqueThemeIdentifier)
 	end
 end;
 
-
-function module.useTheme(theme)
+--[=[
+	@return State
+]=]
+function Theme.useTheme(theme:string):Instance
 	-- print(ThemeDefault[theme], theme)
 	-- return ThemeDefault[theme]
 	--[[ disabled until further notice ]]
@@ -146,11 +178,12 @@ function module.useTheme(theme)
 		end;
 		return;
 	end;
-	module.buildTheme();
-	return module.useTheme(theme);
+	Theme.buildTheme();
+	return Theme.useTheme(theme);
 end;
 
-function module.ThemeToggler()
+--[=[]=]
+function Theme.ThemeToggler()
 	-- if(ThemeToggler)then return ThemeToggler;end;
 
 	local App = require(script.Parent.Parent.Parent);
@@ -170,9 +203,9 @@ function module.ThemeToggler()
 		Roundness = UDim.new(25);
 		-- BackgroundTransparency = .5;
 		IconAdaptsTextColor = false;
-		BackgroundColor3 = module.useTheme("Primary");
-		IconColor3 = module.useTheme("Text");
-		StrokeColor3 = module.useTheme("Text");
+		BackgroundColor3 = Theme.useTheme("Primary");
+		IconColor3 = Theme.useTheme("Text");
+		StrokeColor3 = Theme.useTheme("Text");
 		Text = "";
 		Icon = "ico-mdi@action/nightlight_round";
 		StrokeThickness = 4;
@@ -200,7 +233,7 @@ function module.ThemeToggler()
 		RespectViewport = false;
 		RevealOnMouseEnter = false;
 		PositionBehaviour = Enumeration.PositionBehaviour.Static;
-		BackgroundColor3 = module.useTheme("BackgroundLite");
+		BackgroundColor3 = Theme.useTheme("BackgroundLite");
 		New "$Frame" {
 			Name = "ContentContainer";
 			Size = UDim2.fromOffset(0); 
@@ -264,13 +297,17 @@ function module.ThemeToggler()
 	return Button;
 end;
 
-function module.getDefaultTheme()
+--[=[]=]
+function Theme.getDefaultTheme()
 	return ThemeDefault;
 end;
 
-function module.getCurrentTheme()
-	return module.getDefaultTheme();
+--[=[
+	Useful if you just want to use the current value of a Theme, this value will not be stateful (This is what is used by core components)
+]=]
+function Theme.getCurrentTheme()
+	return Theme.getDefaultTheme();
 end;
 
 
-return module
+return Theme

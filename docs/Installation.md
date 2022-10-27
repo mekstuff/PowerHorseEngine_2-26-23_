@@ -1,4 +1,20 @@
+---
+sidebar_position: 2
+---
+
 # Installation
+
+## CLI
+
+:::warning
+This feature is not yet stable.
+:::
+
+Install the `PHe` CLI from npm using `npm i -g PHe`
+
+Then run `PHe init` for the interactive menu.
+
+--- 
 
 
 ## npm
@@ -45,7 +61,7 @@ to your wally dependency list then run wally install
 
 ## Github
 
-Visit [Lanzo](https://github.com/lanzoinc) on GitHub and look for our `PowerHorseEngine` repository.
+Visit [LanzoInc](https://github.com/lanzoinc) on GitHub and look for our `PowerHorseEngine` repository.
 
 :::note "Direct Repo Link"
 [https://github.com/lanzoinc/PowerHorseEngine](https://github.com/lanzoinc/PowerHorseEngine)

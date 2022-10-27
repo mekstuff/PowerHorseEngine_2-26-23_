@@ -2,16 +2,25 @@ local App = require(script.Parent.Parent.Parent);
 local matcher = "^ico%-(%w+)@(.+)";
 local loadedpacks={};
 
---[[
+--[=[
     @class ImageProvider
     @tag Provider
-]]
+]=]
 
 local ImageProvider = {};
+
+--[=[
+    @return string | Promise
+]=]
 
 function ImageProvider:RequestUri(src:string,promise:boolean):string?
     return promise and self:RequestImageUri(src) or self:GetImageUri(src,true);
 end
+
+
+--[=[
+    @return Promise
+]=]
 
 function ImageProvider:RequestImageUri(img:string)
     local Promise = App.new("Promise");
@@ -28,6 +37,7 @@ function ImageProvider:RequestImageUri(img:string)
     return Promise;
 end
 
+--[=[]=]
 function ImageProvider:GetImageUri(img:string,warnsAreErrors:boolean):string
     local warn = warn;
     if(warnsAreErrors)then warn = error;end;

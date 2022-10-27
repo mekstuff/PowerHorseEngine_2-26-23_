@@ -1,7 +1,9 @@
 local Theme = require(script.Parent.Parent.Parent.Theme);
 local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
-local Core = require(script.Parent.Parent.Parent);
-local IsClient = game:GetService("RunService"):IsClient();
+
+--[=[
+	@class TextComponent
+]=]
 
 local TextComponent = {
 	Name = "TextComponent";
@@ -9,8 +11,6 @@ local TextComponent = {
 	ComponentTextAdjustment = Enumeration.Adjustment.Left;
 	ComponentText = "Text Here";
 	ComponentTextColor3 = Theme.getCurrentTheme().Text;
-	-- ComponentTextSize = -1;
-	-- ComponentSize = -1;
 	ComponentTextSize = 16;
 	ComponentSize = UDim2.new(-1);
 	Component = "";
@@ -20,10 +20,35 @@ local TextComponent = {
 	StrokeColor3 = Theme.getCurrentTheme().Background;
 	StrokeTransparency = 1;
 	StrokeThickness = 1.5;
-	-- Size = -1;
 	Size = UDim2.new(-1)
 };
 TextComponent.__inherits = {"BaseGui"};
+
+--[=[
+	@prop ComponentTextAdjustment Enumeration.Adjustment
+	@within TextComponent
+]=]
+--[=[
+	@prop ComponentText string
+	@within TextComponent
+]=]
+--[=[
+	@prop ComponentTextColor3 Color3
+	@within TextComponent
+]=]
+--[=[
+	@prop ComponentSize UDim2 -- Set to UDim2.new(-1) for it to be automatic.
+	@within TextComponent
+]=]
+--[=[
+	@prop Component string
+	@within TextComponent
+]=]
+--[=[
+	@prop Padding number
+	@within TextComponent
+]=]
+
 
 local function gridRespectObject(p,n)
 	local e = Instance.new("Frame");

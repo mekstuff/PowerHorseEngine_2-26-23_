@@ -25,7 +25,7 @@ local function getCommand(cmdName)
 	
 end;
 
-function module.getCanExecuteCommand(rankNumber,Command)
+function module.getCanExecuteCommand(rankNumber:number,Command:string)
 	
 	if(rankNumber == Ranks[1][1])then
 		return true; --> Highest rank does not need validation.
@@ -48,8 +48,7 @@ function module.getCanExecuteCommand(rankNumber,Command)
 	
 end;
 
-function module.InvokeClientCommand(Player,cmdName,...)
-
+function module.InvokeClientCommand(Player:Player,cmdName:string,...:any):string?
 
 	local rankData = PHeCommandsMainModule.getUserRank(Player);
 	
@@ -106,7 +105,7 @@ local function convertType(type_,myArg,PlayerExecuter)
 	return arg;
 end
 
-function module.executeCommand(PlayerExecuter,commandName,t)
+function module.executeCommand(PlayerExecuter:Player,commandName:string,t:table?)
 	
 	if(typeof(PlayerExecuter) ~= "string" and PlayerExecuter:IsA("Player") ) then
 	else

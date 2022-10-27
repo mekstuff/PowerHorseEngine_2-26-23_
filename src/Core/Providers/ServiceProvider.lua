@@ -26,6 +26,7 @@ if(rs:IsServer() and rs:IsRunning())then
 	AppPointer.Parent = ServerSideServices;
 end;
 
+--[=[]=]
 function ServiceProvider:LoadServiceAsync(ServiceName:string)
 	local Results = ModuleFetcher(ServiceName,CoreServices,ServiceName.." Is Not A Valid Service Name",false, (rs:IsServer() and rs:IsRunning()) and ServerSideServices);
 	--local Results = ModuleFetcher(ServiceName,CoreServices,Servi);

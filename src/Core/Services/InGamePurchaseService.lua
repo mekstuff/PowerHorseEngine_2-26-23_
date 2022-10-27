@@ -1,4 +1,9 @@
-local module = {}
+--[=[
+	@class InGamePurchaseService
+	@tag Service
+]=]
+
+local InGamePurchaseService = {}
 
 local Globals = script.Parent.Parent.Globals;
 
@@ -10,7 +15,14 @@ local InGamePurchaseRemoteEvent = Engine:FetchStorageEvent("InGamePurchaseServic
 local IsServer = game:GetService("RunService"):IsServer();
 
 if(not IsServer)then
-	module.PurchaseCompleted = SignalProvider.new("InGamePurchaseCompleted");
+	--[=[
+		@prop PurchaseCompleted PHeSignal
+		@within InGamePurchaseService
+		@client
+		@server
+		Fired whenever a purchase is completed
+	]=]
+	InGamePurchaseService.PurchaseCompleted = SignalProvider.new("InGamePurchaseCompleted");
 end
 
 local function combineString(strings)
@@ -19,8 +31,11 @@ local function combineString(strings)
 	return format(strings.Text):concat(" "):concat(strings.Name):concat(" for "):concat("$"):concat(PriceStringed):concat(strings.Currency):concat("? "):concat(strings.AssuranceText):End();
 end
 
-
-function module:PromptPurchase(Plr,ProductId,Props,...)
+--[=[
+	@client
+	@server
+]=]
+function InGamePurchaseService:PromptPurchase(Plr:Player,ProductId:number,Props:table)
 	
 	assert(Plr and game:GetService("Players"):FindFirstChild(Plr.Name), "PromptPurchase() First Argument Must Be A Player Instance");
 	
@@ -46,4 +61,4 @@ function module:PromptPurchase(Plr,ProductId,Props,...)
 	
 end;
 
-return module
+return InGamePurchaseService

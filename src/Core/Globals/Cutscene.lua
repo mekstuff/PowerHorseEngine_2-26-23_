@@ -10,7 +10,7 @@ local Camera = workspace.CurrentCamera;
 	"CutsceneConstructor" is used for documentation purposes.
 :::
 @tag Global
-@class CutsceneConstrctor
+@class CutsceneConstructor
 ]=]
 local Cutscene = {}
 
@@ -59,7 +59,7 @@ end;
 
 --[=[
 Constructor for creating a new cutscene
-@within CutsceneConstrctor
+@within CutsceneConstructor
 @return Cutscene
 ]=]
 function Cutscene.new(CFrame_:CFrame,Speed_:number,EasingStyle_:TweenInfo,EasingDirection_:TweenInfo,Lifetime_:number)

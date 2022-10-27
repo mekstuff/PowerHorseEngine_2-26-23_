@@ -44,16 +44,16 @@ function AudioService:RemoveChannel(ChannelName:string)
 end
 
 --[=[
-	@class ChannelMethods
+	@class AudioChannel
 ]=]
-local ChannelMethods = {};
+local AudioChannel = {};
 
 --[=[]=]
-function ChannelMethods:Destroy()
+function AudioChannel:Destroy()
 	AudioService:RemoveChannel(self.Name);
 end;
 --[=[]=]
-function ChannelMethods:SetAudioMuted(AudioName:string,State:boolean,AudioInstance:any)
+function AudioChannel:SetAudioMuted(AudioName:string,State:boolean,AudioInstance:any)
 	if(not AudioInstance)then
 		for _,q in pairs(self.Audios)do
 			if(q.Name == AudioName)then	
@@ -72,11 +72,11 @@ function ChannelMethods:SetAudioMuted(AudioName:string,State:boolean,AudioInstan
 end
 
 --[=[]=]
-function ChannelMethods:GetAudio(AudioName:string)
+function AudioChannel:GetAudio(AudioName:string)
 	return self.Audios[AudioName];
 end
 --[=[]=]
-function ChannelMethods:GetAudios()
+function AudioChannel:GetAudios()
 	return self.Audios;
 end
 
@@ -94,7 +94,7 @@ local function getAudioFromChannel(Channel,AudioName)
 	return Channel.Audios[AudioName];
 end
 --[=[]=]
-function ChannelMethods:SetDefaultAudio(AudioName:string)
+function AudioChannel:SetDefaultAudio(AudioName:string)
 	for _,v in pairs(self.Audios)do
 		v.isDefaultAudio=false
 	end;
@@ -124,7 +124,7 @@ local function removeFromActiveList(self,AudioName)
 	end;
 end
 --[=[]=]
-function ChannelMethods:SetVolume(Volume:number)
+function AudioChannel:SetVolume(Volume:number)
 	for _,v in pairs(self.ActiveAudios)do
 		v.Volume = Volume;
 	end;
@@ -155,17 +155,17 @@ local function TweenAudioOut(Obj,self)
 	t.Completed:Wait();
 end;
 --[=[]=]
-function ChannelMethods:Mute()
+function AudioChannel:Mute()
 	if(not self.Muted)then
 		self.Muted=true;
 		for _,v in pairs(self.Audios)do
 			--v.Muted=true;
-			ChannelMethods:SetAudioMuted(nil,true,v);
+			AudioChannel:SetAudioMuted(nil,true,v);
 		end
 	end
 end;
 --[=[]=]
-function ChannelMethods:Unmute()
+function AudioChannel:Unmute()
 	if(self.Muted)then
 		self.Muted=false;
 		for _,v in pairs(self.Audios)do
@@ -174,14 +174,14 @@ function ChannelMethods:Unmute()
 		end;
 		for _,q in pairs(self.ActiveAudios)do
 			--print(q.Name);
-			--ChannelMethods:SetAudioMuted(nil,false,q);
+			--AudioChannel:SetAudioMuted(nil,false,q);
 			--self:PlayAudio(q.Name,true);
 		end
 	end;
 end;
 
 --[=[]=]
-function ChannelMethods:PlayAudio(AudioName:string,FromPaused:boolean)
+function AudioChannel:PlayAudio(AudioName:string,FromPaused:boolean)
 	
 	local TargetAudio = getAudioFromChannel(self,AudioName);
 	
@@ -210,7 +210,7 @@ function ChannelMethods:PlayAudio(AudioName:string,FromPaused:boolean)
 	return TargetAudio;
 end
 --[=[]=]
-function ChannelMethods:StopAudio(AudioName:string,ignoreDefault:boolean)
+function AudioChannel:StopAudio(AudioName:string,ignoreDefault:boolean)
 	local TargetAudio = getAudioFromChannel(self,AudioName)
 	if not (TargetAudio.AudioInstance.IsPlaying)then return end;
 	TweenAudioOut(TargetAudio,self);
@@ -225,7 +225,7 @@ end
 
 
 --[=[]=]
-function ChannelMethods:PauseAudio(AudioName:string,ignoreDefault:boolean,DoNotRemove:boolean)
+function AudioChannel:PauseAudio(AudioName:string,ignoreDefault:boolean,DoNotRemove:boolean)
 	local TargetAudio = getAudioFromChannel(self,AudioName)
 	if not (TargetAudio.AudioInstance.IsPlaying)then return end;
 	TweenAudioOut(TargetAudio,self);
@@ -258,7 +258,7 @@ function AudioObjectMethods:Destroy()
 	self.AudioInstance:Destroy();
 end
 --[=[]=]
-function ChannelMethods:AddAudio(AudioName:string,AudioID:number,AudioVolume:number,Looped:boolean,PlayAudio:boolean,Instant:boolean)
+function AudioChannel:AddAudio(AudioName:string,AudioID:number,AudioVolume:number,Looped:boolean,PlayAudio:boolean,Instant:boolean)
 	if(self.Audios[AudioName])then
 		local App = require(script.Parent.Parent.Parent);
 		local ErrorService = App:GetService("ErrorService");
@@ -333,9 +333,9 @@ function AudioService:CreateSoundEffectsChannel(ChannelName:string)
 	return AudioService:CreateChannel(ChannelName or "SoundEffects",15,nil,nil,true);
 end
 --[=[
-	
+	@return AudioChannel
 ]=]
-function AudioService:CreateChannel(ChannelName:string, AudiosAllowedInParallel:number, DefaultVolume:number, DefaultLoop:boolean, AudiosInstant:boolean)
+function AudioService:CreateChannel(ChannelName:string, AudiosAllowedInParallel:number, DefaultVolume:number, DefaultLoop:boolean, AudiosInstant:boolean):Instance
 	
 	if(Channels[ChannelName])then  return Channels[ChannelName];end;
 	--local SignalProvider = require(script.Parent.Parent.Parent.):GetProvider("SignalProvider");
@@ -374,7 +374,7 @@ function AudioService:CreateChannel(ChannelName:string, AudiosAllowedInParallel:
 	
 	--newChannel.
 	
-	setmetatable(newChannel, {__index=ChannelMethods});
+	setmetatable(newChannel, {__index=AudioChannel});
 	
 	Channels[ChannelName]=newChannel;
 	

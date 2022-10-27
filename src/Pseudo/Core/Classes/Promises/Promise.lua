@@ -4,7 +4,7 @@ Promise.ClassName = "Promise";
 Promise.PromiseState = "pending";
 
 --[=[
-@class Promise
+    @class Promise
 ]=]
 
 function Promise:_Render()

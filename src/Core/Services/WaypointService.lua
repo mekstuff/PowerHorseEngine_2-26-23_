@@ -7,9 +7,15 @@ local Character = Player.Character or Player.CharacterAdded:Wait();
 local HumanRP = Character:WaitForChild("HumanoidRootPart");
 local CustomClassService = require(script.Parent.CustomClassService);
 
-local module = {}
+--[=[
+	@class WaypointService
+]=]
+local WaypointService = {}
 
-local WaypointClass = {
+--[=[
+	@class Waypoint
+]=]
+local Waypoint = {
 	Name = "Waypoint";
 	ClassName = "Waypoint";
 	ShowOnMap = false;
@@ -17,8 +23,24 @@ local WaypointClass = {
 	ShowDirectionalArrow = true;
 	WaypointInfo = "";
 };
+--[=[
+	@prop ShowOnMap boolean
+	@within Waypoint
+]=]
+--[=[
+	@prop ShowScreenIndicator boolean
+	@within Waypoint
+]=]
+--[=[
+	@prop ShowDirectionalArrow boolean
+	@within Waypoint
+]=]
+--[=[
+	@prop WaypointInfo string
+	@within Waypoint
+]=]
 
-function WaypointClass:_Render()
+function Waypoint:_Render()
 	local App = self:_GetAppModule();
 	local CoreGuiService = App:GetService("CoreGuiService");
 
@@ -62,12 +84,15 @@ function WaypointClass:_Render()
 		end,
 		
 	};
-end
+end;
 
-function module:CreateWaypoint(Direction,WaypointInfo)
-	local Waypoint = CustomClassService:CreateClassAsync(WaypointClass,nil,{Direction = Direction});
+--[=[
+	@return Waypoint
+]=]
+function WaypointService:CreateWaypoint(Direction:Vector3,WaypointInfo:string?):Instance
+	local Waypoint = CustomClassService:CreateClassAsync(Waypoint,nil,{Direction = Direction});
 	Waypoint.WaypointInfo = WaypointInfo;
 	return Waypoint;
 end;
 
-return module
+return WaypointService
