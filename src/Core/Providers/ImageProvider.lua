@@ -12,13 +12,16 @@ local ImageProvider = {};
 --[=[
     @return string | Promise
 ]=]
+
 function ImageProvider:RequestUri(src:string,promise:boolean):string?
     return promise and self:RequestImageUri(src) or self:GetImageUri(src,true);
 end
 
+
 --[=[
     @return Promise
 ]=]
+
 function ImageProvider:RequestImageUri(img:string)
     local Promise = App.new("Promise");
     Promise:Try(function(resolve,reject)
