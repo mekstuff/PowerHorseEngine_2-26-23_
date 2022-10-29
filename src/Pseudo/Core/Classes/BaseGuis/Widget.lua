@@ -26,6 +26,7 @@ local Widget = {
 	Required = false;
 	Enabled = true;
 	BorderRoundness = UDim.new(0);
+	BackgroundTransparency = 0;
 	BackgroundColor3 = Theme.getCurrentTheme().Background;
 	AutomaticHide = false;
 	Dragging = false;
@@ -355,7 +356,7 @@ function Widget:_Render(App)
 		};
 		_Mapping = {
 			[Widget] = {
-				"BackgroundColor3";
+				"BackgroundColor3","BackgroundTransparency";
 			}
 		};
 	};
