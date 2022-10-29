@@ -4,7 +4,6 @@ local Core = require(script.Parent.Parent.Parent);
 
 local __PHeImage = "rbxasset://textures/loading/robloxTilt.png";
 
-local IsClient = game:GetService("RunService"):IsClient();
 local TweenService = game:GetService("TweenService");
 local a_zLowercase = {};
 local z_aLowercase = {};
@@ -14,6 +13,10 @@ end;
 for _,v in pairs(a_zLowercase) do
 	table.insert(z_aLowercase,v);
 end;Core.InverseTable(z_aLowercase);
+
+--[=[
+	@class NotificationGroup
+]=]
 
 local NotificationGroup = {
 	Name = "NotificationGroup";
@@ -29,6 +32,49 @@ local NotificationGroup = {
 	NotificationAnimationStyle = Enumeration.NotificationAnimationStyle.Slide;
 	BackgroundTransparency = 1;
 };
+
+--[=[
+	@prop DefaultNotificationPriority Enumeration.NotificationPriority
+	@within NotificationGroup
+]=]
+--[=[
+	@prop DefaultNotificationLifetime number
+	@within NotificationGroup
+	Set to -1 for infinite Notification
+]=]
+--[=[
+	@prop ContentAdjustment Enumeration.Adjustment
+	@within NotificationGroup
+]=]
+--[=[
+	@prop SortOrderAdjustment Enumeration.Adjustment
+	@within NotificationGroup
+]=]
+--[=[
+	@prop Padding UDim
+	@within NotificationGroup
+]=]
+--[=[
+	@prop Position UDim2
+	@within NotificationGroup
+]=]
+--[=[
+	@prop AnchorPoint Vector2
+	@within NotificationGroup
+]=]
+--[=[
+	@prop Size UDim2
+	@within NotificationGroup
+]=]
+--[=[
+	@prop NotificationAnimationStyle Enumeration.NotificationAnimationStyle
+	@within NotificationGroup
+]=]
+--[=[
+	@prop BackgroundTransparency number
+	@within NotificationGroup
+]=]
+
 NotificationGroup.__inherits = {"BaseGui","Frame"}
 
 --//
@@ -543,6 +589,10 @@ function NotificationGroup:_Render(App)
 	NotificationsContainer.ScrollingDirection = Enum.ScrollingDirection.Y;
 ]]
 	
+	--[=[
+		@prop Notification PHeSignal
+		@within NotificationGroup
+	]=]
 	self:AddEventListener("Notification",true);
 
 	local NotificationsContainer = App.new("Frame",self:GetRef());

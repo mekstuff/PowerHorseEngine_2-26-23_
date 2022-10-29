@@ -1,8 +1,6 @@
 local Theme = require(script.Parent.Parent.Parent.Theme);
 local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
 
-
-
 local Checkbox = {
 	Name = "Checkbox";
 	ClassName = "Checkbox";
@@ -71,10 +69,30 @@ function Checkbox:_Render(App)
 	CheckboxButton.Padding = Vector2.new(0,0);
 	--CheckboxButton.Icon = "";
 
+--[=[
+	@prop MouseButton1Down PHeSignal
+	@within Checkbox
+]=]
 	self:AddEventListener("MouseButton1Down",true,CheckboxButton.MouseButton1Down);
+--[=[
+	@prop MouseButton1Up PHeSignal
+	@within Checkbox
+]=]
 	self:AddEventListener("MouseButton1Up",true,CheckboxButton.MouseButton1Up);
+--[=[
+	@prop MouseButton2Down PHeSignal
+	@within Checkbox
+]=]
 	self:AddEventListener("MouseButton2Down",true,CheckboxButton.MouseButton2Down);
+--[=[
+	@prop MouseButton2Up PHeSignal
+	@within Checkbox
+]=]
 	self:AddEventListener("MouseButton2Up",true,CheckboxButton.MouseButton2Up);
+--[=[
+	@prop Toggled PHeSignal
+	@within Checkbox
+]=]
 	local Toggled = self:AddEventListener("Toggled",true);
 	
 	return {

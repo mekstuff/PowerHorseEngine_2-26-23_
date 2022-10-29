@@ -2,7 +2,11 @@ local Theme = require(script.Parent.Parent.Parent.Theme);
 local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
 local Core = require(script.Parent.Parent.Parent);
 
+--[=[
+	@class Button
 
+	Inherits [Frame], [GUI], [BaseGui], [Text]
+]=]
 local Button = {
 	Name = "Button";
 	ClassName = "Button";
@@ -26,11 +30,6 @@ local Button = {
 };
 
 Button.__inherits = {"Frame","GUI","BaseGui","Text"};
---[=[
-	@class Button
-
-	Inherits [Frame], [GUI], [BaseGui], [Text]
-]=]
 
 --[=[
 	@prop Icon string
@@ -246,14 +245,45 @@ function Button:_Render(App)
 	ButtonEventer.Text = "";
 	ButtonEventer.Parent = Frame:GetGUIRef();
 
+	--[=[
+		@prop MouseButton1Down PHeSignal
+		@within Button
+	]=]
 	local MB1D = self:AddEventListener("MouseButton1Down",true);
+	--[=[
+		@prop MouseButton1Up PHeSignal
+		@within Button
+	]=]
 	local MB1U = self:AddEventListener("MouseButton1Up",true);
+	--[=[
+		@prop MouseButton2Down PHeSignal
+		@within Button
+	]=]
 	local MB2D = self:AddEventListener("MouseButton2Down",true);
+	--[=[
+		@prop MouseButton2Up PHeSignal
+		@within Button
+	]=]
 	local MB2U = self:AddEventListener("MouseButton2Up",true);
+	--[=[
+		@prop MouseButton1Click PHeSignal
+		@within Button
+	]=]
 	local MB1C = self:AddEventListener("MouseButton1Click",true);
+	--[=[
+		@prop MouseButton2Click PHeSignal
+		@within Button
+	]=]
 	local MB2C = self:AddEventListener("MouseButton2Click",true);
-	
+	--[=[
+		@prop MouseEnter PHeSignal
+		@within Button
+	]=]
 	self:AddEventListener("MouseEnter", true, Frame:GetEventListener("MouseEnter"));
+	--[=[
+		@prop MouseLeave PHeSignal
+		@within Button
+	]=]
 	self:AddEventListener("MouseLeave", true, Frame:GetEventListener("MouseLeave"));
 
 	local function fireEvent(e:BindableEvent,...:any):nil

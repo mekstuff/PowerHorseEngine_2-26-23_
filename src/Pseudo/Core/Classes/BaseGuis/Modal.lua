@@ -2,6 +2,12 @@ local Theme = require(script.Parent.Parent.Parent.Theme);
 local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
 local TweenService = game:GetService("TweenService");
 
+--[=[
+	@class Modal
+
+	Inherits [BaseGui], [GUI]
+]=]
+
 local Modal = {
 	Name = "Modal";
 	ClassName = "Modal";
@@ -28,11 +34,7 @@ local Modal = {
 };
 Modal.__inherits = {"BaseGui","GUI"};
 
---[=[
-	@class Modal
 
-	Inherits [BaseGui], [GUI]
-]=]
 
 --[=[
 	@prop Header string
@@ -280,7 +282,15 @@ function Modal:_Render(App)
 	Header.HoverEffect = Enumeration.HoverEffect.None; --< HoverEffect.None 
 	Header.Parent = Top;
 	
+--[=[
+	@prop ButtonClicked PHeSignal
+	@within Modal
+]=]
 	self:AddEventListener("ButtonClicked",true);
+--[=[
+	@prop ButtonClicked PHeSignal
+	@within Modal
+]=]
 	self:AddEventListener("ButtonAdded",true);
 	
 	local CloseButton = App.new("CloseButton",Top);

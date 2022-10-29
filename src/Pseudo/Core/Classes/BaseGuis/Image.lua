@@ -77,10 +77,30 @@ function Image:_Render(App)
 	ImageContent.BackgroundTransparency = 1;
 	ImageContent.ZIndex = self.ZIndex+1;
 
+	--[=[
+		@prop MouseEnter PHeSignal
+		@within Image
+	]=]
 	self:AddEventListener("MouseEnter",true,Container.MouseEnter);
+	--[=[
+		@prop MouseLeave PHeSignal
+		@within Image
+	]=]
 	self:AddEventListener("MouseLeave",true,Container.MouseLeave);
+	--[=[
+		@prop InputBegan PHeSignal
+		@within Image
+	]=]
 	self:AddEventListener("InputBegan",true,Container.InputBegan);
+	--[=[
+		@prop InputEnded PHeSignal
+		@within Image
+	]=]
 	self:AddEventListener("InputEnded",true,Container.InputEnded);
+	--[=[
+		@prop InputChanged PHeSignal
+		@within Image
+	]=]
 	self:AddEventListener("InputChanged",true,Container.InputChanged);
 
 	local ModelContent;local ModelContentCamera;

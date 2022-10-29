@@ -59,8 +59,17 @@ function Accordion:_Render(App)
 	AccordionButton.Roundness = UDim.new(0);
 
 	AccordionButton.ClickEffect = false;
-
+	--[=[
+		@prop ButtonMouseEnter PHeSignal
+		@tag Event
+		@within Accordion
+	]=]
 	self:AddEventListener("ButtonMouseEnter",true,AccordionButton.MouseEnter);
+		--[=[
+		@prop ButtonMouseLeave PHeSignal
+		@tag Event
+		@within Accordion
+	]=]
 	self:AddEventListener("ButtonMouseLeave",true,AccordionButton.MouseLeave);
 	
 	local AccordionContent = App.new("Frame",AccordionContainer);
@@ -84,7 +93,11 @@ function Accordion:_Render(App)
 	local AutoExpandButton = Instance.new("TextButton", AccordionButton:GetGUIRef());
 	AutoExpandButton.BackgroundTransparency = 1;
 	AutoExpandButton.Text = "";
-	
+	--[=[
+		@prop ButtonPressed PHeSignal
+		@tag Event
+		@within Accordion
+	]=]
 	self:AddEventListener("ButtonPressed",true,AutoExpandButton.MouseButton1Down);
 	
 	return {

@@ -51,13 +51,45 @@ function Frame:_Render(App)
 	Round.Name = "$l_round";
 	
 
+	--[=[
+		@prop MouseEnter PHeSignal
+		@within Frame
+	]=]
 	self:AddEventListener("MouseEnter",true,FrameObject.MouseEnter);
+	--[=[
+		@prop MouseLeave PHeSignal
+		@within Frame
+	]=]
 	self:AddEventListener("MouseLeave",true,FrameObject.MouseLeave);
+	--[=[
+		@prop MouseMoved PHeSignal
+		@within Frame
+	]=]
 	self:AddEventListener("MouseMoved",true,FrameObject.MouseMoved);
+	--[=[
+		@prop MouseWheelForward PHeSignal
+		@within Frame
+	]=]
 	self:AddEventListener("MouseWheelForward",true,FrameObject.MouseWheelForward);
+	--[=[
+		@prop MouseWheelBackward PHeSignal
+		@within Frame
+	]=]
 	self:AddEventListener("MouseWheelBackward",true,FrameObject.MouseWheelBackward);
+	--[=[
+		@prop InputBegan PHeSignal
+		@within Frame
+	]=]
 	self:AddEventListener("InputBegan",true,FrameObject.InputBegan);
+	--[=[
+		@prop InputEnded PHeSignal
+		@within Frame
+	]=]
 	self:AddEventListener("InputEnded",true,FrameObject.InputEnded);
+	--[=[
+		@prop InputChanged PHeSignal
+		@within Frame
+	]=]
 	self:AddEventListener("InputChanged",true,FrameObject.InputChanged);
 
 	
@@ -93,30 +125,8 @@ function Frame:_Render(App)
 			GlobalToolTip.tip:_Hide();
 		end
 	end);
-	
-	--[[
-	FrameObject.InputBegan:Connect(function(InputObject)
-		if(self.Disabled)then return end;
-		if(InputObject.UserInputType == Enum.UserInputType.MouseButton1)then
-			MouseButton1DownEvent:Fire();
-		elseif(InputObject.UserInputType == Enum.UserInputType.MouseButton2)then
-			MouseButton2DownEvent:Fire();
-		end
-	end);FrameObject.InputEnded:Connect(function(InputObject)
-		if(InputObject.UserInputType == Enum.UserInputType.MouseButton1)then
-			MouseButton1UpEvent:Fire();
-		elseif(InputObject.UserInputType == Enum.UserInputType.MouseButton2)then
-			MouseButton2UpEvent:Fire();
-		end
-	end)
-	]]
 
 	local Padding;
-	
-	
-	local firstInit=true;
-	
-	--print(tick()-t, " seconds");
 	
 	return {
 		["Padding"] = function(v)

@@ -55,6 +55,10 @@ function AppBar:_Render(App)
     -- Btn.TextScaled = true;
     Btn.TextAdjustment = Enumeration.Adjustment.Left;
 
+    --[=[
+        @prop ActionButtonPressed PHeSignal
+        @within AppBar
+    ]=]
     self:AddEventListener("ActionButtonPressed",true,Btn.MouseButton1Down);
 	
 	return {

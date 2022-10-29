@@ -397,6 +397,10 @@ function ActionMenu:AddAction(ActionName:string,id:string,ActionIcon:string,...:
 
 	self._dev.__TreeContents[id] = Action;
 
+	--[=[
+		@prop MouseButton1Down PHeSignal
+		@within ActionMenu
+	]=]
 	ActionButton:AddEventListener("MouseButton1Down"):Connect(function()
 		if(ActionButton.Name ~= "_notrigger")then
 			--self:Hide();
@@ -468,6 +472,10 @@ function ActionMenu:_Render(App)
 	MainActionToolTip.ContentPadding = Vector2.new(0,5);
 	MainActionToolTip.BackgroundColor3 = Color3.fromRGB(53, 53, 53);
 	
+	--[=[
+		@prop ActionTriggered PHeSignal
+		@within ActionMenu
+	]=]
 	self:AddEventListener("ActionTriggered",true)
 	
 	if(self._InitialAdornee)then
