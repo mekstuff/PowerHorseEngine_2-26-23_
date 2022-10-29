@@ -3,6 +3,9 @@ local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
 local Core = require(script.Parent.Parent.Parent);
 local IsClient = game:GetService("RunService"):IsClient();
 
+--[=[
+	@class Portal
+]=]
 local Portal = {
 	Name = "Portal";
 	ClassName = "Portal";
@@ -11,8 +14,21 @@ local Portal = {
 	IgnoreGuiInset = false;
 	ResetOnSpawn = false;
 };
+
 Portal.__inherits = {"BaseGui"}
 
+--[=[
+	@prop Inherits BaseGui
+	@within Portal
+]=]
+--[=[
+	@prop IgnoreGuiInset boolean
+	@within Portal
+]=]
+--[=[
+	@prop ResetOnSpawn boolean
+	@within Portal
+]=]
 
 function Portal:_Render(App)
 	local PluginService = App:GetService("PluginService");

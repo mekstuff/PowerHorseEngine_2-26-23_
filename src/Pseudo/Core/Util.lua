@@ -600,7 +600,15 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 				local StateLibrary = App:Import("State");
 				local hooks = {};
 				--> useComponents hook
-				hooks.useComponents = function(components:any)
+				--[=[
+					@class useComponents
+				]=]
+				--[=[
+					@function useComponents
+					@within useComponents
+					@param components table
+				]=]
+				hooks.useComponents = function(components:table)
 					assert(typeof(components) == "table", ("table expected from useComponents hook, got %s"):format(typeof(components)));
 					for name,value in pairs(components) do
 						if Pseudo._Components[name] then 
@@ -610,6 +618,49 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 					end;
 				end;
 				--> useEffect hook
+
+				--[=[
+					@class useEffect
+
+					useEffect is a hook that is use by functional [Pseudo]'s.
+				]=]
+				--[=[
+					@function useEffect
+					@within useEffect
+					@param callback function -- A function that is called whenever the useEffect is triggered
+					@param dependencies table? -- An optional list of items that can trigger this useEffect
+
+					```lua
+					--> useEffect with a state depedency
+					useEffect(function()
+						print("This is only called when the state is changed")
+					end,{AwesomeState});
+
+					--> useEffect with property depedency
+					useEffect(function()
+						print("This is only called when \"OtherProperty\" and \"TextColor3\" are changed")
+					end,{"OtherProperty","TextColor3"})
+
+					useEffect(function()
+						local doCleanupOnPreviousLoop = false;
+						for i = 1,AwesomeState,1 do
+							if(doCleanupOnPreviousLoop)then break;end;
+							print("Running at index : ",i);
+							wait(1);
+						end;
+						return function ()
+							--//This will cause the previous for loop if still running to end whenever this useEffect hook is called
+							doCleanupOnPreviousLoop = true; 
+						end;
+						
+					end,{AwesomeState})
+
+
+					return function ()
+						print("This is called whenever any property of the component is changed");
+					end;
+					```
+				]=]
 				hooks.useEffect = function(callback:any,dependencies:table?)
 					if(not Pseudo._dev._useEffectState)then 
 						Pseudo._dev._useEffectState = StateLibrary("nil");
@@ -618,6 +669,15 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 					return Pseudo._dev._useEffectState:useEffect(callback,dependencies)
 				end;
 				--> useMapping hook
+				--[=[
+					@class useMapping
+				]=]
+				--[=[
+					@function useMapping
+					@within useMapping
+					@param props table
+					@param dependencies table
+				]=]
 				hooks.useMapping = function(props:table,dependencies:table):nil
 					if(not quickMap)then
 						quickMap = {};
