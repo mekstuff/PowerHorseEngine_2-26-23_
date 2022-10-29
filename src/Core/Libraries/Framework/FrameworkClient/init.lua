@@ -45,7 +45,7 @@ function FrameworkClient:Start()
         for _,v in pairs(PortedModulars) do
             local initRan,initResults = pcall(function()
                 v.Parent = Modulars;
-                return v:Init();
+                return v:Init(v._RenderHooksPassOn);
             end);
             if(not initRan)then
                 reject("Failed to :Init a service at ["..v.ClassName.."] -> "..initResults);
@@ -55,7 +55,9 @@ function FrameworkClient:Start()
         --//Start
         for _,v in pairs(PortedModulars) do
             local startRan,startResults = pcall(function()
-                return v:Start();
+                local Hooks = v._RenderHooksPassOn;
+                v._RenderHooksPassOn = nil;
+                return v:Start(Hooks);
             end);
             if(not startRan)then
 
@@ -214,7 +216,9 @@ function FrameworkClient:PortModular(Modular:any)
 
     if(not Modular._Render)then
         function Modular:_Render()
-            return{};
+            return function (Hooks)
+                self._RenderHooksPassOn = Hooks;
+            end
         end;
     end;
 
