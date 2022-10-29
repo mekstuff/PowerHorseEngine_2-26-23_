@@ -25,7 +25,7 @@ local Widget = {
 	WidgetIcon = "";
 	Required = false;
 	Enabled = true;
-	BorderRoundness = UDim.new(0);
+	Roundness = UDim.new(0);
 	BackgroundTransparency = 0;
 	BackgroundColor3 = Theme.getCurrentTheme().Background;
 	AutomaticHide = false;
@@ -306,7 +306,7 @@ function Widget:_Render(App)
 			WidgetTop_Header.Icon = Value;
 		end,["*Name"] = function(Value)
 			WidgetTop_Header.Text = Value;
-		end,["BorderRoundness"] = function(Value)
+		end,["Roundness"] = function(Value)
 			Widget.Roundness = Value
 		end,["WidgetColor"] = function(Value)
 			WidgetTop.BackgroundColor3 = Value;
