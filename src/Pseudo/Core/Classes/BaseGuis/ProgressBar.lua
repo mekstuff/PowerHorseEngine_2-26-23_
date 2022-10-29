@@ -1,8 +1,9 @@
 local Theme = require(script.Parent.Parent.Parent.Theme);
-local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
-local Core = require(script.Parent.Parent.Parent);
-local IsClient = game:GetService("RunService"):IsClient();
 local TweenService = game:GetService("TweenService");
+
+--[=[
+	@class ProgressBar
+]=]
 
 local ProgressBar = {
 	Name = "ProgressBar";
@@ -17,6 +18,28 @@ local ProgressBar = {
 	Roundness = UDim.new(0);
 };
 ProgressBar.__inherits = {"BaseGui"}
+--[=[
+	@prop Inherits BaseGui
+	@within ProgressBar
+]=]
+
+--[=[
+	@prop Value number
+	@within ProgressBar
+]=]
+--[=[
+	@prop Progress number
+	@within ProgressBar
+	@deprecated v1.7.0 -- You should use .Value instead
+]=]
+--[=[
+	@prop ForegroundColor3 Color3
+	@within ProgressBar
+]=]
+--[=[
+	@prop TweenSpeed number
+	@within ProgressBar
+]=]
 
 
 function ProgressBar:_Render(App)

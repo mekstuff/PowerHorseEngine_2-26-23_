@@ -1,21 +1,26 @@
-local Theme = require(script.Parent.Parent.Parent.Theme);
 local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
-local Core = require(script.Parent.Parent.Parent);
-local IsClient = game:GetService("RunService"):IsClient();
-
 local UIS = game:GetService("UserInputService");
 local TotalPadding = 5;
 
+--[=[
+	@class TextSlider
+]=]
 local TextSlider = {
 	Name = "TextSlider";
 	ClassName = "TextSlider";
 	Size = UDim2.fromOffset(200,35);
 	Focused = false;
 };
+
+--[=[
+	@prop Focused boolean
+	@within TextSlider
+]=]
+
 TextSlider.__inherits = {"BaseGui"}
 
---//
-function TextSlider:SetFocus(Focus)
+--[=[]=]
+function TextSlider:SetFocus(Focus:boolean)
 	if(not Focus)then
 		if(self._dev.__FocusEvents)then
 			self._dev.__FocusEvents.l:Disconnect();self._dev.__FocusEvents.l=nil;
@@ -38,8 +43,9 @@ function TextSlider:SetFocus(Focus)
 		end)
 	end
 end;
---//
-function TextSlider:RemoveText(Text)
+
+--[=[]=]
+function TextSlider:RemoveText(Text:string)
 	if(self._dev.TEXTS)then
 		for index,v in pairs(self._dev.TEXTS) do
 			if(v.Text == Text)then
@@ -50,8 +56,9 @@ function TextSlider:RemoveText(Text)
 		end
 	end
 end;	
---//
-function TextSlider:AddText(Text,TextSize)
+
+--[=[]=]
+function TextSlider:AddText(Text:string,TextSize:number?)
 	if(self._dev.TEXTS)then
 		for _,v in pairs(self._dev.TEXTS) do
 			if(v.Text == Text)then return end;
@@ -122,8 +129,12 @@ function TextSlider:_Render(App)
 	local Navigator = App.new("Navigator",TextArea);
 	Navigator.Size = UDim2.fromScale(1,1);
 	
-	self._dev.__rbd = RightButton.MouseButton1Down:Connect(function()Navigator:Next()end);
-	self._dev.__lbd = LeftButton.MouseButton1Down:Connect(function()Navigator:Back()end);
+	self._dev.__rbd = RightButton.MouseButton1Down:Connect(function()
+		Navigator:Next()
+	end);
+	self._dev.__lbd = LeftButton.MouseButton1Down:Connect(function()
+		Navigator:Back()
+	end);
 	
 	
 	self:AddEventListener("SelectionChanged",true,Navigator.Navigated)

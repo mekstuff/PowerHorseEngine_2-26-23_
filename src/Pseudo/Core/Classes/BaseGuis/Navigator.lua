@@ -3,6 +3,11 @@ local TweenService = game:GetService("TweenService");
 
 local safeNumber = 0;
 
+--[=[
+	@class Navigator
+
+	Inherits [BaseGui]
+]=]
 local Navigator = {
 	Name = "Navigator";
 	ClassName = "Navigator";
@@ -11,11 +16,7 @@ local Navigator = {
 
 Navigator.__inherits = {"BaseGui"}
 
---[=[
-	@class Navigator
 
-	Inherits [BaseGui]
-]=]
 --[=[
 	@prop NavigationSpeed number
 	@within Navigator
@@ -175,6 +176,10 @@ function Navigator:_Render(App)
 	self._dev.__nav.pages = {};
 	self._dev.__nav.currentIndex = safeNumber;
 	
+--[=[
+	@prop Navigated PHeSignal
+	@within Navigator
+]=]
 	self:AddEventListener("Navigated",true);
 	
 	return {

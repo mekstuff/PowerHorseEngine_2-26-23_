@@ -1,8 +1,8 @@
-local Theme = require(script.Parent.Parent.Parent.Theme);
-local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
-local Core = require(script.Parent.Parent.Parent);
 local PseudoService = require(script.Parent.Parent.Parent.Parent.Parent.Core.Services.PseudoService);
-local IsClient = game:GetService("RunService"):IsClient();
+
+--[=[
+	@class StackProvider
+]=]
 
 local StackProvider = {
 	Name = "StackProvider";
@@ -15,9 +15,38 @@ local StackProvider = {
 	DirectChildrenOnly = false;
 	--Adornee = "**Instance";
 };
+
+--[=[
+	@prop Filter string
+	@within StackProvider
+]=]
+--[=[
+	@prop IgnoreOtherProviders boolean
+	@within StackProvider
+]=]
+--[=[
+	@prop Stack table
+	@within StackProvider
+]=]
+--[=[
+	@prop Enabled boolean
+	@within StackProvider
+]=]
+--[=[
+	@prop Provider Pseudo | Instance
+	@within StackProvider
+]=]
+--[=[
+	@prop DirectChildrenOnly boolean
+	@within StackProvider
+]=]
+
 StackProvider.__inherits = {}
 
-function StackProvider:fetchObjects(search,filter,ignoreOthers,prevTable,addedevent)
+--[=[
+	@private
+]=]
+function StackProvider:fetchObjects(search:any,filter:table,ignoreOthers:boolean,prevTable:table,addedevent:any):table
 	if(prevTable and self.DirectChildrenOnly)then return prevTable;end;
 	prevTable = prevTable or {};
 	search = search:GetChildren();
@@ -41,14 +70,20 @@ function StackProvider:fetchObjects(search,filter,ignoreOthers,prevTable,addedev
 	return prevTable;
 end
 
-function StackProvider:_tableFilter(f)
+--[=[
+	@private
+]=]
+function StackProvider:_tableFilter(f:table):table
 	f = f or self.Filter;
 	local t={};
 	for x in f:gmatch("(%w+),*") do table.insert(t,x);end;
 	return t;
 end
 
-function StackProvider:_removeFromStackForce(id,className)
+--[=[
+	@private
+]=]
+function StackProvider:_removeFromStackForce(id:any,className:string)
 	if(not self.Stack[className])then return;end;
 	self.Stack[className][id]=nil;
 	if(not self.Enabled)then return end;
@@ -63,7 +98,17 @@ function StackProvider:_Render(App)
 	local DescendantAddedEvent;
 	local DescendantRemovingEvent;
 	
+	--[=[
+		@prop PseudoAdded PHeSignal
+		@tag Event
+		@within StackProvider
+	]=]
 	local PseudoAdded = self:AddEventListener("PseudoAdded",true);
+	--[=[
+		@prop PseudoRemoved PHeSignal
+		@tag Event
+		@within StackProvider
+	]=]
 	local PseudoRemoved = self:AddEventListener("PseudoRemoved",true)
 	
 	local function disconnectEvents()

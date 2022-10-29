@@ -13,6 +13,13 @@ local AppBar = {
     BackgroundTransparency = 1;
     BackgroundColor3 = Theme.getCurrentTheme().Primary;
 };
+
+--[=[
+    @prop Inherits BaseGui
+    @within AppBar
+]=]
+AppBar.__inherits = {"BaseGui"};
+
 --[=[
     @prop Text string
     @within AppBar
@@ -38,7 +45,6 @@ local AppBar = {
     @within AppBar
 ]=]
 
-AppBar.__inherits = {"BaseGui"};
 
 function AppBar:_Render(App)
 
@@ -55,6 +61,10 @@ function AppBar:_Render(App)
     -- Btn.TextScaled = true;
     Btn.TextAdjustment = Enumeration.Adjustment.Left;
 
+    --[=[
+        @prop ActionButtonPressed PHeSignal
+        @within AppBar
+    ]=]
     self:AddEventListener("ActionButtonPressed",true,Btn.MouseButton1Down);
 	
 	return {

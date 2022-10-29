@@ -284,7 +284,7 @@ function FrameworkServer:PortService(Service:any)
         Idealy, you would want to call this method during the services Init lifecycle. You will then be able to access
         this Channel on the client by using `Service:UseChannel(ChannelName)`
 
-        Channels are just [RemoteEvents].
+        Channels are just [RemoteEvent]'s.
     ]=]
     function Service:UseChannel(ChannelName:string, ...:any):RemoteEvent
         local hasSharedContainer = self._dev.__SharedContainer;

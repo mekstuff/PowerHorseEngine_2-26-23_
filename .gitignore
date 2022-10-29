@@ -11,3 +11,6 @@ node_modules/
 #custom ignores
 /testing
 /testing.project.json
+
+# moonwave docs
+/build

@@ -59,6 +59,8 @@ local State = {
 
     If you're familiar with `React` then the useEffect is very similar.
 
+    Uses the [useEffect] hook.
+
     ```lua
     local State1 = .new("State");
     local State2 = .new("State");

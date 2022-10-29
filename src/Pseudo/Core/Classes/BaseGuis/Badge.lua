@@ -1,7 +1,12 @@
 local Theme = require(script.Parent.Parent.Parent.Theme);
 local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
-local Core = require(script.Parent.Parent.Parent);
-local IsClient = game:GetService("RunService"):IsClient();
+local TextService = game:GetService("TextService")
+
+--[=[
+	@class Badge
+
+	Inherits [BaseGui], [Text]
+]=]
 
 local Badge = {
 	Name = "Badge";
@@ -19,9 +24,13 @@ local Badge = {
 	xAdjustment = Enumeration.Adjustment.Right;
 };
 
+--[=[
+	@prop xAdjustment Enumeration.Adjustment
+]=]
+
 Badge.__inherits = {"BaseGui"}
 
-local function PositionButton(Button,xAdjustment)
+local function PositionButton(TextObject,xAdjustment)
 	local x;
 	if(xAdjustment == Enumeration.Adjustment.Left)then
 		x=0 
@@ -30,43 +39,34 @@ local function PositionButton(Button,xAdjustment)
 	else
 		x = 1
 	end;
-	Button.Position = UDim2.new(x, - (Button:GetAbsoluteSize().X/2),0,- (Button:GetAbsoluteSize().Y/2));
+	TextObject.Position = UDim2.new(x, - (TextObject:GetAbsoluteSize().X/2),0,- (TextObject:GetAbsoluteSize().Y/2));
 end
 
 
 function Badge:_Render(App)
 	
-	local Button = App.new("Button",self:GetRef());
-	-- Button.TextAdjustment = Enumeration.Adjustment.Center;
-	-- Button.ButtonFlexSizing = false;
-	Button.RippleStyle = Enumeration.RippleStyle.None
-	--PositionButton(Button)
---[[
-	Button:GetPropertyChangedSignal("Size"):Connect(function()
-		if(IsClient)then
-			game:GetService("RunService").RenderStepped:Wait();
-		else
-			task.wait();
-		end
-		PositionButton(Button,self.xAdjustment);
-		--Button.Position = UDim2.new(1, - (Button:GetAbsoluteSize().X/2),0,- (Button:GetAbsoluteSize().Y/2));
-	end);
-]]
-	
-	--local ParentPropertySizeChange
+	local TextObject = App.new("Text",self:GetRef());
+	TextObject.Size = UDim2.new(0);
+
+	local Rounder = Instance.new("UICorner", TextObject:GetGUIRef())
 	
 	return {
 		["xAdjustment"] = function(Value)
-			PositionButton(Button,Value)
+			PositionButton(TextObject,Value)
 		end,
 		["Text"] = function(Value)
-			Button.Text = Value;
-			Button:JiggleEffect();
+			TextObject.Text = Value;
+			local s = TextService:GetTextSize(Value, TextObject.TextSize, TextObject.Font, Vector2.new(math.huge,math.huge));
+			self.Size = UDim2.fromOffset(s.X+15,s.Y+7.5);
+			PositionButton(TextObject,self.xAdjustment)
 		end,
+		["Roundness"] = function(v)
+			Rounder.CornerRadius = v;
+		end;
 		_Components = {};
 		_Mapping = {
-			[Button] = {
-				"Roundness","TextScaled","Visible",
+			[TextObject] = {
+				"TextScaled","Visible",
 				"Size","TextColor3","StrokeTransparency","StrokeThickness","StrokeColor3","BackgroundColor3","BackgroundTransparency"
 			}	
 		};
