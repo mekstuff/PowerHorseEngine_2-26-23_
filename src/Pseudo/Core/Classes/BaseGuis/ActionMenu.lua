@@ -154,18 +154,28 @@ end;
 local ActionMenuAction = {
 	Name = "ActionMenuAction";
 	ClassName = "ActionMenuAction";
-	ID = ""
+	ID = "";
+	Text = "";
+	Icon = "";
 };
 function ActionMenuAction:_Render()
-	return {};
+	self._ActionButton = self._dev.args;
+	return {
+		["Text"] = function(v)
+			self._ActionButton.Text = v;
+		end;
+		["Icon"] = function(v)
+			self._ActionButton.Icon = v;
+		end;
+	};
 end
 --[=[]=]
 function ActionMenuAction:UpdateText(Text:string)
-	self._ActionButton.Text = Text;
+	self.Text = Text;
 end;
 --[=[]=]
 function ActionMenuAction:UpdateIcon(Icon:string)
-	self._ActionButton.Icon = Icon or "?";
+	self.Icon = Icon;
 end;
 --[=[
 @return ActionMenu
@@ -278,8 +288,6 @@ function ActionMenu:AddAction(ActionName:string,id:string,ActionIcon:string,...:
 
 	local UserKeybindService = App:GetService("UserKeybindService");
 
-	local Action = App.Create(ActionMenuAction);
-
 	local ContentFrame = self:GET("ContentFrame");
 	local UIGrid = self:GET("UIGrid");
 
@@ -311,6 +319,7 @@ function ActionMenu:AddAction(ActionName:string,id:string,ActionIcon:string,...:
 	ActionButton.RippleStyle = Enumeration.RippleStyle.None;
 	ActionButton.Parent = Container;
 	
+	local Action = App.Create(ActionMenuAction,nil,ActionButton);
 
 
 	local x;
@@ -368,7 +377,6 @@ function ActionMenu:AddAction(ActionName:string,id:string,ActionIcon:string,...:
 
 	Action._ParentExpandIcon = ActionRightImage;
 	Action._Container = Container;
-	Action._ActionButton = ActionButton;
 	Action._Menu = self;
 
 	id = id or tostring(math.random(1,500));
