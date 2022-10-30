@@ -107,7 +107,7 @@ function ToolTip:_Track()
 		end
 		self._dev.__prevAdorneeConnectionC = game:GetService("UserInputService").InputChanged:Connect(function(input, gameProcessedEvent)
 			if(input.UserInputType == Enum.UserInputType.MouseMovement)then
-				update(input);
+				update(input.Position);
 			end
 		end)
 	end;
