@@ -302,6 +302,7 @@ function Widget:_Render(App)
 			WidgetContent = WidgetContent;	
 			FatherComponent = WidgetContent:GetGUIRef();
 			ActionButtons = WidgetTop_ActionButtons;
+			WidgetObject = WidgetObject;
 		};
 		_Mapping = {
 			[WidgetObject] = {
