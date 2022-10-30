@@ -309,8 +309,7 @@ function ActionMenu:AddAction(ActionName:string,id:string,ActionIcon:string,...:
 	local ActionButton = App.new("Button");
 	ActionButton.ButtonFlexSizing = false;
 	ActionButton.Name = "ActionButton";
-	ActionButton.Text = ActionName;
-	ActionButton.Icon = ActionIcon or "?";
+
 	ActionButton.Roundness = UDim.new(0);
 	ActionButton.BackgroundTransparency = 1;
 	ActionButton.StrokeTransparency = 1;
@@ -320,7 +319,8 @@ function ActionMenu:AddAction(ActionName:string,id:string,ActionIcon:string,...:
 	ActionButton.Parent = Container;
 	
 	local Action = App.Create(ActionMenuAction,nil,ActionButton);
-
+	Action.Text = ActionName;
+	Action.Icon = ActionIcon or "";
 
 	local x;
 
@@ -389,15 +389,9 @@ function ActionMenu:AddAction(ActionName:string,id:string,ActionIcon:string,...:
 
 	self._dev.__TreeContents[id] = Action;
 
-	--[=[
-		@prop MouseButton1Down PHeSignal
-		@within ActionMenu
-	]=]
+	
 	ActionButton:AddEventListener("MouseButton1Down"):Connect(function()
-		-- if(ActionButton.Name ~= "ActionButton_notrigger")then
-			-- print("Ran this");
-			self:GetEventListener("ActionTriggered"):Fire(Action);
-		-- end;
+		self:GetEventListener("ActionTriggered"):Fire(Action);
 	end);
 
 	return Action;
