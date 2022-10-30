@@ -180,10 +180,12 @@ function Widget:_Render(App)
 	WidgetTop_ActionButtons_List.HorizontalAlignment = Enum.HorizontalAlignment.Right;
 	WidgetTop_ActionButtons_List.VerticalAlignment = Enum.VerticalAlignment.Center;
 	WidgetTop_ActionButtons_List.Parent = WidgetTop_ActionButtons:GetGUIRef();
+	WidgetTop_ActionButtons_List.SortOrder = Enum.SortOrder.LayoutOrder;
 	WidgetTop_ActionButtons_List.FillDirection = Enum.FillDirection.Horizontal;
 
-	local WidgetTop_CloseBtn = App.new("CloseButton")
-	WidgetTop_CloseBtn.Parent = WidgetTop_ActionButtons
+	local WidgetTop_CloseBtn = App.new("CloseButton");
+	WidgetTop_CloseBtn.Name = "z1_$l";
+	WidgetTop_CloseBtn.Parent = WidgetTop_ActionButtons;
 	WidgetTop_CloseBtn.Position = UDim2.new(1,0,0,0);
 	WidgetTop_CloseBtn.Size = UDim2.fromOffset(WidgetTop:GetAbsoluteSize().Y,WidgetTop:GetAbsoluteSize().Y); 
 	WidgetTop_CloseBtn.SupportsRBXUIBase = true;
