@@ -63,8 +63,6 @@ return function(UserId)
 
 	local Pages = script.Pages;
 	
-	
-
 	local function AddPageChildren(Loop,Group)
 		for _,v in pairs(Loop)do
 			local page = require(v);

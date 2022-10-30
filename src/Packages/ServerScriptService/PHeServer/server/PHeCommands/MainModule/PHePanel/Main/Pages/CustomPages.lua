@@ -3,7 +3,7 @@ local App = require(game:GetService("ReplicatedStorage"):WaitForChild("PowerHors
 
 return {
 	Name = "";
-	Icon = "ico-more_horiz";
+	Icon = "ico-mdi@navigation/more_horiz";
 	Func = function()
 		local Frame = App.new("Frame");
 		return Frame;

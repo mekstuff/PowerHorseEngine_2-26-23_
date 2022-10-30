@@ -53,17 +53,17 @@ end;
 function ActionMenu:Show(ignoreFocusLost:boolean, CustomAdornee:any)
 	if(self._dev._Showing)then
 		self:Hide();
-		wait();
+		task.wait();
 	end;
 	local App = self:_GetAppModule()
 	local UserKeybindService = App:GetService("UserKeybindService");
 	local MainActionToolTip = self:GET("MainActionToolTip");
 	
-	if(CustomAdornee and CustomAdornee ~= MainActionToolTip._Adornee)then
+	if(CustomAdornee and CustomAdornee ~= MainActionToolTip.Adornee)then
 		MainActionToolTip.StaticXAdjustment = Enumeration.Adjustment.Flex;
 		MainActionToolTip.StaticYAdjustment = Enumeration.Adjustment.Bottom;
 		MainActionToolTip.PositionBehaviour = Enumeration.PositionBehaviour.Static;
-		MainActionToolTip._Adornee = CustomAdornee
+		MainActionToolTip.Adornee = CustomAdornee
 		MainActionToolTip:_UpdateAdornee();
 	end;
 	
@@ -102,7 +102,7 @@ function ActionMenu:Show(ignoreFocusLost:boolean, CustomAdornee:any)
 	
 	if(not ignoreFocusLost)then
 		local ev;
-		wait(.4);
+		task.wait(.4);
 		if(not self._dev._Showing)then return end;
 		ev = UIS.InputBegan:Connect(function(inputObject)
 			--if(not gp)then return;end;
@@ -134,7 +134,7 @@ function ActionMenu:Hide()
 			if(v.connection)then v.connection:Disconnect();v.connection=nil;end;
 		end
 	end;
-	delay(5,function()
+	task.delay(5,function()
 		if(not self)then return end;
 		if(self._dev.EnterEventInitiated and not self._dev._Showing)then
 			if(self._dev.__TreeContents)then
@@ -310,6 +310,7 @@ function ActionMenu:AddAction(ActionName:string,id:string,ActionIcon:string,...:
 	ActionRightImage.Visible = false;
 
 	local ActionButton = App.new("Button");
+	ActionButton.ButtonFlexSizing = false;
 	ActionButton.Name = "ActionButton";
 	ActionButton.Text = ActionName;
 	ActionButton.Icon = ActionIcon or "?";
@@ -373,7 +374,7 @@ function ActionMenu:AddAction(ActionName:string,id:string,ActionIcon:string,...:
 	end
 
 	Container.Parent = ContentFrame;
-	Container.Size = UDim2.new(1,0,0,ActionButton:GetAbsoluteSize().Y);
+	Container.Size = UDim2.new(1,0,0,30) -- UDim2.new(1,0,0,ActionButton:GetAbsoluteSize().Y);
 	ContentFrame.Size = UDim2.fromOffset(x+bindfit,UIGrid.AbsoluteContentSize.Y);
 	ActionButton.Size = UDim2.fromScale(1,1);
 
@@ -467,7 +468,7 @@ function ActionMenu:_Render(App)
 	--MainActionToolTip.Parent = Vanilla_Core.Mouse;
 	--MainActionToolTip.Parent = self._InitialAdornee or self:GetRef();
 	MainActionToolTip.Parent = self._InitialAdornee or self:GetRef();
-	MainActionToolTip._Adornee = self._InitialAdornee or Vanilla_Core.Mouse;
+	MainActionToolTip.Adornee = self._InitialAdornee or Vanilla_Core.Mouse;
 	MainActionToolTip:_UpdateAdornee();
 	MainActionToolTip.ContentPadding = Vector2.new(0,5);
 	MainActionToolTip.BackgroundColor3 = Color3.fromRGB(53, 53, 53);
@@ -500,7 +501,6 @@ function ActionMenu:_Render(App)
 	local UIGrid = Instance.new("UIListLayout", ContentFrame);
 	UIGrid.SortOrder = Enum.SortOrder.LayoutOrder;
 	
-	local stateFirst = true;
 	
 	return {
 		_Components = {
