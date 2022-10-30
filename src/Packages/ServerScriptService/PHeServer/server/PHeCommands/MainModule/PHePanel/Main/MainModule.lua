@@ -22,6 +22,8 @@ function module.CreateWidget()
 
 	Widget.Name = "PHe Panel";
 	Widget.MinimumSize = Vector2.new(550,350);
+	Widget.Roundness = UDim.new(0,5);
+	Widget.BackgroundTransparency = .05;
 
 	local TabGroup = App.new("TabGroup",Widget);
 	TabGroup.Size = UDim2.fromScale(1,1);

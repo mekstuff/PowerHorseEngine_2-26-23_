@@ -11,16 +11,14 @@ return {
 		local Frame = App.new("Frame");
 		
 		if not(PlayerInfo.PlayerInServer)then
-			
 			HeadsupText(PlayerInfo.Username.." isn't in the current server, you can't manipulate their statistics.", Frame);
-			
 		else
 			
 			local leaderstats = PlayerInfo.Player:FindFirstChild("leaderstats");
 			
 			if(not leaderstats)then
 				HeadsupText("No \"leaderstats\" folder found. Does your game not use leaderstats? you can still edit data in the datastore tab!", Frame);
-				else
+			else
 				local Container = App.new("ScrollingFrame",Frame);
 				Container.AutomaticCanvasSize = Enum.AutomaticSize.Y;
 				Container.Size = UDim2.fromScale(1,1);

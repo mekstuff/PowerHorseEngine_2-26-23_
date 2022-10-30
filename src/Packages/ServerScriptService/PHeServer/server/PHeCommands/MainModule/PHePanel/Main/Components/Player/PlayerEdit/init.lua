@@ -85,7 +85,7 @@ return function(UserId)
 	local PagesInOrder = {
 		Pages.Statistics;
 		Pages.Character;
-		
+		Pages.Other;
 	}
 
 
