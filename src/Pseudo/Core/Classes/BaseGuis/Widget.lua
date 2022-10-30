@@ -257,7 +257,7 @@ function Widget:_Render(App)
 			end;
 		end)
 	end)
-	WidgetObject.Position = UDim2.fromOffset( (Cam.ViewportSize.X/2-WidgetObject:GetAbsoluteSize().X/2) , (Cam.ViewportSize.Y/2-Widget:GetAbsoluteSize().Y/2));
+	WidgetObject.Position = UDim2.fromOffset( (Cam.ViewportSize.X/2-WidgetObject:GetAbsoluteSize().X/2) , (Cam.ViewportSize.Y/2-WidgetObject:GetAbsoluteSize().Y/2));
 	return {
 		["WidgetIcon"] = function(Value)
 			WidgetTop_Header.Icon = Value;
