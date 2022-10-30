@@ -4,6 +4,12 @@
 
 --[=[
 	@class PHePanel
+
+	For CustomCMDS, add a folder Called `CustomCMDS` to your .content > Config folder
+
+	For CustomPages, add a folder called `PHeCmdsPage` to your .content > Config folder
+
+	
 ]=]
 
 local PHePanel = {}
