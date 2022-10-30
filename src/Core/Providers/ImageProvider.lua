@@ -29,7 +29,7 @@ function ImageProvider:RequestImageUri(img:string)
             return ImageProvider:GetImageUri(img,true);
         end)
         if(s)then
-            resolve(r or "");
+            resolve(r);
         else
             reject(r);
         end
@@ -66,7 +66,9 @@ function ImageProvider:GetImageUri(img:string,warnsAreErrors:boolean):string
             packmodule = loadedpacks[iconpack];
         end;
         if(loadedpacks[iconpack] == "$wait")then
-            return "";
+            loadedpacks[iconpack]=nil;
+            task.wait(1);
+            return self:GetImageUri(img,warnsAreErrors);
         end
         local link;
         if(typeof(loadedpacks[iconpack]) == "table")then
