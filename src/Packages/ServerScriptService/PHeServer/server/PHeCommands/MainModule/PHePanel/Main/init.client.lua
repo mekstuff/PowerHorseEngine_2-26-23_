@@ -43,24 +43,24 @@ end)
 
 local Pages = script.Pages;
 
-
-function AddPageChildren(Loop,Group)
+local function AddPageChildren(Loop,Group)
 	for _,v in pairs(Loop)do
-		if(v:IsA("ModuleScript"))then
-			local page = require(v);
-			local Tab = page.Func(Group,Widget);
-			Tab.Size = UDim2.fromScale(1,1);
-			Tab.BackgroundTransparency = 1;
-			Tab.StrokeTransparency = 1;
-			Group:AddTab(Tab,page.Name,page.Icon,v.Name);
-			if(#v:GetChildren() > 0)then
-				local newTabGroup = App.new("TabGroup",Tab);
-				newTabGroup.Name = "SubTabGroup";
-				newTabGroup.Size = UDim2.fromScale(1,1);
-				AddPageChildren(v:GetChildren(), newTabGroup)
-			end
-		end;
-	end;
+		local page = require(v);
+		assert(typeof(page) == "table", ("table Expected from Page, got %s"):format(typeof(page)));
+		assert(typeof(page.Func) == "function", ("function expected from Page.Func, got %s"):format(typeof(page.Func)))
+		local Tab = page.Func(Group, Widget);
+		assert(Tab and typeof(Tab) == "table" and Tab:IsA("Frame"), ("Expected Pseudo Frame from Page.Func return got %s"):format(tostring(Tab)));
+		Tab.Size = UDim2.fromScale(1,1);
+		Tab.BackgroundTransparency = 1;
+		Tab.StrokeTransparency = 1;
+		Group:AddTab(Tab,page.Name,page.Icon,v.Name);
+		if(#v:GetChildren() > 0)then
+			local newTabGroup = App.new("TabGroup",Tab);
+			newTabGroup.Name = "SubTabGroup";
+			newTabGroup.Size = UDim2.fromScale(1,1);
+			AddPageChildren(v:GetChildren(), newTabGroup)
+		end
+	end
 end
 
 local PagesInOrder = {

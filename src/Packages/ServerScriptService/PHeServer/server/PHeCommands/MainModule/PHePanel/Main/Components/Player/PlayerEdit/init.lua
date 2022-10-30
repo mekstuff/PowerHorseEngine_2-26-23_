@@ -68,7 +68,7 @@ return function(UserId)
 	local function AddPageChildren(Loop,Group)
 		for _,v in pairs(Loop)do
 			local page = require(v);
-			assert(typeof(page) == "table", ("table Expected from Page, got %s")):format(typeof(page));
+			assert(typeof(page) == "table", ("table Expected from Page, got %s"):format(typeof(page)));
 			assert(typeof(page.Func) == "function", ("function expected from Page.Func, got %s"):format(typeof(page.Func)))
 			local Tab = page.Func(Group, pinfo);
 			assert(Tab and typeof(Tab) == "table" and Tab:IsA("Frame"), ("Expected Pseudo Frame from Page.Func return got %s"):format(tostring(Tab)));
