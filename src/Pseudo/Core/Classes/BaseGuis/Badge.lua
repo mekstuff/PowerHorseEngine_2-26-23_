@@ -26,6 +26,7 @@ local Badge = {
 
 --[=[
 	@prop xAdjustment Enumeration.Adjustment
+	@within Badge
 ]=]
 
 Badge.__inherits = {"BaseGui"}

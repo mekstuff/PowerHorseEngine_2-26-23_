@@ -2,11 +2,15 @@
 -- Written by Olanzo James @ Lanzo, Inc.
 -- Friday, September 23 2022 @ 08:15:22
 
-local module = {}
+--[=[
+	@class PHePanel
+]=]
+
+local PHePanel = {}
 
 local RS = game:GetService("ReplicatedStorage");
-local PHeModule = RS:WaitForChild("PowerHorseEngine");
-local PowerHorseEngine = require(PHeModule);
+local PHePHePanel = RS:WaitForChild("PowerHorseEngine");
+local PowerHorseEngine = require(PHePHePanel);
 local Engine = PowerHorseEngine:GetGlobal("Engine");
 local PHeCMDSConfig = Engine:RequestConfig().PHePanel
 -- local NotificationService = PowerHorseEngine:GetService("NotificationService");
@@ -42,8 +46,14 @@ local function fetchRank(UserId)
 		name = lowestRank[2];
 	}
 end
---//
-function module.getRank(rank)
+
+type RankData = {
+	number: number;
+	name: string;
+}
+
+--[=[]=]
+function PHePanel.getRank(rank:RankData)
 	for _,v in pairs(PHeCMDSConfig.Ranks)do
 		if(rank == v[1] or rank == v[2])then
 			return  {
@@ -53,8 +63,8 @@ function module.getRank(rank)
 		end
 	end
 end
---//
-function module.getUserRank(User)
+--[=[]=]
+function PHePanel.getUserRank(User:number|string|Player):RankData
 	local UserId = UserIdService.getUserId(User);
 	if(UserId)then
 		if(RankCache[UserId])then return RankCache[UserId];end;
@@ -64,35 +74,32 @@ function module.getUserRank(User)
 	end;
 	--return 0;
 end;
---//
-function module.updateUserRank(User,Rank)
+--[=[]=]
+function PHePanel.updateUserRank(User:number|string|Player,Rank:RankData)
 	local Player = game:GetService("Players"):FindFirstChild(User);
 	if(not Player)then ErrorService.tossError(User.." is not a valid player");end;
 	local UserId = UserIdService.getUserId(User);
 	if(UserId)then
-		local TargetRank = module.getRank(Rank);
+		local TargetRank = PHePanel.getRank(Rank);
 		if(not TargetRank)then 
 			ErrorService.tossError(Rank.." is not a valid rank")
 		end;
-			--module.removeCommands(use)
-		--module.removeCommands(Player)
+			--PHePanel.removeCommands(use)
+		--PHePanel.removeCommands(Player)
 		RankCache[UserId]=TargetRank;
-		module.giveCommands(Player,TargetRank);
+		PHePanel.giveCommands(Player,TargetRank);
 	end;
 end
 --//
-function module.removeCommands(Player)
-	
+function PHePanel.removeCommands(Player:Player)
 	local PlayerGui = Player:WaitForChild("PlayerGui");
 	local Cmds = PlayerGui:FindFirstChild("PHePanel");
 	if(Cmds)then	
 		PowerHorseEngine:GetGlobal("Engine"):FetchStorageEvent("PHe_PanelRemover"):FireClient(Player)
 	end;
 end;
---//
-local ClientCommandModule;
 
-module.SecurePages = {
+PHePanel.SecurePages = {
 	["DataStoreEditor"] = 3,
 	["DataStore"] = 3,
 	["DatastoreKey"] = 3,
@@ -110,8 +117,8 @@ local SecurePage = script.Sources.SecurePage;
 local RankAdminCommandsCache = {};
 
 --//
-function module.giveCommands(Player,Rank)
-	module.removeCommands(Player);
+function PHePanel.giveCommands(Player:Player,Rank:RankData)
+	PHePanel.removeCommands(Player);
 	local PHeAdminCommands;
 	
 	if(RankAdminCommandsCache[Rank.name])then
@@ -120,7 +127,7 @@ function module.giveCommands(Player,Rank)
 		PHeAdminCommands = script.PHePanel:Clone();
 		PHeAdminCommands.rank.Value = Rank.name;
 		PHeAdminCommands["rank#"].Value = Rank.number;
-		for pageName,v in pairs(module.SecurePages) do
+		for pageName,v in pairs(PHePanel.SecurePages) do
 			if(v > Rank.number)then
 				local FileObject = PHeAdminCommands:FindFirstChild(pageName,true);
 				if(FileObject)then
@@ -138,4 +145,4 @@ function module.giveCommands(Player,Rank)
 
 end;
 
-return module
+return PHePanel
