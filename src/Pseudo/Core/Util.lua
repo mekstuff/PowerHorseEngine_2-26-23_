@@ -668,6 +668,28 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 					dependencies = _organizeuseEffectHookDependencies(Pseudo,dependencies or Pseudo._getCurrentPropSheetState(true,true,nil,true))
 					return Pseudo._dev._useEffectState:useEffect(callback,dependencies)
 				end;
+				--> useRender
+				--[=[
+					@class useRender
+				]=]
+				--[=[
+					@function useRender
+					@within useRender
+					@param props table
+					@param dependencies table
+
+					A useEffect hook wrapper that only runs you callback after the first useEffect call.
+				]=]
+				hooks.useRender = function(callback:any,dependencies:table?)
+					local usedEffect = false;
+					return hooks.useEffect(function(...:any)
+						if(usedEffect)then
+							callback(...);
+						else
+							usedEffect = true;
+						end;
+					end, dependencies)
+				end;
 				--> useMapping hook
 				--[=[
 					@class useMapping
