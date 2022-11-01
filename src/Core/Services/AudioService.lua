@@ -267,7 +267,9 @@ function AudioChannel:AddAudio(AudioName:string,AudioID:number,AudioVolume:numbe
 	end;
 	
 	AudioVolume = AudioVolume or self.DefaultVolume;
-	if(typeof(AudioID)~="string")then tostring(AudioID);end;
+	if(typeof(AudioID)~="string")then
+		 AudioID = tostring(AudioID);
+	end;
 	AudioID = AudioID and (AudioID:match("^rbxassetid://") and AudioID or "rbxassetid://"..AudioID) or ""
 	-- AudioID = AudioID and "rbxassetid://"..tostring(AudioID) or "";
 	Looped = Looped or self.DefaultLoop;
