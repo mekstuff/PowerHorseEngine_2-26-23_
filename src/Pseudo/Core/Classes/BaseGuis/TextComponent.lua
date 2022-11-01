@@ -198,7 +198,7 @@ function TextComponent:_Render(App)
 		end,
 		_Components = {
 			FatherComponent = Container:GetGUIRef();	
-			-- Text = 
+			Text = Text;
 		};
 		_Mapping = {
 			[Container]	 = {
