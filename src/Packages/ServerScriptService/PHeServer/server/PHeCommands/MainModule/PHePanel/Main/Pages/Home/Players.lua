@@ -2,7 +2,10 @@ local App = require(game:GetService("ReplicatedStorage"):WaitForChild("PowerHors
 local Components = script.Parent.Parent.Parent.Components;
 local CommandOutput = require(Components.CommandOutput);
 local PlayerComponent = require(Components.Player);
+local MainModule = require(script.Parent.Parent.Parent.MainModule)
 local pColor = Color3.fromRGB(85, 170, 255);
+
+local Player = game.Players.LocalPlayer;
 
 local fetchingPlayers=false;
 local ProgressIndicator;
@@ -13,9 +16,75 @@ local PlayerEdit = require(script.Parent.Parent.Parent.Components.Player.PlayerE
 local Rank = script.Parent.Parent.Parent.Parent["rank#"].Value;
 
 local function EditPlayer(UserId)
-		local Widget = PlayerEdit(UserId);
-		Widget.Enabled = true;	
+	local Widget = PlayerEdit(UserId);
+	Widget.Enabled = true;	
 end
+
+local PlayerActionMenu = {
+	{
+		name = "Open", id = "expand",
+		func = function(Data)
+			EditPlayer(Data.UserId)
+		end;
+	},
+	{
+		name = "Kick", id = "kick",
+		func = function()
+			
+		end;
+	},
+	{
+		name = "Ban", id = "ban", split = true,
+		func = function()
+			
+		end;
+	},
+--
+	{
+		name = "Teleport", id = "tp",
+		nested = {
+			{
+				name = "To Me", id = "tp/me",
+				func = function(TargetName)
+					MainModule.exe("Teleport "..TargetName.." "..Player.Name)
+				end;
+			},
+			{
+				name = "To Them", id = "tp/them",
+				func = function(TargetName)
+					MainModule.exe("Teleport "..Player.Name.." "..TargetName)
+				end;
+			},
+			{
+				name = "Server To Them", id = "tp/allthem",
+				func = function()
+					
+				end;
+			},
+		},
+		func = function()
+			
+		end;
+	},
+}
+
+local idActions = {};
+
+local function handleActionMenu(ActionMenu:any,List:table)
+	for _,v in pairs(List) do
+		local Action = ActionMenu:AddAction(v.name,v.id,v.icon);
+		if(v.split)then
+			ActionMenu:AddSplit();
+		end;
+		if(v.func)then
+			assert(v.id, "No id given for action, no func can be given aswell."..v.name);
+			idActions[v.id] = v.func;
+		end
+		if(v.nested)then
+			handleActionMenu(Action:AddActionMenu(),v.nested);
+		end
+	end
+end;
 
 local function getPlayersForTab(Canvas,Container)
 	if(not fetchingPlayers)then
@@ -41,23 +110,15 @@ local function getPlayersForTab(Canvas,Container)
 				newPlayer.Name = v.Name;
 				newPlayer.Parent = Container:GetGUIRef();
 				local ActionMenu = App.new("ActionMenu", script.Parent.Parent.Parent.Components.content);
-				
-				--ActionMenu:AddHeader(v.Name);
-				--ActionMenu:AddSplit();
-				ActionMenu:AddAction("Open","expand");
-				ActionMenu:AddAction("Kick","kick");
-				ActionMenu:AddAction("Ban","ban");
-				ActionMenu:AddAction("Teleport to Me","tp-to_me");
-				ActionMenu:AddAction("Teleport to Them","tp-to_them");
-				ActionMenu:AddSplit();
-				ActionMenu:AddAction("Copy UserId","copy-id");
-				ActionMenu:AddAction("Copy Username","copy-name");
-				ActionMenu:AddAction("Copy Displayname","copy-displayname");
-				ActionMenu:AddSplit();
-				ActionMenu:AddAction("Private Message","private-message");
-				ActionMenu:AddAction("Send Notification","ntfy");
-				
-				
+				handleActionMenu(ActionMenu,PlayerActionMenu);
+
+				ActionMenu.ActionTriggered:Connect(function(Action)
+					local func = idActions[Action.ID];
+					if(func)then
+						func(v.Name,Action);
+					end;
+				end)
+					
 				ActionButton.MouseButton2Down:Connect(function()
 					ActionMenu:Show();	
 				end);
@@ -65,7 +126,6 @@ local function getPlayersForTab(Canvas,Container)
 				ActionButton.MouseButton1Down:Connect(function()
 					EditPlayer(v.UserId);
 				end)
-				
 			end
 		end;
 		

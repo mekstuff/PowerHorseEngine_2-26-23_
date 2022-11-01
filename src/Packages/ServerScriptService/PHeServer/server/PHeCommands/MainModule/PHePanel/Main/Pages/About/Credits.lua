@@ -7,9 +7,7 @@ local Components = script.Parent.Parent.Parent.Components;
 local createHeader = require(Components.createHeader);
 local createCredit = require(Components.createSubheader);
 
-
 local credits = App.Manifest.Credits;
-
 
 return {
 	Name = "Credits";

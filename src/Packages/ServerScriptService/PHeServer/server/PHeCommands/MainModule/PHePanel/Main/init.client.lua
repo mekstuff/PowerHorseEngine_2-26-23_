@@ -47,13 +47,21 @@ local function AddPageChildren(Loop,Group)
 	for _,v in pairs(Loop)do
 		local page = require(v);
 		assert(typeof(page) == "table", ("table Expected from Page, got %s"):format(typeof(page)));
-		assert(typeof(page.Func) == "function", ("function expected from Page.Func, got %s"):format(typeof(page.Func)))
-		local Tab = page.Func(Group, Widget);
+		assert(typeof(page.Func) == "function", ("function expected from Page.Func, got %s"):format(typeof(page.Func)));
+
+		local PageContainer = App.new("Frame");
+		PageContainer.Size = UDim2.fromScale(1,1);
+		PageContainer.Name = "PageContainer@"..page.Name;
+		PageContainer.BackgroundTransparency = 1;
+		--> We added a PageContainer so we can have access the the Tabs button so we can pass it to the .Func
+		local GroupButton = Group:AddTab(PageContainer,page.Name,page.Icon,v.Name);
+
+		local Tab = page.Func(Group, GroupButton, Widget);
 		assert(Tab and typeof(Tab) == "table" and Tab:IsA("Frame"), ("Expected Pseudo Frame from Page.Func return got %s"):format(tostring(Tab)));
 		Tab.Size = UDim2.fromScale(1,1);
 		Tab.BackgroundTransparency = 1;
 		Tab.StrokeTransparency = 1;
-		Group:AddTab(Tab,page.Name,page.Icon,v.Name);
+		Tab.Parent = PageContainer
 		if(#v:GetChildren() > 0)then
 			local newTabGroup = App.new("TabGroup",Tab);
 			newTabGroup.Name = "SubTabGroup";

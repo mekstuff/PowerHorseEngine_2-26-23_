@@ -4,10 +4,15 @@
 
 local CommandsModule = require(script.Parent.Commands);
 local MainModule = require(script.Parent.MainModule);
-local PowerHorseEngine = require(game:GetService("ReplicatedStorage"):WaitForChild("PowerHorseEngine"))
-local PowerHorseEngineContent = PowerHorseEngine:GetGlobal("Engine"):RequestContentFolder();
-local PheCmdsFolder = PowerHorseEngineContent:FindFirstChild("PHeCommands");
+local PowerHorseEngine = require(game:GetService("ReplicatedStorage"):WaitForChild("PowerHorseEngine"));
+local Engine = PowerHorseEngine:GetGlobal("Engine");
+local PowerHorseEngineContent = Engine:RequestContentFolder();
 local PHeCmdsPage = PowerHorseEngineContent:WaitForChild("Config"):FindFirstChild("PHeCmdsPage");
+
+if(Engine:RequestConfig().PHePanel and Engine:RequestConfig().PHePanel.Disabled == true)then
+	return;
+end;
+
 --//Custom Pages Wrap in pcall probably?
 if(PHeCmdsPage)then
 	for _,v in pairs(PHeCmdsPage:GetChildren())do
@@ -17,7 +22,6 @@ if(PHeCmdsPage)then
 	end
 end
 
-local Engine = PowerHorseEngine:GetGlobal("Engine");
 
 
 local ClientCommandData;
