@@ -171,7 +171,8 @@ function Widget:_Render(App)
 	WidgetTop_Header.RippleStyle = Enumeration.RippleStyle.None;
 
 	local WidgetTop_ActionButtons = App.new("Frame", WidgetTop);
-	WidgetTop_ActionButtons.Size = UDim2.new(1,-30,1,0);
+	WidgetTop_ActionButtons.Size = UDim2.new(0,0,1,0);
+	WidgetTop_ActionButtons.AutomaticSize = Enum.AutomaticSize.X;
 	WidgetTop_ActionButtons.AnchorPoint = Vector2.new(1,.5);
 	WidgetTop_ActionButtons.BackgroundTransparency = 1;
 	WidgetTop_ActionButtons.Position = UDim2.new(1,-5,.5,0);
@@ -192,9 +193,14 @@ function Widget:_Render(App)
 
 	local WidgetTop_MoveableBtn = Instance.new("TextButton", WidgetTop:GetGUIRef());
 	WidgetTop_MoveableBtn.Name = "WidgetMover";
-	WidgetTop_MoveableBtn.Size = UDim2.new(1,-30,1,0);
+	WidgetTop_MoveableBtn.Size = UDim2.new(1,-WidgetTop_ActionButtons:GetGUIRef().AbsoluteSize.X,1,0);
 	WidgetTop_MoveableBtn.Text = "";
 	WidgetTop_MoveableBtn.BackgroundTransparency = 1;
+
+	WidgetTop_ActionButtons:GetGUIRef():GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+		WidgetTop_MoveableBtn.Size = UDim2.new(1,-WidgetTop_ActionButtons:GetGUIRef().AbsoluteSize.X,1,0);
+	end);
+
 	self:AddEventListener("OnWindowCloseRequest",true,WidgetTop_CloseBtn:GetEventListener("Activated"));
 
 	self:AddEventListener("OnWindowCloseRequest"):Connect(function()
