@@ -165,14 +165,17 @@ end;
 --[=[
 	@return State
 ]=]
-function Theme.useTheme(theme:string):Instance
+function Theme.useTheme(theme:string,uniqueThemeIdentifier:string?):Instance
 	-- print(ThemeDefault[theme], theme)
 	-- return ThemeDefault[theme]
 	--[[ disabled until further notice ]]
+	if(uniqueThemeIdentifier)then
+		theme = uniqueThemeIdentifier..theme;
+	end
 	if(ThemeObject)then
-		local t =  ThemeObject.Themes[theme];
+		local t = ThemeObject.Themes[theme];
 		if(not t)then
-			warn(tostring(theme).." was not found. Use .ExtendTheme to add a theme");
+			warn(tostring(theme).." was not found. Use .extendTheme to add a theme");
 		else 
 			return t;
 		end;
