@@ -154,7 +154,7 @@ function Image:_Render(App)
 		};
 		_Mapping = {
 			[Container] = {
-				"AnchorPoint","Position","Visible","ZIndex","Size","BackgroundTransparency","BackgroundColor3","Roundness"
+				"AnchorPoint","Position","Visible","ZIndex","Size","BackgroundTransparency","BackgroundColor3","Roundness","Rotation"
 			};
 			[ImageContent] = {
 				"ScaleType",

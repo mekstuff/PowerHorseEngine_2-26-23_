@@ -29,6 +29,7 @@ local BaseGui = {
 	ZIndex = 1;
 	Disabled = false;
 	SupportsRBXUIBase = false;
+	Rotation = 0;
 };
 BaseGui.__inherits = {}
 --[=[
