@@ -36,7 +36,6 @@ function module.CreateWidget()
 	MinimizeButton.Text = "";
 	MinimizeButton.BackgroundTransparency = 1;
 
-
 	WidgetCollapsed:useEffect(function()
 		MinimizeButton.Icon = WidgetCollapsed() and "ico-mdi@action/open_in_full" or "ico-mdi@action/close_fullscreen";
 		Widget:GET("WidgetTop").BackgroundTransparency = WidgetCollapsed() and .95 or 0;
@@ -68,7 +67,7 @@ function module.CreateWidget()
 
 	local TabGroup = App.new("TabGroup",Widget);
 	TabGroup.Size = UDim2.fromScale(1,1);
-	Widget.Enabled = true;
+	Widget.Enabled = false;
 	wx = Widget;
 	
 	return wx,TabGroup;
@@ -139,8 +138,6 @@ module.Themes = {
 		}
 	};
 }
-
-
 
 function module.SetTheme(Theme)
 	if(tp)then

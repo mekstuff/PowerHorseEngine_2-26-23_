@@ -20,17 +20,21 @@ local function fetchPlayerInfo(UserId)
 	
 end
 
-return function(UserId)
+return function(UserId,clearCacheOnClose:boolean?)
 	if(PlayerEditCache[UserId])then
-		
 		return PlayerEditCache[UserId];
 	end;
 	local Widget = App.new("Widget",script.Parent.Parent.content);
+	Widget.Name = "Loading...";
 	PlayerEditCache[UserId]=Widget;
 	
 	local pinfo = fetchPlayerInfo(UserId)
 
-	
+	if(not pinfo.PlayerInServer)then
+		--> If not in server, then if we didn't specify clearCacheOnClose then set to true.
+		clearCacheOnClose = clearCacheOnClose == nil and true;
+	end
+
 	local ProfileSection = App.new("Frame",Widget);
 	ProfileSection.Size = UDim2.new(1,0,0,50);
 	ProfileSection.BackgroundTransparency = 1;
@@ -86,7 +90,7 @@ return function(UserId)
 	local PagesInOrder = {
 		Pages.Statistics;
 		Pages.Character;
-		Pages.Other;
+		Pages.PlayerInstance;
 	}
 
 
@@ -95,6 +99,11 @@ return function(UserId)
 	Widget.OnWindowCloseRequest:Connect(function()
 		--//If player is in game, then do not remove them from cache, else remove widget from cache after given time
 		Widget.Enabled = false;	
-	end)
+		if(clearCacheOnClose)then
+			Widget:Destroy();
+			PlayerEditCache[UserId] = nil;
+		end
+	end);
+	Widget.Name = "Edit | "..pinfo.Username;
 	return Widget;
 end

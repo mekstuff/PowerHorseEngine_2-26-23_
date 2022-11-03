@@ -37,7 +37,6 @@ local PanelThemes = {
 
 PowerHorseEngine:GetGlobal("Theme").extendTheme(PanelThemes,PanelThemesExtender);
 
-print(PowerHorseEngine:GetGlobal("Theme").useTheme("Background",PanelThemesExtender)())
 --//
 local RankCache = {};
 

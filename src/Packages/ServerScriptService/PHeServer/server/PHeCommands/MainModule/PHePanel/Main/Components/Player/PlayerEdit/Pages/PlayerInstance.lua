@@ -98,7 +98,7 @@ local function createOtherContent(list, parent)
 end;
 
 return {
-    Name = "More",
+    Name = "Instance",
     Icon = "",
     Func = function(_,PlayerInfo)
 		local Frame = App.new("Frame");
