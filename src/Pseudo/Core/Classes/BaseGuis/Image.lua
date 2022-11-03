@@ -105,6 +105,9 @@ function Image:_Render(App)
 
 	local ModelContent;local ModelContentCamera;
 	local function fetchModelContent()
+		if(ModelContent)then 
+			ModelContent:ClearAllChildren();
+		end;
 		ModelContent = Instance.new("ViewportFrame",Container:GetGUIRef());
 		ModelContent.BackgroundTransparency = 1;
 		ModelContent.Size = UDim2.fromScale(1,1);
