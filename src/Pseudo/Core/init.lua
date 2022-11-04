@@ -99,7 +99,7 @@ end;
 function module.getElementObject(obj)
 	if(not obj)then return end;
 	--if(not obj)then print("No Object"); return end;
-	local x = typeof(obj) == "table" and obj:GetGUIRef() or obj;
+	local x = typeof(obj) == "table" and obj:_GetCompRef() or obj;
 
 	if(typeof(x) == "table" or not x)then
 
@@ -171,13 +171,11 @@ function module.CalculateRespectiveRelativeViewportPosition(AnchorPoint, Object,
 	
 	local x,y;
 	
-	
 	AnchorPoint = module.getElementObject(AnchorPoint);Object = module.getElementObject(Object);
 
 	local ran,reason = pcall(function() return AnchorPoint["AbsolutePosition"] end);
 
 	local AnchorPointBounds;
-
 
 	if(not ran)then
 		if(string.find(reason, "PlayerMouse") or string.find(reason, "PluginMouse"))then
@@ -187,8 +185,6 @@ function module.CalculateRespectiveRelativeViewportPosition(AnchorPoint, Object,
 		AnchorPointBounds = module.CalculateComponentBoundings(AnchorPoint);
 	end
 
-
-
 	local AnchorPointLeft = AnchorPointBounds.left;
 	local AnchorPointRight = AnchorPointBounds.right;
 	local AnchorPointTop = AnchorPointBounds.top;
@@ -197,7 +193,6 @@ function module.CalculateRespectiveRelativeViewportPosition(AnchorPoint, Object,
 	if(Override)then
 		local ViewportSize = workspace.CurrentCamera.ViewportSize;
 		if not(typeof(Override == "boolean"))then
-			--print(typeof(Override))
 			ViewportSize = Override;
 		end;
 

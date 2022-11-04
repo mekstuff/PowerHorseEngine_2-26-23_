@@ -70,6 +70,6 @@ return function(UserId)
 	DeviceIcon.Image = "ico-laptop";
 	DeviceIcon.BackgroundTransparency = 1;
 	
-	return GridRespect,Frame,ActionButton
+	return GridRespect,Frame,ActionButton,n
 	
 end;

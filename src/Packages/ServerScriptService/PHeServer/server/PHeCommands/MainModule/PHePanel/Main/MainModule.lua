@@ -18,19 +18,59 @@ function module.CreateWidget()
 	
 	if(wx)then return wx;end;
 	
-	local Widget = App.new("Widget");
+	local State = App:Import("State");
 
+	local Widget = App.new("Widget");
+	local WidgetObject = Widget:GET("WidgetObject");
 	Widget.Name = "PHe Panel";
 	Widget.MinimumSize = Vector2.new(550,350);
+	Widget.Roundness = UDim.new(0,5);
+	Widget.BackgroundTransparency = .05;
+
+	local WidgetCollapsed,setWidgetCollapsed = State(true);
+	table.insert(Widget._dev,WidgetCollapsed);
+
+	local MinimizeButton = App.new("Button");
+	MinimizeButton.ButtonFlexSizing = false;
+	MinimizeButton.Size = UDim2.fromScale(0,1);
+	MinimizeButton.Text = "";
+	MinimizeButton.BackgroundTransparency = 1;
+
+	WidgetCollapsed:useEffect(function()
+		MinimizeButton.Icon = WidgetCollapsed() and "ico-mdi@action/open_in_full" or "ico-mdi@action/close_fullscreen";
+		Widget:GET("WidgetTop").BackgroundTransparency = WidgetCollapsed() and .95 or 0;
+		if(WidgetCollapsed())then
+			WidgetObject.Position = UDim2.new(1,-WidgetObject:GetGUIRef().AbsoluteSize.X,1,-Widget:GET("WidgetTop"):GetGUIRef().AbsoluteSize.Y);
+			if(not WidgetObject._dev.__TrackCollapsePHe)then
+				WidgetObject._dev.__TrackCollapsePHe = WidgetObject:GetPropertyChangedSignal("Position"):Connect(function()
+					WidgetObject._dev.__TrackCollapsePHe:Disconnect();
+					WidgetObject._dev.__TrackCollapsePHe = nil;
+					setWidgetCollapsed(false);
+				end)
+			end;
+		else
+			WidgetObject.Position = UDim2.new(.5,-WidgetObject:GetGUIRef().AbsoluteSize.X/5,.5,-WidgetObject:GetGUIRef().AbsoluteSize.Y/5);
+		end
+	end);
+
+	MinimizeButton.MouseButton1Click:Connect(function()
+		setWidgetCollapsed(function(prev)
+			return not prev;
+		end)
+	end);
+
+	local Ratio = Instance.new("UIAspectRatioConstraint", MinimizeButton:GetGUIRef());
+	Ratio.AspectType = Enum.AspectType.ScaleWithParentSize;
+	Ratio.DominantAxis = Enum.DominantAxis.Height;
+	MinimizeButton.Parent = Widget:GET("ActionButtons");
+	MinimizeButton.SupportsRBXUIBase = true;
 
 	local TabGroup = App.new("TabGroup",Widget);
 	TabGroup.Size = UDim2.fromScale(1,1);
 	Widget.Enabled = false;
 	wx = Widget;
-
 	
 	return wx,TabGroup;
-	
 end;
 
 module.Colors = {
@@ -98,8 +138,6 @@ module.Themes = {
 		}
 	};
 }
-
-
 
 function module.SetTheme(Theme)
 	if(tp)then

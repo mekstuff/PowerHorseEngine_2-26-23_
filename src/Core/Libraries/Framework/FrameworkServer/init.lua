@@ -106,12 +106,8 @@ function FrameworkServer:Start()
             end)
             --//Init
             local initRan,initResults = pcall(function()
-                -- local PHe_RS = Engine:FetchReplicatedStorage();
-                -- local WorflowShared = PHe_RS:WaitForChild("Framework_Workflow:Shared");
-                -- local Modulars = Instance.new("Folder",FrameworkServerStorage);
-                -- Modulars.Name = "@Services";
                 v.Parent = ServicesFolder;
-                return v:Init();
+                return v:Init(v._RenderHooksPassOn);
             end);
             if(not initRan)then
                 reject("Failed to :Init a service at ["..v.ClassName.."] -> "..initResults);
@@ -122,7 +118,9 @@ function FrameworkServer:Start()
         --//Start
         for _,v in pairs(PortedServices) do
             local startRan,startResults = pcall(function()
-                return v:Start();
+                local Hooks = v._RenderHooksPassOn;
+                v._RenderHooksPassOn = nil;
+                return v:Start(Hooks);
             end);
             if(not startRan)then
                 reject("Failed to :Start a service at ["..v.ClassName.."] -> "..startResults);
@@ -310,7 +308,9 @@ function FrameworkServer:PortService(Service:any)
 
 
     function Service:_Render()
-        return{};
+        return function (Hooks)
+            self._RenderHooksPassOn = Hooks;
+        end
     end;
 
     local AsClass = CustomClassService:Create(Service);
@@ -332,6 +332,7 @@ local function getServiceAsync(n,tries)
         end
         if(tries == 5)then
             ErrorService.tossWarn("Possible Infinite Yield On Framework:GetService(\""..n.."\") Because The Server Has Not Been Started. Make Sure :Start Was Called And Did Not Fail")
+            ErrorService.tossWarn(debug.traceback("Call Stack:",1));
         end
         return getServiceAsync(n,tries+1);
     end

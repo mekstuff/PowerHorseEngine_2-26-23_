@@ -37,7 +37,7 @@ classes = [
 "Modal","Navigator","NotificationResponse","PHeSignal","Promise","PromptResponse",
 "Pseudo","RInstance","Servant","State","ToolTip",
 "Waypoint","Widget","PingReader","Transition","Tween","TabGroup","TextComponent","Toast",
-"Toggle","TextInput","TextSlider","ProgressBar","StackProvider","Portal","NotificationGroup"
+"Toggle","TextInput","TextSlider","ProgressBar","StackProvider","Portal","NotificationGroup","ClientBackpackServiceTool"
 ]
 
 [[classOrder]]
@@ -45,13 +45,13 @@ section = "Services"
 classes = [
 "AudioService","CoreGuiService","CustomClassService","ErrorService","FormatService","InGamePurchaseService","PingService",
 "PromptService","PseudoService","TextService","TradeService","UserIdService","WaypointService","NotificationService","TweenService",
-"CoordinateService","CommandService"
+"CoordinateService","CommandService","ClientBackpackService","ClientService",
 ]
 
 [[classOrder]]
 section = "Providers"
 classes = [
-"LibraryProvider","ModuleFetcher","ServiceProvider","SignalProvider","UtilProvider","ImageProvider"
+"LibraryProvider","ModuleFetcher","ServiceProvider","SignalProvider","UtilProvider","ImageProvider","LanzoCoreUtil"
 ]
 
 [[classOrder]]
@@ -63,12 +63,17 @@ classes = [
 [[classOrder]]
 section = "Built In Libraries"
 classes = [
-"Collector","Framework","FrameworkClient","FrameworkServer","StateLibrary","Whiplash","Array"
+"Collector","Framework","FrameworkClient","FrameworkServer","StateLibrary","Whiplash","Array","Math","ReClasser"
 ]
 
 [[classOrder]]
 section = "Hooks"
 classes = [
-"useEffect","useMapping","useComponents"
+"useEffect","useMapping","useComponents","useRender",
 ]
 
+[[classOrder]]
+section = "PHe Panel"
+classes = [
+    "PHePanel"
+]

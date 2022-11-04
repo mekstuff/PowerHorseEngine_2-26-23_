@@ -162,7 +162,8 @@ end;
 function Promise:Cancel(reason:any)
     if(self._cancelMethod)then
         self._cancelMethod(reason);
-    end
+    end;
+    return self;
 end;
 
 --[=[

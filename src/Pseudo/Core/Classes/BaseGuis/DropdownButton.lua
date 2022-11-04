@@ -8,13 +8,10 @@ local DropdownButton = {
 	ClassName = "DropdownButton";
 	IconAdjustment = Enumeration.Adjustment.Right;
 	Icon = "rbxasset://textures/ui/Settings/DropDown/DropDown.png";	
-	IconSize = UDim2.fromOffset(20,20);
-	--ButtonFlexSizing = false;
+	IconSize = UDim2.fromOffset(10,10);
 	TextTruncate = Enum.TextTruncate.AtEnd;
-	--Size = UDim2.fromOffset(100,30);
 	ContentSize = Vector2.new(100,100);
 	Expanded = false;
-	--Text = "Dropdown Text";
 };
 DropdownButton.__inherits = {"Button","BaseGui","Frame","GUI","Text"};
 --//
@@ -33,11 +30,9 @@ function DropdownButton:AddButton(Text,id)
 		end;
 		if(self._CollapseAutomatically == nil)then self._CollapseAutomatically=true;end;
 	end;
-	local respectGrid = Instance.new("Frame",self:GET("_Appender"));
-	respectGrid.BackgroundTransparency = 1;
 	local Button = self:_GetAppModule().new("Button");
 	Button.Name = "DropdownButton";
-	--Button.ButtonFlexSizing = false;
+	Button.ButtonFlexSizing = false;
 	Button.TextTruncate = Enum.TextTruncate.AtEnd;
 	Button.Size = UDim2.fromScale(1,1);
 	Button.Roundness = UDim.new(0);
@@ -45,7 +40,8 @@ function DropdownButton:AddButton(Text,id)
 	Button.BackgroundTransparency = 1;
 	Button.Text = Text;
 	Button.Name = id or Text;
-	Button.Parent = respectGrid;
+	Button.Parent = self:GET("_Appender");
+	Button.SupportsRBXUIBase = true;
 	Button._dev.MouseEnterConnection = Button.MouseEnter:Connect(function()
 		Button.BackgroundTransparency = 0;
 	end);
@@ -79,17 +75,8 @@ function DropdownButton:_Render(App)
 	ToolTip.IdleTimeRequired = 0;
 	ToolTip.ContentPadding = Vector2.new(0,0);
 
-	--print(ButtonProps)
-	
-	--self.ContentSize = Button:GetAbsol
-
-	
 	local Scroller = App.new("ScrollingFrame",ToolTip);
 	Scroller.BackgroundTransparency = 1;
-	--Scroller.Size = 
-	--ToolTip.IdleTimeRequired = 0;
-	--local Contents = App.new("ScrollingFrame");
-	--ToolTip:_Show();
 	local xValueupd;
 	
 	Button.MouseButton1Down:Connect(function()
@@ -106,25 +93,19 @@ function DropdownButton:_Render(App)
 			end
 		end,
 		["ContentSize"] = function(Value)
-	
-			--Scroller.Size = UDim2.fromOffset(Value.X,Value.Y);
-	
 			if(Value.X == -1)then
 				
 				if(not xValueupd)then 
 					Scroller.Size = UDim2.fromOffset(Button:GetAbsoluteSize().X,Value.Y);
 					xValueupd = Button:GetPropertyChangedSignal("Size"):Connect(function()
-						--game:GetService("RunService").RenderStepped:Wait();
 						Scroller.Size = UDim2.fromOffset(Button:GetAbsoluteSize().X,Value.Y);
 					end);
 					
 				end;
 			else
 				Scroller.Size = UDim2.fromOffset(Value.X,Value.Y);
-				if(xValueupd)then xValueupd:Disconnect();xValueupd=nil;end;
-				
-			end;
-			
+				if(xValueupd)then xValueupd:Disconnect();xValueupd=nil;end;	
+			end;	
 		end,
 		_Components = {
 			FatherComponent = Button:GetGUIRef();	

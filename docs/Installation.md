@@ -7,7 +7,7 @@ sidebar_position: 2
 ## CLI
 
 :::warning
-This feature is not yet stable.
+This feature is not yet available to the public.
 :::
 
 Install the `PHe` CLI from npm using `npm i -g PHe`

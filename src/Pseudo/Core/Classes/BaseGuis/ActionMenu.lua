@@ -53,29 +53,29 @@ end;
 function ActionMenu:Show(ignoreFocusLost:boolean, CustomAdornee:any)
 	if(self._dev._Showing)then
 		self:Hide();
-		wait();
+		task.wait();
 	end;
 	local App = self:_GetAppModule()
 	local UserKeybindService = App:GetService("UserKeybindService");
 	local MainActionToolTip = self:GET("MainActionToolTip");
 	
-	if(CustomAdornee and CustomAdornee ~= MainActionToolTip._Adornee)then
-		MainActionToolTip.StaticXAdjustment = Enumeration.Adjustment.Flex;
-		MainActionToolTip.StaticYAdjustment = Enumeration.Adjustment.Bottom;
+	if(CustomAdornee and CustomAdornee ~= MainActionToolTip.Adornee)then
+		MainActionToolTip.StaticXAdjustment = Enumeration.Adjustment.Right;
+		MainActionToolTip.StaticYAdjustment = Enumeration.Adjustment.Flex;
 		MainActionToolTip.PositionBehaviour = Enumeration.PositionBehaviour.Static;
-		MainActionToolTip._Adornee = CustomAdornee
+		MainActionToolTip.Adornee = CustomAdornee
 		MainActionToolTip:_UpdateAdornee();
 	end;
 	
 	if(not self._dev.EnterEventInitiated)then
 		if(self._dev.__TreeContents)then
 			for _,v in pairs(self._dev.__TreeContents)do
-				if(not v.EnterEvent)then
-					v.EnterEventA = v.Container.MouseEnter:Connect(function()
-						v.Container.BackgroundTransparency = .4;
+				if(not v._EnterEvent)then
+					v._EnterEventA = v._Container.MouseEnter:Connect(function()
+						v._Container.BackgroundTransparency = .4;
 					end);
-					v.EnterEventB = v.Container.MouseLeave:Connect(function()
-						v.Container.BackgroundTransparency = 1;
+					v._EnterEventB = v._Container.MouseLeave:Connect(function()
+						v._Container.BackgroundTransparency = 1;
 					end)
 				end
 			end
@@ -102,7 +102,7 @@ function ActionMenu:Show(ignoreFocusLost:boolean, CustomAdornee:any)
 	
 	if(not ignoreFocusLost)then
 		local ev;
-		wait(.4);
+		task.wait(.4);
 		if(not self._dev._Showing)then return end;
 		ev = UIS.InputBegan:Connect(function(inputObject)
 			--if(not gp)then return;end;
@@ -134,7 +134,7 @@ function ActionMenu:Hide()
 			if(v.connection)then v.connection:Disconnect();v.connection=nil;end;
 		end
 	end;
-	delay(5,function()
+	task.delay(5,function()
 		if(not self)then return end;
 		if(self._dev.EnterEventInitiated and not self._dev._Showing)then
 			if(self._dev.__TreeContents)then
@@ -152,86 +152,87 @@ end;
 @class ActionMenuAction
 ]=]
 local ActionMenuAction = {
+	Name = "ActionMenuAction";
 	ClassName = "ActionMenuAction";
+	ID = "";
+	Text = "";
+	Icon = "";
 };
+function ActionMenuAction:_Render()
+	self._ActionButton = self._dev.args;
+	return {
+		["Text"] = function(v)
+			self._ActionButton.Text = v;
+		end;
+		["Icon"] = function(v)
+			self._ActionButton.Icon = v;
+		end;
+	};
+end
 --[=[]=]
 function ActionMenuAction:UpdateText(Text:string)
-	self.ActionButton.Text = Text;
+	self.Text = Text;
 end;
 --[=[]=]
 function ActionMenuAction:UpdateIcon(Icon:string)
-	self.ActionButton.Icon = Icon or "?";
+	self.Icon = Icon;
 end;
 --[=[
 @return ActionMenu
 ]=]
-function ActionMenuAction:AddActionMenu(hybrid:boolean)
-	local App = require(script.Parent.Parent.Parent)
-	local newActionMenu = App.new("ActionMenu",nil,{_InitialAdornee = self.Container})
-	newActionMenu.Parent = self.Container;
-	--newActionMenu. = self.ActionButton;
+function ActionMenuAction:AddActionMenu()
+	local App = self:_GetAppModule();
+	local State = App:Import("State");
+	local newActionMenu = App.new("ActionMenu",nil,{_InitialAdornee = self._Container})
+	newActionMenu.Parent = self._Container;
 	newActionMenu.AutomaticHide = Enumeration.ActionMenuAutomaticHide.None;
 
-	
-	self.ParentExpandIcon.Visible = true;
-	
-	self.ActionButton.Name = "_notrigger";
-	
-	self.Container.InputBegan:Connect(function(Input)
-		if(Input.UserInputType == Enum.UserInputType.MouseButton1)then
-			if(newActionMenu._dev._Showing)then
-				newActionMenu:Hide();
-			else
-				newActionMenu:Show();
-			end;
-		end
-	end);
-	
-	--self.ActionButton.MouseButton1Down:Connect(function()
-	--	if(newActionMenu._dev._Showing)then
-	--		newActionMenu:Hide();
-	--	else
-	--		newActionMenu:Show();
-	--	end
-	--end)
-	
---[[
-	local HoveringFromSelf = false;
+	self._ParentExpandIcon.Visible = true;
 
-	self.Container.MouseEnter:Connect(function()
-		--HoveringFromSelf = true;
-		newActionMenu:Show();
-	end);
+	local IsHoveringActionButton,setIsHoveringActionButton = State(false);
+	local IsHoveringContentFrame,setIsHoveringContentFrame = State(false);
+
+	table.insert(self._dev,IsHoveringActionButton);
+	table.insert(self._dev,IsHoveringContentFrame);
 	
-	local FRAME = newActionMenu:GET("MainActionToolTip"):GET("Frame"):GetGUIRef()
-	
-	print(newActionMenu._dev);
-	
-	newActionMenu._dev.____looseSignalA = FRAME.MouseLeave:Connect(function()
-		HoveringFromSelf = false;
-		newActionMenu:Hide();
-	end);
-	newActionMenu._dev.____looseSignalB = FRAME.MouseEnter:Connect(function()
-		HoveringFromSelf = true;
+	newActionMenu:GET("ContentFrame").MouseEnter:Connect(function()
+		if(not IsHoveringContentFrame())then
+			setIsHoveringContentFrame(true);
+		end
+	end)
+	newActionMenu:GET("ContentFrame").MouseLeave:Connect(function()
+		if(IsHoveringContentFrame())then
+			setIsHoveringContentFrame(false);
+		end
+	end)
+
+	self._ActionButton.MouseEnter:Connect(function()
+		if(not IsHoveringActionButton())then
+			setIsHoveringActionButton(true);
+		end
+	end)
+	self._ActionButton.MouseLeave:Connect(function()
+		if(IsHoveringActionButton())then
+			setIsHoveringActionButton(false);
+		end
+	end)
+
+	IsHoveringActionButton:useEffect(function()
+		if(IsHoveringActionButton() or IsHoveringContentFrame())then
+			if(not newActionMenu.Showing)then
+				newActionMenu:Show(nil,self._ActionButton);
+			end
+		else
+			if(newActionMenu.Showing)then
+				newActionMenu:Hide();
+			end
+		end
+	end, {IsHoveringContentFrame});
+
+	newActionMenu.ActionTriggered:Connect(function(...)
+		self._Menu.ActionTriggered:Fire(...)
 	end)
 	
-
-	
-
-	
-	self.Container.MouseLeave:Connect(function()
-		if(not HoveringFromSelf)then
-			newActionMenu:Hide();
-		end;
-	end);
-
-	self.ActionButton.Disabled = not hybrid;
-	--print(self.ActionButton.Disabled);
-]]
-
-
-	
-
 	return newActionMenu;
 end;
 --[=[]=]
@@ -287,15 +288,11 @@ function ActionMenu:AddAction(ActionName:string,id:string,ActionIcon:string,...:
 
 	local UserKeybindService = App:GetService("UserKeybindService");
 
-	local Action = {};
-
-	local MainActionToolTip = self:GET("MainActionToolTip");
 	local ContentFrame = self:GET("ContentFrame");
 	local UIGrid = self:GET("UIGrid");
 
 	local Container = Instance.new("Frame");
 	Container.BackgroundTransparency = 1;
-	--Container.StrokeTransparency = 1;
 
 	local Fit = 10;
 
@@ -310,9 +307,9 @@ function ActionMenu:AddAction(ActionName:string,id:string,ActionIcon:string,...:
 	ActionRightImage.Visible = false;
 
 	local ActionButton = App.new("Button");
+	ActionButton.ButtonFlexSizing = false;
 	ActionButton.Name = "ActionButton";
-	ActionButton.Text = ActionName;
-	ActionButton.Icon = ActionIcon or "?";
+
 	ActionButton.Roundness = UDim.new(0);
 	ActionButton.BackgroundTransparency = 1;
 	ActionButton.StrokeTransparency = 1;
@@ -321,9 +318,11 @@ function ActionMenu:AddAction(ActionName:string,id:string,ActionIcon:string,...:
 	ActionButton.RippleStyle = Enumeration.RippleStyle.None;
 	ActionButton.Parent = Container;
 	
+	local Action = App.Create(ActionMenuAction,nil,ActionButton);
+	Action.Text = ActionName;
+	Action.Icon = ActionIcon or "";
 
-
-	local x,y;
+	local x;
 
 	if(ContentFrame.AbsoluteSize.X < ActionButton:GetAbsoluteSize().X)then
 		x = ActionButton:GetAbsoluteSize().X+Fit+10;
@@ -331,7 +330,6 @@ function ActionMenu:AddAction(ActionName:string,id:string,ActionIcon:string,...:
 	else 
 		x = ContentFrame.AbsoluteSize.X;
 	end;
-
 
 	local binds = {...};
 	local bindfit=0;
@@ -373,23 +371,17 @@ function ActionMenu:AddAction(ActionName:string,id:string,ActionIcon:string,...:
 	end
 
 	Container.Parent = ContentFrame;
-	Container.Size = UDim2.new(1,0,0,ActionButton:GetAbsoluteSize().Y);
+	Container.Size = UDim2.new(1,0,0,30) -- UDim2.new(1,0,0,ActionButton:GetAbsoluteSize().Y);
 	ContentFrame.Size = UDim2.fromOffset(x+bindfit,UIGrid.AbsoluteContentSize.Y);
 	ActionButton.Size = UDim2.fromScale(1,1);
 
-	Action.ParentExpandIcon = ActionRightImage;
-	Action.Container = Container;
-	Action.ActionButton = ActionButton;
+	Action._ParentExpandIcon = ActionRightImage;
+	Action._Container = Container;
+	Action._Menu = self;
 
 	id = id or tostring(math.random(1,500));
 
 	Action.ID = id;
-
-
-
-	setmetatable(Action, {
-		__index = ActionMenuAction;
-	})
 
 	if(not self._dev.__TreeContents)then
 		self._dev.__TreeContents = {};
@@ -397,15 +389,8 @@ function ActionMenu:AddAction(ActionName:string,id:string,ActionIcon:string,...:
 
 	self._dev.__TreeContents[id] = Action;
 
-	--[=[
-		@prop MouseButton1Down PHeSignal
-		@within ActionMenu
-	]=]
 	ActionButton:AddEventListener("MouseButton1Down"):Connect(function()
-		if(ActionButton.Name ~= "_notrigger")then
-			--self:Hide();
-			self:GetEventListener("ActionTriggered"):Fire(Action);
-		end;
+		self:GetEventListener("ActionTriggered"):Fire(Action);
 	end);
 
 	return Action;
@@ -444,7 +429,6 @@ function ActionMenu:AddToTree(...:any)
 		table.insert(self._dev.__ActionTree, x);
 		x.ActionTriggered:Connect(function(...)
 			if(self.AutomaticHide == Enumeration.ActionMenuAutomaticHide.None)then return end;
-			--hideAll(self);
 			self:Hide();
 			self:GetEventListener("ActionTriggered"):Fire(...);
 		end);
@@ -467,7 +451,7 @@ function ActionMenu:_Render(App)
 	--MainActionToolTip.Parent = Vanilla_Core.Mouse;
 	--MainActionToolTip.Parent = self._InitialAdornee or self:GetRef();
 	MainActionToolTip.Parent = self._InitialAdornee or self:GetRef();
-	MainActionToolTip._Adornee = self._InitialAdornee or Vanilla_Core.Mouse;
+	MainActionToolTip.Adornee = self._InitialAdornee or Vanilla_Core.Mouse;
 	MainActionToolTip:_UpdateAdornee();
 	MainActionToolTip.ContentPadding = Vector2.new(0,5);
 	MainActionToolTip.BackgroundColor3 = Color3.fromRGB(53, 53, 53);
@@ -500,7 +484,6 @@ function ActionMenu:_Render(App)
 	local UIGrid = Instance.new("UIListLayout", ContentFrame);
 	UIGrid.SortOrder = Enum.SortOrder.LayoutOrder;
 	
-	local stateFirst = true;
 	
 	return {
 		_Components = {

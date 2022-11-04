@@ -1,7 +1,5 @@
 local Theme = require(script.Parent.Parent.Parent.Theme);
 local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
-local Core = require(script.Parent.Parent.Parent);
-local IsClient = game:GetService("RunService"):IsClient();
 local Core_Vanilla = require(script.Parent.Parent.Parent.Vanilla)
 local System = require(script.Parent.Parent.Parent.Parent.System);
 local Mouse = Core_Vanilla.Mouse;
@@ -25,7 +23,8 @@ local Widget = {
 	WidgetIcon = "";
 	Required = false;
 	Enabled = true;
-	BorderRoundness = UDim.new(0);
+	Roundness = UDim.new(0);
+	BackgroundTransparency = 0;
 	BackgroundColor3 = Theme.getCurrentTheme().Background;
 	AutomaticHide = false;
 	Dragging = false;
@@ -51,10 +50,10 @@ local function createWidgetBorder(Widget)
 		frame.BackgroundTransparency = 1;
 		return frame;
 	end
-	local top = makeFrame( UDim2.new(0), UDim2.new(1,0,0,borderSize), Vector2.new(0) );	
-	local bottom = makeFrame( UDim2.new(0,0,1,borderSize), UDim2.new(1,0,0,borderSize), Vector2.new(0,1) );	
-	local left = makeFrame( UDim2.new(0), UDim2.new(0,borderSize,1,0), Vector2.new(0,0) );	
-	local right = makeFrame( UDim2.new(1,borderSize), UDim2.new(0,borderSize,1,0), Vector2.new(1,0) );	
+	local top = makeFrame(UDim2.new(0), UDim2.new(1,0,0,borderSize), Vector2.new(0));	
+	local bottom = makeFrame(UDim2.new(0,0,1,borderSize), UDim2.new(1,0,0,borderSize), Vector2.new(0,1));	
+	local left = makeFrame(UDim2.new(0), UDim2.new(0,borderSize,1,0), Vector2.new(0,0));	
+	local right = makeFrame(UDim2.new(1,borderSize), UDim2.new(0,borderSize,1,0), Vector2.new(1,0));	
 	return top,right,bottom,left;	
 end
 
@@ -118,20 +117,13 @@ end
 
 --//
 function Widget:_Render(App)
-
-	
 	local Portal = App.new("Portal", self:GetRef());
 	Portal.IgnoreGuiInset = true;
+	local WidgetObject = App.new("Frame")	
+	WidgetObject.Parent = Portal:GetGUIRef();
+	WidgetObject.StrokeTransparency = 0;
 	
-	local Widget = App.new("Frame")	
-	Widget.Parent = Portal:GetGUIRef();
-	Widget.StrokeTransparency = 0;
-	
-	--local __s = self._dev.args and self._dev.args[1] or self.MinimumSize;
-	--Widget.Size = __s;
-	--Widget.BackgroundColor3 = Theme.getCurrentTheme().Background;
-	
-	local ActivityFrame = Instance.new("Frame", Widget:GetGUIRef());
+	local ActivityFrame = Instance.new("Frame", WidgetObject:GetGUIRef());
 	ActivityFrame.Name = "__ActivityFrame";
 	ActivityFrame.BackgroundTransparency = 1;
 	ActivityFrame.BackgroundColor3 = Color3.fromRGB(0);
@@ -139,13 +131,13 @@ function Widget:_Render(App)
 	ActivityFrame.Size = UDim2.fromScale(1,1);
 
 	local WidgetTop = App.new("Frame");
-	WidgetTop.Parent = Widget:GetGUIRef();
+	WidgetTop.Parent = WidgetObject:GetGUIRef();
 	WidgetTop.Size = UDim2.new(1,0,0,37);
 	WidgetTop.BackgroundColor3 = Theme.getCurrentTheme().Disabled;
 	WidgetTop.StrokeTransparency = 1;
 	WidgetTop.Roundness = UDim.new(0);
 	local WidgetBottom = App.new("Frame");
-	WidgetBottom.Parent = Widget:GetGUIRef();
+	WidgetBottom.Parent = WidgetObject:GetGUIRef();
 	WidgetBottom.Size = UDim2.new(1,0,0,15);
 	WidgetBottom.Position = UDim2.fromScale(0,1);
 	WidgetBottom.AnchorPoint = Vector2.new(0,1);
@@ -153,20 +145,15 @@ function Widget:_Render(App)
 	WidgetBottom.StrokeTransparency = 1
 
 	local WidgetBottom_ScaleableBtn = Instance.new("TextButton", WidgetBottom:GetGUIRef());
-	--WidgetBottom_ScaleableBtn.Image = "rbxasset://textures/ui/AvatarContextMenu_Arrow.png";
 	WidgetBottom_ScaleableBtn.AnchorPoint = Vector2.new(1,.5);
 	WidgetBottom_ScaleableBtn.Position = UDim2.new(1,15,.5,0);
 	WidgetBottom_ScaleableBtn.Size = UDim2.new(0,10,0,10)
 	WidgetBottom_ScaleableBtn.BorderSizePixel = 2;
 	WidgetBottom_ScaleableBtn.BorderColor3 = Color3.fromRGB(0);
 	WidgetBottom_ScaleableBtn.Text = "";
-	
-	--WidgetBottom_ScaleableBtn.BackgroundTransparency = 1;
-	--WidgetBottom_ScaleableBtn.ScaleType = Enum.ScaleType.Fit;
-
 
 	local WidgetContent = App.new("Frame");
-	WidgetContent.Parent = Widget:GetGUIRef();
+	WidgetContent.Parent = WidgetObject:GetGUIRef();
 	WidgetContent.Size = UDim2.new(1,0,1,-35);
 	WidgetContent.Position = UDim2.fromOffset(0,35);
 	WidgetContent.BackgroundTransparency = 1
@@ -178,45 +165,47 @@ function Widget:_Render(App)
 	WidgetTop_Header.AnchorPoint = Vector2.new(0,.5);
 	WidgetTop_Header.Size = UDim2.new(1,-35,1,0);
 	WidgetTop_Header.BackgroundTransparency = 1;
-	--WidgetTop_Header.Text = "Widget Name";
 	WidgetTop_Header.TextXAlignment = Enum.TextXAlignment.Left;
 	WidgetTop_Header.TextTruncate = Enum.TextTruncate.AtEnd;
 	WidgetTop_Header.StrokeTransparency = 1;
 	WidgetTop_Header.RippleStyle = Enumeration.RippleStyle.None;
+
+	local WidgetTop_ActionButtons = App.new("Frame", WidgetTop);
+	WidgetTop_ActionButtons.Size = UDim2.new(0,0,1,0);
+	WidgetTop_ActionButtons.AutomaticSize = Enum.AutomaticSize.X;
+	WidgetTop_ActionButtons.AnchorPoint = Vector2.new(1,.5);
+	WidgetTop_ActionButtons.BackgroundTransparency = 1;
+	WidgetTop_ActionButtons.Position = UDim2.new(1,-5,.5,0);
 	
-	local WidgetTop_CloseBtn = App.new("CloseButton")
-	WidgetTop_CloseBtn.Parent = WidgetTop:GetGUIRef();
+	local WidgetTop_ActionButtons_List = Instance.new("UIListLayout");
+	WidgetTop_ActionButtons_List.HorizontalAlignment = Enum.HorizontalAlignment.Right;
+	WidgetTop_ActionButtons_List.VerticalAlignment = Enum.VerticalAlignment.Center;
+	WidgetTop_ActionButtons_List.Parent = WidgetTop_ActionButtons:GetGUIRef();
+	WidgetTop_ActionButtons_List.SortOrder = Enum.SortOrder.LayoutOrder;
+	WidgetTop_ActionButtons_List.FillDirection = Enum.FillDirection.Horizontal;
+
+	local WidgetTop_CloseBtn = App.new("CloseButton");
+	WidgetTop_CloseBtn.Name = "z1_$l";
+	WidgetTop_CloseBtn.Parent = WidgetTop_ActionButtons;
 	WidgetTop_CloseBtn.Position = UDim2.new(1,0,0,0);
 	WidgetTop_CloseBtn.Size = UDim2.fromOffset(WidgetTop:GetAbsoluteSize().Y,WidgetTop:GetAbsoluteSize().Y); 
-
+	WidgetTop_CloseBtn.SupportsRBXUIBase = true;
 
 	local WidgetTop_MoveableBtn = Instance.new("TextButton", WidgetTop:GetGUIRef());
 	WidgetTop_MoveableBtn.Name = "WidgetMover";
-	WidgetTop_MoveableBtn.Size = UDim2.new(1,-30,1,0);
+	WidgetTop_MoveableBtn.Size = UDim2.new(1,-WidgetTop_ActionButtons:GetGUIRef().AbsoluteSize.X,1,0);
 	WidgetTop_MoveableBtn.Text = "";
 	WidgetTop_MoveableBtn.BackgroundTransparency = 1;
-	
-	
-	--//
 
-	
+	WidgetTop_ActionButtons:GetGUIRef():GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+		WidgetTop_MoveableBtn.Size = UDim2.new(1,-WidgetTop_ActionButtons:GetGUIRef().AbsoluteSize.X,1,0);
+	end);
 
-	local e = self:AddEventListener("OnWindowCloseRequest",true,WidgetTop_CloseBtn:GetEventListener("Activated"));
+	self:AddEventListener("OnWindowCloseRequest",true,WidgetTop_CloseBtn:GetEventListener("Activated"));
 
 	self:AddEventListener("OnWindowCloseRequest"):Connect(function()
 		if(self.AutomaticHide)then self.Enabled = false;end;
 	end)
-
-	--table.insert(GlobalWidgetsData, {ActivityFrame = ActivityFrame, Portal = Portal});
---[[
-	ActivityFrame.InputBegan:Connect(function(InputObject)
-		if(InputObject.UserInputType == Enum.UserInputType.MouseButton1)then
-			if(HybridWidgetInPlace and HybridWidgetInPlace ~= self)then HybridWidgetInPlace:FlashBorders();print("Can Only Move Hybrid Widget") return;end
-			--self:SetFocus();
-			--focus_GlobalWidgetsData(self);
-		end
-	end)
-]]
 
 	local LastAbsolutePosition_FROMBTN;
 	local LastAbsoluteSize;
@@ -225,33 +214,23 @@ function Widget:_Render(App)
 	local function Resize()
 		local x,y = (Mouse.X-10)-LastAbsolutePosition_FROMBTN.X,(Mouse.Y-10)-LastAbsolutePosition_FROMBTN.Y;
 		local X,Y = math.clamp(LastAbsoluteSize.X+x, self.MinimumSize.X, math.huge),math.clamp(LastAbsoluteSize.Y+y, self.MinimumSize.Y, math.huge)
-		Widget.Size = UDim2.fromOffset(X,Y);
+		WidgetObject.Size = UDim2.fromOffset(X,Y);
 	end;
 	
-
-	
-	local LastAbsolutePosition;
 	local MoveConnection;
 	local MoveUISConnection;
 	local NormalizedInputValue = {X=.5,Y=.5};
-	
-	local PluginService = App:GetService("PluginService");
-	--local yValueForTopbar = PluginService:IsPluginMode() and 36 or 0;
 	local yValueForTopbar = 0;
 
 	local function Position()
-		Widget.Position = UDim2.fromOffset(Mouse.X-Widget:GetAbsoluteSize().X*NormalizedInputValue.X , (Mouse.Y-yValueForTopbar)+WidgetTop:GetAbsoluteSize().Y *(1-NormalizedInputValue.Y));
+		WidgetObject.Position = UDim2.fromOffset(Mouse.X-WidgetObject:GetAbsoluteSize().X*NormalizedInputValue.X , (Mouse.Y-yValueForTopbar)+WidgetTop:GetAbsoluteSize().Y *(1-NormalizedInputValue.Y));
 	end
 
-
 	WidgetBottom_ScaleableBtn.MouseButton1Down:Connect(function()
-		--if(HybridWidgetInPlace and HybridWidgetInPlace ~= self)then print("Can Only Move Hybrid Widget") return;end
 		if(self.Static)then print("Static")return end;
 		if(self.FullScreen)then print("Fullscreen")return end;
 		LastAbsolutePosition_FROMBTN = WidgetBottom_ScaleableBtn.AbsolutePosition;
-
-		LastAbsoluteSize = Widget:GetAbsoluteSize();
-
+		LastAbsoluteSize = WidgetObject:GetAbsoluteSize();
 		ResizeConnection = game:GetService("RunService").RenderStepped:Connect(Resize);	
 		UISConnection = UIS.InputEnded:Connect(function(InputType)
 		self.Scaling = true;
@@ -267,15 +246,11 @@ function Widget:_Render(App)
 		end)
 	end);
 
-	--Position();
-
 	WidgetTop_MoveableBtn.MouseButton1Down:Connect(function()
-		--if(HybridWidgetInPlace and HybridWidgetInPlace ~= self)then print("Can Only Move Hybrid Widget") return;end
 		if(self.FullScreen)then print("Fullscreen")return end;
-		local DifferenceX = Mouse.X-Widget:GetAbsolutePosition().X;
-		local DifferenceY = Mouse.Y-Widget:GetAbsolutePosition().Y;
-
-		NormalizedInputValue.X,NormalizedInputValue.Y = System.Processes:Normalize(DifferenceX,0,Widget:GetAbsoluteSize().X),System.Processes:Normalize(DifferenceY,0,WidgetTop:GetAbsoluteSize().Y);
+		local DifferenceX = Mouse.X-WidgetObject:GetAbsolutePosition().X;
+		local DifferenceY = Mouse.Y-WidgetObject:GetAbsolutePosition().Y;	
+		NormalizedInputValue.X,NormalizedInputValue.Y = System.Processes:Normalize(DifferenceX,0,WidgetObject:GetAbsoluteSize().X),System.Processes:Normalize(DifferenceY,0,WidgetTop:GetAbsoluteSize().Y);
 		self.Dragging = true;
 		MoveConnection = game:GetService("RunService").RenderStepped:Connect(Position);
 		MoveUISConnection = UIS.InputEnded:Connect(function(InputType)
@@ -290,33 +265,24 @@ function Widget:_Render(App)
 			end;
 		end)
 	end)
-	--Widget.Size = UDim2.fromOffset(self.MinimumSize.X, self.MinimumSize.Y);
-	Widget.Position = UDim2.fromOffset( (Cam.ViewportSize.X/2-Widget:GetAbsoluteSize().X/2) , (Cam.ViewportSize.Y/2-Widget:GetAbsoluteSize().Y/2));
-	
-	--print(Widget.Size);
---]]	
+	WidgetObject.Position = UDim2.fromOffset( (Cam.ViewportSize.X/2-WidgetObject:GetAbsoluteSize().X/2) , (Cam.ViewportSize.Y/2-WidgetObject:GetAbsoluteSize().Y/2));
 	return {
-		--[[
-		["Size"] = function(Value)
-			Widget.Size = Value;
-		end,
-		]]
 		["WidgetIcon"] = function(Value)
 			WidgetTop_Header.Icon = Value;
 		end,["*Name"] = function(Value)
 			WidgetTop_Header.Text = Value;
-		end,["BorderRoundness"] = function(Value)
-			Widget.Roundness = Value
+		end,["Roundness"] = function(Value)
+			WidgetObject.Roundness = Value
 		end,["WidgetColor"] = function(Value)
 			WidgetTop.BackgroundColor3 = Value;
 			WidgetBottom_ScaleableBtn.BackgroundColor3 = Value;
-			Widget.StrokeColor3 = Value;
+			WidgetObject.StrokeColor3 = Value;
 		end,["MinimumSize"] = function(Value)
-			if(Widget:GetAbsoluteSize().X < Value.X)then
-				Widget.Size = UDim2.fromOffset(Value.X,Widget:GetAbsoluteSize().Y)
+			if(WidgetObject:GetAbsoluteSize().X < Value.X)then
+				WidgetObject.Size = UDim2.fromOffset(Value.X,WidgetObject:GetAbsoluteSize().Y)
 			end;
-			if(Widget:GetAbsoluteSize().Y < Value.Y)then
-				Widget.Size = UDim2.fromOffset(Widget:GetAbsoluteSize().X,Value.Y);
+			if(WidgetObject:GetAbsoluteSize().Y < Value.Y)then
+				WidgetObject.Size = UDim2.fromOffset(WidgetObject:GetAbsoluteSize().X,Value.Y);
 			end;
 		end,
 		["Enabled"] = function(Value)
@@ -328,22 +294,12 @@ function Widget:_Render(App)
 		end,
 		["Static"] = function(Value)
 			WidgetBottom_ScaleableBtn.Visible = not Value;
-			--if(Value)then
-				--WidgetContent.Size = UDim2.new(1,0,1,-35);
-			--else
-				--WidgetContent.Size = UDim2.new(1,0,1,-35);
-				--WidgetContent.Size = UDim2.new(1,0,1,-50);
-			--end
 		end,["FullScreen"] = function(Value)
 			if(Value)then
-
-				Widget.Size = UDim2.fromScale(1,1);
-				Widget.Position = UDim2.new(0);
-				--self._beforeFullscreen = self.Static;
-				--self.Static = true;
+				WidgetObject.Size = UDim2.fromScale(1,1);
+				WidgetObject.Position = UDim2.new(0);
 			else
-				Widget.Size = UDim2.fromOffset(self.MinimumSize.X,self.MinimumSize.Y);
-				--self.Static = self._beforeFullscreen or false;
+				WidgetObject.Size = UDim2.fromOffset(self.MinimumSize.X,self.MinimumSize.Y);
 			end;
 		end,
 		_Components = {
@@ -351,15 +307,16 @@ function Widget:_Render(App)
 			ActivityFrame = ActivityFrame;
 			WidgetContent = WidgetContent;	
 			FatherComponent = WidgetContent:GetGUIRef();
-			--_Appender = WidgetContent:GetGUIRef();
+			ActionButtons = WidgetTop_ActionButtons;
+			WidgetObject = WidgetObject;
+			WidgetTop = WidgetTop;
 		};
 		_Mapping = {
-			[Widget] = {
-				"BackgroundColor3";
+			[WidgetObject] = {
+				"BackgroundColor3","BackgroundTransparency";
 			}
 		};
 	};
 end;
 
-
-return Widget
+return Widget;

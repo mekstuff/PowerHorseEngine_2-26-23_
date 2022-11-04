@@ -1,3 +1,5 @@
+local StarterGui = game:GetService("StarterGui")
+
 --[=[
 	@class CoreGuiService
 	@tag Service
@@ -6,11 +8,39 @@
 local CoreGuiService = {}
 
 local ErrorService = require(script.Parent.ErrorService);
+local Pseudo = require(script.Parent.Parent.Globals.Pseudo)
 
 local Shared = {};
 local CoreGuiData = {
 	PurchaseCallbackPrompts = true,
 }
+--[=[
+	@return Promise
+]=]
+
+function CoreGuiService:SetNativeGuiEnabled(coreGuiType:Enum.CoreGuiType,enabled:boolean,MAX_TRIES:number?)
+	MAX_TRIES = MAX_TRIES or 60;
+	local totalTries=0;
+	return Pseudo.new("Promise"):Try(function(resolve,reject)
+		local function trySet()
+			local s,r = pcall(function()
+				return StarterGui:SetCoreGuiEnabled(coreGuiType,enabled);
+			end)
+			if(not s)then
+				if(totalTries == MAX_TRIES)then
+					warn("MAX_TRIES exhausted on SetNativeGuiEnabled(%s,%s,%s")
+					reject("MAX_TRIES exhausted");
+				end
+				totalTries+=1;
+				task.wait(totalTries/4)
+				return trySet();
+			else
+				resolve(r);
+			end;
+		end;
+		trySet();
+	end)
+end;
 --[=[]=]
 function CoreGuiService:SetCoreGuiEnabled(n:string,v:any):nil
 	if(not CoreGuiData[n])then
@@ -81,7 +111,7 @@ function CoreGuiService:WaitFor(CoreGuiName:string,TIME:number?)
 	--end;
 end
 
-function CoreGuiService.RemoveObject(Name)
+function CoreGuiService.RemoveObject(Name:string)
 	if(Shared[Name])then
 		Shared[Name]=nil;
 	else
@@ -89,7 +119,7 @@ function CoreGuiService.RemoveObject(Name)
 	end	
 end
 
-function CoreGuiService.ShareObject(Name,Value)
+function CoreGuiService.ShareObject(Name:string,Value:any)
 	if(not Shared[Name])then
 		Shared[Name]=Value;
 	else
@@ -97,7 +127,7 @@ function CoreGuiService.ShareObject(Name,Value)
 	end
 end;
 
-function CoreGuiService:GetCoreGui(Name)
+function CoreGuiService:GetCoreGui(Name:string)
 	if(Shared[Name])then
 		return Shared[Name];
 	else

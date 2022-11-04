@@ -197,11 +197,17 @@ return {
 				func = function()
 					MainModule.Console.clear();
 				end,
+			},
+			{
+				text = "Restart Panel";
+				id = "restart";
+				func = function()
+					print("Restarting");
+				end,
 			}
 		}
 		
 		local ActionMenu = App.new("ActionMenu", script.Parent.Parent.Parent.Components.content);
-		--ActionMenu:AddAction("Clear Output","clear");
 		for _,x in pairs(ActionMenuController) do
 			ActionMenu:AddAction(x.text,x.id);
 		end;

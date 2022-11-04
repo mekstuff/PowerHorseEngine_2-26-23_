@@ -2,7 +2,7 @@ local App = require(game:GetService("ReplicatedStorage"):WaitForChild("PowerHors
 
 return {
 	Name = "";
-	Icon = "ico-block";
+	Icon = "ico-mdi@content/block";
 	Func = function()
 		local Frame = App.new("Frame");
 		local HeadsupImage = App.new("Image",Frame);

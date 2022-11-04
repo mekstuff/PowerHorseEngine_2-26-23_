@@ -105,6 +105,9 @@ function Image:_Render(App)
 
 	local ModelContent;local ModelContentCamera;
 	local function fetchModelContent()
+		if(ModelContent)then 
+			ModelContent:ClearAllChildren();
+		end;
 		ModelContent = Instance.new("ViewportFrame",Container:GetGUIRef());
 		ModelContent.BackgroundTransparency = 1;
 		ModelContent.Size = UDim2.fromScale(1,1);
@@ -154,7 +157,7 @@ function Image:_Render(App)
 		};
 		_Mapping = {
 			[Container] = {
-				"AnchorPoint","Position","Visible","ZIndex","Size","BackgroundTransparency","BackgroundColor3","Roundness"
+				"AnchorPoint","Position","Visible","ZIndex","Size","BackgroundTransparency","BackgroundColor3","Roundness","Rotation"
 			};
 			[ImageContent] = {
 				"ScaleType",

@@ -1,9 +1,13 @@
 -- Copyright © 2022 Lanzo Inc. All rights reserved.
 -- Written by Olanzo James @ Lanzo, Inc.
 -- Tuesday, September 27 2022 @ 09:51:21
--- Main Source For Controlling Pseudo Components.
 
-local module = {}
+--[=[
+	@class LanzoCoreUtil
+	@private
+	Main Source For Controlling Pseudo Components.
+]=]
+local LanzoCoreUtil = {}
 local App;
 local Classes = script.Parent.Classes;
 local Core = require(script.Parent);
@@ -554,7 +558,7 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 
 	
 	--> Initializing
-	module.__Pseudos[id]=Pseudo; --> Stores the Pseudo so .getPseudo works
+	LanzoCoreUtil.__Pseudos[id]=Pseudo; --> Stores the Pseudo so .getPseudo works
 	if(not App)then
 		App = require(script.Parent.Parent.Parent);
 	end;
@@ -630,6 +634,8 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 					@param callback function -- A function that is called whenever the useEffect is triggered
 					@param dependencies table? -- An optional list of items that can trigger this useEffect
 
+					@return Servant
+
 					```lua
 					--> useEffect with a state depedency
 					useEffect(function()
@@ -667,6 +673,30 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 					end;
 					dependencies = _organizeuseEffectHookDependencies(Pseudo,dependencies or Pseudo._getCurrentPropSheetState(true,true,nil,true))
 					return Pseudo._dev._useEffectState:useEffect(callback,dependencies)
+				end;
+				--> useRender
+				--[=[
+					@class useRender
+				]=]
+				--[=[
+					@function useRender
+					@within useRender
+					@param props table
+					@param dependencies table
+
+					@return Servant
+
+					A useEffect hook wrapper that only runs your callback after the first useEffect call.
+				]=]
+				hooks.useRender = function(callback:any,dependencies:table?)
+					local usedEffect = false;
+					return hooks.useEffect(function(...:any)
+						if(usedEffect)then
+							callback(...);
+						else
+							usedEffect = true;
+						end;
+					end, dependencies)
 				end;
 				--> useMapping hook
 				--[=[
@@ -740,11 +770,14 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 end;
 
 --> Store Pseudos in a weak table
-module.__Pseudos = {};
-setmetatable(module.__Pseudos, {__mode="kv"})
+LanzoCoreUtil.__Pseudos = {};
+setmetatable(LanzoCoreUtil.__Pseudos, {__mode="kv"})
 
 --> For creating custom classes
-function module.Create(Class:table,Parent:any?,...:any?):any
+--[=[
+	@ignore
+]=]
+function LanzoCoreUtil.Create(Class:table,Parent:any?,...:any?):any
 	assert(Class.ClassName, "Tried to create class without a ClassName.");
 	assert(Class._Render or Class.Render, "Tried To Create Class with no form of rendering. All Components require a :_Render method");
 	--[[
@@ -767,7 +800,10 @@ local function handleClassBlocked(ClassName:string):nil
 end;
 
 -- Used by .new Constructor
-function module.Produce(n:string,Parent:Instance?,...:any?):any
+--[=[
+	@ignore
+]=]
+function LanzoCoreUtil.Produce(n:string,Parent:Instance?,...:any?):any
 	local ClassModule = getClassModule(n);
 	
 	if(not ClassModule)then
@@ -785,4 +821,4 @@ function module.Produce(n:string,Parent:Instance?,...:any?):any
 end;
 
 
-return module;
+return LanzoCoreUtil;

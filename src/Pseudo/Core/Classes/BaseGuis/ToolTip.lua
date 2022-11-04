@@ -84,6 +84,7 @@ function ToolTip:_Track()
 
 
 	local function update(pos,obj)
+		
 		local targetPos;
 		if(self.RespectViewport)then
 			targetPos = Core.CalculateRespectiveRelativeViewportPosition(obj or self.Adornee, Ref, self.StaticXAdjustment,self.StaticYAdjustment,self.RespectViewport);		
@@ -106,7 +107,7 @@ function ToolTip:_Track()
 		end
 		self._dev.__prevAdorneeConnectionC = game:GetService("UserInputService").InputChanged:Connect(function(input, gameProcessedEvent)
 			if(input.UserInputType == Enum.UserInputType.MouseMovement)then
-				update(input);
+				update(input.Position);
 			end
 		end)
 	end;
@@ -115,8 +116,11 @@ end;
 --[=[]=]
 function ToolTip:_Track_Relative(Adornee:Instance)
 	if(not Adornee)then Adornee = self.Adornee;end;
+
+	--> We use Parent if no adornee is set, so parent will be used as adornee
+	Adornee = Adornee or self.Parent;
+
 	local FrameRBX = self:GET("Frame");
-	
 	
 	if(self.Adornee ~= Mouse)then
 		if(not self._dev.__prevAdorneeConnectionC)then
@@ -198,8 +202,6 @@ function ToolTip:_Render(App)
 	ContentsContainer.AutomaticSize = Enum.AutomaticSize.XY;
 	ContentsContainer.BackgroundTransparency = 1;
 	local UIPadding = Instance.new("UIPadding", ContentsContainer);
-
-	
 	
 	return {
 		["ContentPadding"] = function(Value)
@@ -208,11 +210,8 @@ function ToolTip:_Render(App)
 			UIPadding.PaddingLeft = UDim.new(0,Value.X);
 			UIPadding.PaddingRight = UDim.new(0,Value.X);
 		end;
-		["Adornee"] = function(Value)
-			-- if(Value ~= self.Adornee)then
-				self.Adornee = Value;
-				self:_UpdateAdornee();
-			-- end
+		["Adornee"] = function()
+			self:_UpdateAdornee();
 		end,
 	--[[
 		["*Parent"] = function(Value)
