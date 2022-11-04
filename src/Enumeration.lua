@@ -8,6 +8,7 @@ local TweenService = game:GetService("TweenService");
 ]=]
 local Enumeration = {}
 -- [ Ease ] --
+
 Enumeration.Ease = {};
 Enumeration.Ease.Linear = {
 	f = function(cv:number,i:number,ti:number, sv:number):number

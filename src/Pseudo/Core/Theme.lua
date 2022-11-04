@@ -299,7 +299,6 @@ function Theme.ThemeToggler()
 
 	return Button;
 end;
-
 --[=[]=]
 function Theme.getDefaultTheme()
 	return ThemeDefault;
