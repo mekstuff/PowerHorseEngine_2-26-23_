@@ -89,13 +89,21 @@ local module = {}
 local DirectionArrowClass = {
 	Name = "DirectionalArrow3D";
 	ClassName = "DirectionalArrow3D";
-	Origin = "**Instance";
-	Target = "**Vector3";
+	Origin = "**any";
+	Target = "**any";
 	OriginOffset = Vector3.new(0,5,0);
 	Magnitude = 0;
 	BrickColor = BrickColor.new("Lime green");
 	Enabled = true;
 };
+
+function DirectionArrowClass:_GetCFrame(Object:any)
+	if(typeof(Object) == "CFrame")then
+		return Object;
+	elseif(typeof(Object) == "Instance")then
+		return Object:IsA("Model") and Object:GetPrimaryPartCFrame() or Object.CFrame;
+	end
+end;
 
 function DirectionArrowClass:_Render()
 	
@@ -111,9 +119,9 @@ function DirectionArrowClass:_Render()
 	
 	local renderSteppedConnection;
 	local function renderStepped()		
-		local cf =  CFrame.lookAt((self.Origin.CFrame:ToWorldSpace(CFrame.new(self.OriginOffset))).Position, self.Target)
+		local cf =  CFrame.lookAt((self:_GetCFrame(self.Origin):ToWorldSpace(CFrame.new(self.OriginOffset))).Position, self:_GetCFrame(self.Target).Position)
 		Arrow:SetPrimaryPartCFrame(cf)	
-		self.Magnitude = (self.Origin.Position - self.Target).Magnitude;
+		self.Magnitude = (self:_GetCFrame(self.Origin).Position - self:_GetCFrame(self.Target).Position).Magnitude;
 	end;
 
 	local function disconnectConnection()
