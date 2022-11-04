@@ -389,7 +389,6 @@ function ActionMenu:AddAction(ActionName:string,id:string,ActionIcon:string,...:
 
 	self._dev.__TreeContents[id] = Action;
 
-	
 	ActionButton:AddEventListener("MouseButton1Down"):Connect(function()
 		self:GetEventListener("ActionTriggered"):Fire(Action);
 	end);
