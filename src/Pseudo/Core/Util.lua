@@ -1,9 +1,13 @@
 -- Copyright © 2022 Lanzo Inc. All rights reserved.
 -- Written by Olanzo James @ Lanzo, Inc.
 -- Tuesday, September 27 2022 @ 09:51:21
--- Main Source For Controlling Pseudo Components.
 
-local module = {}
+--[=[
+	@class LanzoCoreUtil
+	@private
+	Main Source For Controlling Pseudo Components.
+]=]
+local LanzoCoreUtil = {}
 local App;
 local Classes = script.Parent.Classes;
 local Core = require(script.Parent);
@@ -554,7 +558,7 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 
 	
 	--> Initializing
-	module.__Pseudos[id]=Pseudo; --> Stores the Pseudo so .getPseudo works
+	LanzoCoreUtil.__Pseudos[id]=Pseudo; --> Stores the Pseudo so .getPseudo works
 	if(not App)then
 		App = require(script.Parent.Parent.Parent);
 	end;
@@ -762,11 +766,14 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 end;
 
 --> Store Pseudos in a weak table
-module.__Pseudos = {};
-setmetatable(module.__Pseudos, {__mode="kv"})
+LanzoCoreUtil.__Pseudos = {};
+setmetatable(LanzoCoreUtil.__Pseudos, {__mode="kv"})
 
 --> For creating custom classes
-function module.Create(Class:table,Parent:any?,...:any?):any
+--[=[
+	@ignore
+]=]
+function LanzoCoreUtil.Create(Class:table,Parent:any?,...:any?):any
 	assert(Class.ClassName, "Tried to create class without a ClassName.");
 	assert(Class._Render or Class.Render, "Tried To Create Class with no form of rendering. All Components require a :_Render method");
 	--[[
@@ -789,7 +796,10 @@ local function handleClassBlocked(ClassName:string):nil
 end;
 
 -- Used by .new Constructor
-function module.Produce(n:string,Parent:Instance?,...:any?):any
+--[=[
+	@ignore
+]=]
+function LanzoCoreUtil.Produce(n:string,Parent:Instance?,...:any?):any
 	local ClassModule = getClassModule(n);
 	
 	if(not ClassModule)then
@@ -807,4 +817,4 @@ function module.Produce(n:string,Parent:Instance?,...:any?):any
 end;
 
 
-return module;
+return LanzoCoreUtil;

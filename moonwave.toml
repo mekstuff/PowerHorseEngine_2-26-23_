@@ -69,6 +69,11 @@ classes = [
 [[classOrder]]
 section = "Hooks"
 classes = [
-"useEffect","useMapping","useComponents"
+"useEffect","useMapping","useComponents","useRender",
 ]
 
+[[classOrder]]
+section = "PHe Panel"
+classes = [
+    "PHePanel"
+]
