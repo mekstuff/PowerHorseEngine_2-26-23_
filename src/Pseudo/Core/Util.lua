@@ -634,6 +634,8 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 					@param callback function -- A function that is called whenever the useEffect is triggered
 					@param dependencies table? -- An optional list of items that can trigger this useEffect
 
+					@return Servant
+
 					```lua
 					--> useEffect with a state depedency
 					useEffect(function()
@@ -682,7 +684,9 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 					@param props table
 					@param dependencies table
 
-					A useEffect hook wrapper that only runs you callback after the first useEffect call.
+					@return Servant
+
+					A useEffect hook wrapper that only runs your callback after the first useEffect call.
 				]=]
 				hooks.useRender = function(callback:any,dependencies:table?)
 					local usedEffect = false;

@@ -41,14 +41,14 @@ function ClientBackpackService:GetTools(Player:Player,existingTable:table?)
 end
 
 --[=[
-    @class ClientBackpackService_Tool
+    @class ClientBackpackServiceTool
 ]=]
-local ClientBackpackService_Tool = {
-    Name = "ClientBackpackService_Tool";
-    NameClass = "ClientBackpackService_Tool";
+local ClientBackpackServiceTool = {
+    Name = "ClientBackpackServiceTool";
+    NameClass = "ClientBackpackServiceTool";
 }
 
-function ClientBackpackService_Tool:_Render()
+function ClientBackpackServiceTool:_Render()
     
 end;
 
