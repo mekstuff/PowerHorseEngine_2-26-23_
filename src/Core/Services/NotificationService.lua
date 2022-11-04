@@ -205,6 +205,7 @@ end;
 --[=[
 	@private
 ]=]
+local ObjectiveNotificationGroup;
 function NotificationService:HandleNotificationRequest(...:any)
 	
 	if(typeof(...) == "table")then
@@ -230,8 +231,19 @@ function NotificationService:HandleNotificationRequest(...:any)
 			elseif(t.NotificationMethod == "Chat")then
 				print("Sending as chat");
 				return;
-			end
-
+			elseif(t.NotificationMethod == "Objective")then
+				if(not ObjectiveNotificationGroup)then
+					local App = require(script.Parent.Parent.Parent);
+					ObjectiveNotificationGroup = App.new("NotificationGroup");
+					ObjectiveNotificationGroup.Name = "ObjectiveNotificationGroup";
+					ObjectiveNotificationGroup.AnchorPoint = Vector2.new(1,0);
+					ObjectiveNotificationGroup.Position = UDim2.new(1,-20,.25);
+					ObjectiveNotificationGroup.Size = UDim2.new(0,250,.5);
+					ObjectiveNotificationGroup.SortOrderAdjustment = App.Enumeration.Adjustment.Top;
+					ObjectiveNotificationGroup.Parent = CoreGuiService:WaitFor("NotificationGroup").Parent;
+				end
+				return ObjectiveNotificationGroup:Notify(...);
+			end;
 		end
 		
 	end
