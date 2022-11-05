@@ -202,10 +202,11 @@ local function HandleMusic(p)
 
 end;
 
+local ObjectiveNotificationGroup;
 --[=[
 	@private
+	@within NotificationService
 ]=]
-local ObjectiveNotificationGroup;
 function NotificationService:HandleNotificationRequest(...:any)
 	
 	if(typeof(...) == "table")then

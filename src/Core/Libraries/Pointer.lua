@@ -1,4 +1,4 @@
--- local PseudoService = require(script.Parent.Parent.Services.PseudoService);
+--> 11/4/2022 @ 8:08PM | Bug Discovered: If a Pseudo has a property and the Instance has a child of the property name, it will attempt to write the Instance child as the property value (Not breaking but will toss a pointer warning)
 local App = require(script.Parent.Parent.Parent);
 local Theme = App:GetGlobal("Theme");
 local Enumeration = App:GetGlobal("Enumeration");
@@ -87,7 +87,6 @@ return function(instance,Parent)
 		end;
 	end
 	
-
 	if(not isROBLOXCloneInstance and runAttributes)then
 		for propname in pairs(obj._getCurrentPropSheetState(true,true)) do
 			if(propname ~= "Parent" and propname ~= "ClassName")then
@@ -112,7 +111,7 @@ return function(instance,Parent)
 						obj[propname] = propinInstance;
 					end);
 					if(not s)then
-						warn("PointerError: Failed to apply property \""..propname.."\" to \""..obj..". Source :",r)
+						warn("PointerError: Failed to apply property \""..propname.."\" to \""..obj.Name..". Source :",r)
 					end
 				end
 			end
