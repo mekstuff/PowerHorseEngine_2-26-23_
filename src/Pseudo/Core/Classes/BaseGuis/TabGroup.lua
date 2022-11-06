@@ -15,22 +15,37 @@ local TabGroup = {
 	AutomaticSize = Enum.AutomaticSize.None;
 	BackgroundColor3 = Color3.fromRGB(36, 36, 36);
 	BackgroundTransparency = 1;
+	HighlighterColor3 = Theme.getCurrentTheme().Text;
+	HighlighterThickness = 3;
+	HighlighterPadding = 3;
 	--ShowTabNameWhenSelected = false;
 };
 
-local HighlighterThickness = 3;
-local HighlighterPadding = 3;
+-- local HighlighterThickness = 3;
+-- local HighlighterPadding = 3;
 
 TabGroup.__inherits = {"BaseGui"}
 
 --[=[
 	@param TabContent BaseGui
+	@param TabName string | table -- If table, then it will be used as TabButtonProps, but you can also pass TabIcon and TabId here.
 	@return Button
 ]=]
-function TabGroup:AddTab(TabContent:Instance,TabName:string,TabIcon:string?,TabId:any?)
+function TabGroup:AddTab(TabContent:Instance,TabName:string|table,TabIcon:string?,TabId:any?,TabButtonProps:table?)
 	if(not TabContent)then
 		return self:_GetAppModule():GetService("ErrorService").tossError("AddTab() requires the tabs content to be the first argument");
 	end;
+
+	if(typeof(TabName) == "table")then
+		TabButtonProps = TabName;
+		TabName = TabButtonProps.TabName;
+		TabIcon = TabIcon or TabButtonProps.TabIcon;
+		TabId = TabId or TabButtonProps.TabId;
+		TabButtonProps.TabName = nil;
+		TabButtonProps.TabIcon = nil;
+		TabButtonProps.TabId = nil;
+	end
+
 	TabId = TabId or tostring(#self._dev._tabs);
 	local App = self:_GetAppModule();
 	local Navigator = self:GET("Navigator");
@@ -59,20 +74,24 @@ function TabGroup:AddTab(TabContent:Instance,TabName:string,TabIcon:string?,TabI
 	Button.TextAdjustment = Enumeration.Adjustment.Center;
 	Button.IconAdjustment = Enumeration.Adjustment.Center;
 	Button.ZIndex = self.ZIndex;
+
+	if(TabButtonProps)then
+		for a,b in pairs(TabButtonProps) do
+			Button[a] = b;
+		end;
+	end
+
 	RespectListLayout.Parent = TabGroupTopSection:GetGUIRef();
 	
-	
-
 	table.insert(self._dev._tabs, {
 		Button = Button;
 		TabContent = TabContent;
 		TabName = TabName;
 		TabId = TabId;
 	});
-	
 
 	local indexValue = #self._dev._tabs - 1
-	TabGroupTopSection_Highlighter.Size = UDim2.new(1/#self._dev._tabs,0,0,HighlighterThickness);
+	TabGroupTopSection_Highlighter.Size = UDim2.new(1/#self._dev._tabs,0,0,self.HighlighterPadding);
 	Top_List.CellSize = UDim2.new(1/#self._dev._tabs,-Top_List.CellPadding.X.Offset,1,0);
 	
 	Button.MouseButton1Down:Connect(function()
@@ -123,7 +142,6 @@ function TabGroup:_Render(App)
 	TabGroupContainer.StrokeTransparency = 1;
 	TabGroupContainer.Name = "TabGroup_Container";
 	
-	
 	local TabGroupTopSection = App.new("Frame", TabGroupContainer:GetGUIRef());
 	TabGroupTopSection.Size = UDim2.new(1,0,0,45);
 	TabGroupTopSection.StrokeTransparency = 1;
@@ -131,10 +149,9 @@ function TabGroup:_Render(App)
 	TabGroupTopSection.Name = "TabGroup_Top";
 	
 	local TabGroupTopSection_Highlighter = App.new("Frame", TabGroupTopSection:GetGUIRef());
-	TabGroupTopSection_Highlighter.Size = UDim2.new(1,0,0,HighlighterThickness);
+	TabGroupTopSection_Highlighter.Size = UDim2.new(1,0,0,self.HighlighterThickness);
 	TabGroupTopSection_Highlighter.Roundness = UDim.new(0,5);
-	TabGroupTopSection_Highlighter.Position = UDim2.new(0,0,1,HighlighterPadding);
-	TabGroupTopSection_Highlighter.BackgroundColor3 = Color3.fromRGB(255,255,255);
+	TabGroupTopSection_Highlighter.Position = UDim2.new(0,0,1,self.HighlighterPadding);
 	TabGroupTopSection_Highlighter.StrokeTransparency = 1;
 	
 	local Top_List = Instance.new("UIGridLayout", TabGroupTopSection:GetGUIRef());
@@ -144,8 +161,8 @@ function TabGroup:_Render(App)
 	Top_List.HorizontalAlignment = Enum.HorizontalAlignment.Center;
 
 	local TabGroupContentsSection = App.new("Frame", TabGroupContainer:GetGUIRef());
-	TabGroupContentsSection.Size = UDim2.new(1,0,1,-TabGroupTopSection.Size.Y.Offset-HighlighterThickness-(TabGroupTopSection_Highlighter.Position.Y.Offset*2));
-	TabGroupContentsSection.Position = UDim2.fromOffset(0,TabGroupTopSection.Size.Y.Offset+HighlighterThickness+(TabGroupTopSection_Highlighter.Position.Y.Offset*2));
+	TabGroupContentsSection.Size = UDim2.new(1,0,1,-TabGroupTopSection.Size.Y.Offset-self.HighlighterThickness-(TabGroupTopSection_Highlighter.Position.Y.Offset*2));
+	TabGroupContentsSection.Position = UDim2.fromOffset(0,TabGroupTopSection.Size.Y.Offset+self.HighlighterThickness+(TabGroupTopSection_Highlighter.Position.Y.Offset*2));
 	TabGroupContentsSection.StrokeTransparency = 1;
 	TabGroupContentsSection.BackgroundTransparency = 1;
 	TabGroupContentsSection.Name = "TabGroup_Contents";
@@ -155,13 +172,15 @@ function TabGroup:_Render(App)
 	
 	Navigator.Navigated:Connect(function(_,_,_,index)
 		local x = (self:GET("RespectListLayout").AbsoluteSize.X+Top_List.CellPadding.X.Offset)*(index-1);
-		TweenService:Create(TabGroupTopSection_Highlighter:GetGUIRef(), TweenInfo.new(Navigator.NavigationSpeed), {Position = UDim2.new(0,x,1,HighlighterPadding)}):Play();
+		TweenService:Create(TabGroupTopSection_Highlighter:GetGUIRef(), TweenInfo.new(Navigator.NavigationSpeed), {Position = UDim2.new(0,x,1,self.HighlighterPadding)}):Play();
 	end)
 	
  	self:AddEventListener("TabSwitched",true);
-	
-	
+
 	return {
+		["HighlighterColor3"] = function(Value)
+			TabGroupTopSection_Highlighter.BackgroundColor3 = Value;
+		end;
 		["ZIndex"] = function(Value)
 			TabGroupContainer.ZIndex = Value;
 			TabGroupTopSection.ZIndex = Value;
