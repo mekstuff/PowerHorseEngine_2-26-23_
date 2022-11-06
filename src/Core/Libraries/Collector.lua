@@ -11,6 +11,10 @@ local Collector = {
     ClassName = "Collector",
 };
 
+function Collector:_GetPseudoFromInstance(instance:any)
+    return PseudoService:GetPseudoFromId(instance);
+end;
+
 function Collector:_GetTagInstanceObject(instance:any)
     if(instance:IsA("Pseudo"))then
         instance = instance:GetRef();
@@ -30,6 +34,15 @@ end;
 function Collector:_RemoveTag(instance:any,tagname:string):nil
     instance = self:_GetTagInstanceObject(instance);
     CollectionService:RemoveTag(instance,tagname);
+end;
+--[=[]=]
+function Collector:GetTagged(tag:string)
+    local tags = CollectionService:GetTagged(tag);
+    local t = {};
+    for _,x in pairs(tags) do
+        table.insert(t, self:_GetPseudoFromInstance(x) or x);
+    end;
+    return t;
 end
 --[=[
     @param instance Pseudo | Instance
