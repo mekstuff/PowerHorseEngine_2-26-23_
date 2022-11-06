@@ -1,12 +1,18 @@
+--[=[
+	@class PluginService
+	@tag Service
+]=]
 local PluginService = {};
 local ClientIsPluginMode = false;
 local currentApp,currentPlugin;
 
 local PluginService_SyncFile = require(script.PluginService_SyncFile);
 local PHeAppHandler = require(script.PHeAppHandler);
-local SyncFileInitiated = false;
 
-function PluginService:BuildAsPHeApp(pluginApp,toolbar,plugin)
+--[=[
+	@return PHePluginLibraryObject
+]=]
+function PluginService:BuildAsPHeApp(pluginApp:table,toolbar:PluginToolbar?,plugin:Plugin?)
 	if(not plugin)then plugin = self:ReadSync().currentPlugin;end;
 	assert(pluginApp and plugin,("PluginApp file or plugin is missing when trying to :BuildAsPHeApp. You passed %s as your app and %s as your plugin."):format(tostring(pluginApp),tostring(plugin)))
 	if(not toolbar)then
@@ -19,44 +25,26 @@ function PluginService:BuildAsPHeApp(pluginApp,toolbar,plugin)
 			end;
 		toolbar = sharedBar;
 	end;
-
-	PHeAppHandler.CreatePHeLibraryObject(pluginApp,toolbar,plugin);
-	-- if(not toolbar)then
-	-- 	local CoreGui = game:GetService("CoreGui");
-	-- 	-- local sharedToolbar = 
-	-- 	-- local ModulesFolder = PHeAppHandler.getModulesfolder();
-	-- 	local SharedToolbarContainer = CoreGui:FindFirstChild("$PHeApp:SharedToolbar");
-	-- 	if(not SharedToolbarContainer)then
-	-- 		SharedToolbarContainer = Instance.new("ObjectValue");
-	-- 		SharedToolbarContainer.Name = "$PHeApp:SharedToolbar";
-	-- 		SharedToolbarContainer.Parent = CoreGui;
-			
-	-- 		local sharedTb = plugin:CreateToolbar("PowerHorseEngine");
-	-- 		sharedTb.Parent = SharedToolbarContainer;
-	-- 		SharedToolbarContainer.Value = sharedTb;
-	-- 		-- print(SharedToolbarContainer.Value.Parent, "Original");
-	-- 	end;
-	-- 	-- print(SharedToolbarContainer.Value);
-	-- 	-- return;
-	-- 	-- print(SharedToolbarContainer.Value.Parent);
-	-- 	toolbar = SharedToolbarContainer.Value;
-	-- end
-	-- PHeAppHandler.CreatePHeLibraryObject(pluginApp,toolbar,plugin)
-	-- PHeAppHandler
+	return PHeAppHandler.CreatePHeLibraryObject(pluginApp,toolbar,plugin);
 end;
 
-function PluginService:IsPluginMode()
+--[=[]=]
+function PluginService:IsPluginMode():boolean
 	return ClientIsPluginMode;
 end
 
-function PluginService:ReadSync()
+--[=[]=]
+function PluginService:ReadSync():table?
 	return currentPlugin and {
 		app = currentApp;
 		currentPlugin = currentPlugin
 	} or nil;
 end
 
-function PluginService:__ForceSync(key,app,plugin)
+--[=[
+	@ignore
+]=]
+function PluginService:__ForceSync(key:any,app:table,plugin:Plugin)
     if(key)then
         currentApp = app;
         currentPlugin = plugin;

@@ -1,6 +1,10 @@
-local m = {};
+--[=[
+	@class PHePluginAppHandler
+]=]
+local PHePluginAppHandler = {};
 
-function m.IsProperLibrary(libFile)
+--[=[]=]
+function PHePluginAppHandler.IsProperLibrary(libFile:Folder):table
 	local isFolder = typeof(libFile) == "Instance" and libFile:IsA("Folder");
 	if(not isFolder)then 
 		return {
@@ -41,7 +45,9 @@ end;
 local modulesFolder;
 local prevModnames = {"lanzo_modules"}
 local currModname = ".lanzoinc";
-function m.getModulesfolder()
+
+--[=[]=]
+function PHePluginAppHandler.getModulesfolder()
 	if(modulesFolder)then 
 		return modulesFolder;
 	end;
@@ -59,23 +65,20 @@ function m.getModulesfolder()
 			return t;
 		end
 	end;
-	local m = Instance.new("Folder");
-	m.Name = currModname;
-	m.Parent = game:GetService("ServerStorage");
-	modulesFolder = m;
-	return m;
+	local folder = Instance.new("Folder");
+	folder.Name = currModname;
+	folder.Parent = game:GetService("ServerStorage");
+	modulesFolder = folder;
+	return folder;
 end;
 
-function m.addTool(App,ToolData,ManifestName,toolbar)
-	-- local App = m._app;
-	local PHeModules = m.getModulesfolder();
-	-- if(not PHeModules)then
-	-- 	local m = Instance.new("Folder");
-	-- 	m.Name = ".lanzoinc";
-	-- 	m.Parent = game:GetService("ServerStorage");
-	-- 	PHeModules = m;
-	-- end;
+--[=[
+	@param App PowerHorseEngine
 
+	@return PHePluginStudioTool
+]=]
+function PHePluginAppHandler.addTool(App:table,ToolData:table,ManifestName:string,toolbar:PluginToolbar)
+	local PHeModules = PHePluginAppHandler.getModulesfolder();
 
 	local ImageProvider = App:GetProvider("ImageProvider");
 	local ErrorService = App:GetService("ErrorService");
@@ -83,13 +86,9 @@ function m.addTool(App,ToolData,ManifestName,toolbar)
 	
 	ToolData._Render = function()
 		return{};
-	end
+	end;
 	
 	ErrorService.assert(ToolData.init, "init function missing from tool data, the init function is responsible for returning a table containing the tool data, such as id,name,description etc...");
-	--ErrorService.assert(ToolData._Render, "missing _Render method from tool data, a render method must be passed");
-	-- ErrorService.assert(ToolData.launch, "missing launch method from tool data, tool:launch is called whenever the button for the tool is first clicked, you should set self._enabled = true here also (:open method is not called during launch)");
-
-	
 	ErrorService.assert(ToolData.open, "missing open method from tool data, the open method is triggered whenever the button is pressed and self._enabled = false. you should set self._enabled to true so our system knows that it was opened");
 	ErrorService.assert(ToolData.close, "missing close method from tool data, the closed method is triggered whenever the button is pressed and self._enabled = true. you should set self._enabled to false so our system knows that it was closed");
 	ErrorService.assert(ToolData.initiated, "missing initiated method from tool data, this is triggered whenever the tool was initiated from tool.init");
@@ -98,8 +97,7 @@ function m.addTool(App,ToolData,ManifestName,toolbar)
 	if(not ToolData.launch)then
 		ToolData.launch = ToolData.open;
 	end
-	--ErrorService.assert(ToolData.start, "missing start method from tool data, this is triggered whenever the tool has started");
-	
+
 	local data = ToolData.init();
 	
 	ErrorService.assert(data and data.id, "id missing from init function return, you are required to pass a unique identifier e.g return{ id = example-id-for-my-special-app}");
@@ -114,117 +112,104 @@ function m.addTool(App,ToolData,ManifestName,toolbar)
 		s.Parent = PHeModules;
 		AppStorage = s;
 	end;
-
-	
-
-	-- local toolbar = m._toolbar;
 	
 	ToolData.ClassName = ToolData.ClassName or data.name;
 	
-	local ToolClass = CustomClassService:Create(ToolData);
-	ToolClass.Parent = m._container;
+	--[=[
+		@class PHePluginStudioTool
+	]=]
 
-	
+	--[=[
+		@function init
+		@within PHePluginStudioTool
+	]=]
+	--[=[
+		@method initiated
+		@within PHePluginStudioTool
+	]=]
+	--[=[
+		@method launch
+		@within PHePluginStudioTool
+	]=]
+	--[=[
+		@method open
+		@within PHePluginStudioTool
+	]=]
+	--[=[
+		@method close
+		@within PHePluginStudioTool
+	]=]
+	local PHePluginStudioTool = CustomClassService:Create(ToolData);
+	PHePluginStudioTool.Parent = PHePluginAppHandler._container;
+
 	local ToolClassButton;
-	--local MoreButtonExists=false;
-
-	--[[
-	if(data.toolboxbutton)then
-		if(TotalButtons >= MaxVisibleButtons and not ToolsIgnoreLimit)then
-	
-			if(not MoreButtonsContainer)then
-				MoreButtonsContainer = m.CreatePHeLibraryObject(script:FindFirstChildWhichIsA("Folder"),nil,true);
-			end;
-			
-			local API = MoreButtonsContainer:GetAPI(MoreButtonsContainer.Name);
-			ToolClassButton = API:CreateButton(data);
-	
-			--//Remove when we creaate click for buttons
-			ToolClassButton:AddEventListener("Click",true,ToolClassButton.MouseButton2Down);
-			TotalButtons+=1;
-		else
-			 TotalButtons+=1;
-			 ToolClassButton = data.toolboxbutton and toolbar:CreateButton(data.id.."-"..tostring(math.random()),data.desc or "", ImageProvider:GetImageUri(data.icon) or ImageProvider:GetImageUri("ico-mdi@alert/error_outline"), data.name);
-			 ToolClass._dev.button = ToolClassButton;
-		end;
-	
-	end
-	]]
-
-	-- print(toolbar:GetChildren())
     ToolClassButton = data.toolboxbutton and toolbar:CreateButton(data.id.."-"..tostring(math.random()),data.desc or "", ImageProvider:GetImageUri(data.icon) or ImageProvider:GetImageUri("ico-mdi@alert/error_outline"), data.name);
-    ToolClass._dev.button = ToolClassButton;
+    PHePluginStudioTool._dev.button = ToolClassButton;
+	PHePluginStudioTool._dev.info = data;
+	PHePluginStudioTool._enabled = false;
+	PHePluginStudioTool._storage = AppStorage;
 	
-	
-	--if(ToolClassButton)then ToolClass+=1;end;
-	
-	--ToolClass._dev.plugin = IsCore and m._plugin;
-	--ToolClass._dev.sync = IsCore and m._sync;
-	ToolClass._dev.info = data;
-	ToolClass._enabled = false;
-	ToolClass._storage = AppStorage;
-	
-
-	-- m.createToolStorages(data.id,ToolClass);
-	
-	--ToolClass:initiated();
-
-	--local launched=false;
 	if(data.toolboxbutton)then
 		ToolClassButton.Click:Connect(function()
-			if(not ToolClass.___phestudiotoollaunched)then
-				ToolClass.___phestudiotoollaunched=true;
-				ToolClass:launch();
-				if(ToolClass._mainWidget)then
-					ToolClass._mainWidget:BindToClose(function()
-						ToolClass:close();
+			if(not PHePluginStudioTool.___phestudiotoollaunched)then
+				PHePluginStudioTool.___phestudiotoollaunched=true;
+				PHePluginStudioTool:launch();
+				if(PHePluginStudioTool._mainWidget)then
+					PHePluginStudioTool._mainWidget:BindToClose(function()
+						PHePluginStudioTool:close();
 					end)
 				end
 				return;
 			end;
-			if(ToolClass._enabled)then
-				ToolClass:close();
+			if(PHePluginStudioTool._enabled)then
+				PHePluginStudioTool:close();
 			else
-				ToolClass:open();
+				PHePluginStudioTool:open();
 			end
 		end)
 	end
-	return ToolClass, ToolClassButton;
+	return PHePluginStudioTool, ToolClassButton;
 end;
 
-function m.CreatePHeLibraryObject(LibraryFolder,toolbar,plugin)
+--[=[
+	@return PHePluginLibraryObject
+]=]
+function PHePluginAppHandler.CreatePHeLibraryObject(LibraryFolder:Folder,toolbar:PluginToolbar,plugin:Plugin)
     local App = require(script.Parent.Parent.Parent.Parent);
-	-- local App = m._app;
+	-- local App = PHePluginAppHandler._app;
 	local ErrorService = App:GetService("ErrorService");
 	local CustomClassService = App:GetService("CustomClassService");
 	
-	local isProperyLibrary = m.IsProperLibrary(LibraryFolder);
+	local isProperyLibrary = PHePluginAppHandler.IsProperLibrary(LibraryFolder);
 	if(isProperyLibrary.success)then
 		local Manifest = require(LibraryFolder["$Manifest"]);
-		-- ErrorService.assert(InstalledStudioTools[Manifest.Name] == nil, Manifest.Name.." was already registered/installed as an existing PHe App. if you tried installing with PHePM, run \"PHePM uninstall "..Manifest.Name.."\" then reinstall it.");
-		-- ErrorService.assert(Manifest.Name == LibraryFolder.Name, ("Manifest name mismatch, the name provided in your manifest is different from the library folder name. Manifest's name : %s || Folder's name : %s"):format(Manifest.Name, LibraryFolder.Name))
-		--//
-		-- InstalledStudioTools[Manifest.Name]=Manifest;
-		-- ClassHandler = ClassHandler or {};
-        local ClassHandler = {};
 		
-		--local GeneratedClassData = {
-		ClassHandler.Name = Manifest.Name;
-		ClassHandler.ClassName = ClassHandler.ClassName or "PHePluginLibraryObject";
-		ClassHandler.onReady = "**function";
-		
-		--};
+		--[=[
+			@class PHePluginLibraryObject
+		]=]
+        local PHePluginLibraryObject = {};
+		PHePluginLibraryObject.Name = Manifest.Name;
+		PHePluginLibraryObject.ClassName = PHePluginLibraryObject.ClassName or "PHePluginLibraryObject";
 
-		function ClassHandler:_Render()
+		--[=[
+			@prop onReady function
+			@within PHePluginLibraryObject
+		]=]
+		PHePluginLibraryObject.onReady = "**function";
+
+		function PHePluginLibraryObject:_Render()
 			return {}
 		end;
 
 		--//Shipped with all tools
-		function ClassHandler:CreateStudioTool(ClassInfo)
+
+		--[=[
+			@return PHePluginStudioTool
+		]=]
+		function PHePluginLibraryObject:CreateStudioTool(ClassInfo:table)
 			ErrorService.assert(ClassInfo and typeof(ClassInfo) == "table", ("Table expected when calling :CreatetoolbarButton, got %s"):format(typeof(ClassInfo)));
 			
-			
-			local classObject,toolbarButton = m.addTool(App,ClassInfo, Manifest.Name, toolbar);
+			local classObject,toolbarButton = PHePluginAppHandler.addTool(App,ClassInfo, Manifest.Name, toolbar);
 			classObject._App = self;
 			classObject:initiated();
 			if(classObject._mainWidget and classObject._mainWidget.Enabled)then
@@ -234,129 +219,34 @@ function m.CreatePHeLibraryObject(LibraryFolder,toolbar,plugin)
 			
 			return classObject;
 		end;
-
-		function ClassHandler:CreateDockWidgetPluginGui(WidgetName,WidgetInfo)
-            return plugin:CreateDockWidgetPluginGui(WidgetName,WidgetInfo)
-			-- return m.CreateDockWidgetPluginGui("pluginWidget"..Manifest.Name.."-"..WidgetName,WidgetInfo,plugin);
+		--[=[]=]
+		function PHePluginLibraryObject:CreateDockWidgetPluginGui(WidgetName:string,WidgetInfo:DockWidgetPluginGuiInfo):DockWidgetPluginGui
+            return plugin:CreateDockWidgetPluginGui(WidgetName,WidgetInfo);
 		end;
-		function ClassHandler:CreatePluginMenu(id,name)
+		--[=[]=]
+		function PHePluginLibraryObject:CreatePluginMenu(id:any,name:string?):PluginMenu
             return plugin:CreatePluginMenu(id,name);
-			-- return m._plugin:CreatePluginMenu(tostring(id)..Manifest.Name,name,plugin);	
 		end;
-		function ClassHandler:SavePluginData(key,value)
+		--[=[]=]
+		function PHePluginLibraryObject:SavePluginData(key:any,value:any)
 			key = key.."-"..Manifest.Name;
-			return m._plugin:SetSetting(key,value);
+			return PHePluginAppHandler._plugin:SetSetting(key,value);
 		end;
-		function ClassHandler:GetPluginData(key,value)
+		--[=[]=]
+		function PHePluginLibraryObject:GetPluginData(key:any,value:any)
 			key = key.."-"..Manifest.Name;
-			return m._plugin:GetSetting(key);
+			return PHePluginAppHandler._plugin:GetSetting(key);
 		end;
-	--[[
-		function ClassHandler:UpdatePluginData(key,value,secKey)
-			local dataExists = self:GetPluginData(key);
-			
-			if(not dataExists)then self:SavePluginData(key,value);end;
-			
-			local isTable = typeof(dataExists) == "table";
-			if(isTable)then
-				print("updating table")
-			else
-				self:SavePluginData(key,value);
-			end
-			
-			--key = key.."-"
-		end
-		]]
-		
-		function ClassHandler:SendNotification(t)
+		--[=[]=]
+		function PHePluginLibraryObject:SendNotification(t:any)
 			ErrorService.assert(t and typeof(t) == "table", "Table expected when sending notification, got "..typeof(t))
 			
 			t.Header = t.Header and (t.Header.." - <b>"..Manifest.Name.."</b>") or "Notification - <b>"..Manifest.Name.."</b>"
-			return m._sync:SendNotification(t)
+			return PHePluginAppHandler._sync:SendNotification(t)
 		end;
---[[
-		function ClassHandler:RegisterAPI(ApiFile)
-			ErrorService.assert(ApiFile and typeof(ApiFile) == "table", ("table expected for api file, got %s"):format(typeof(ApiFile)));
-			local ApiAlreadyRegistered = APIs[Manifest.Name];
-			if(ApiAlreadyRegistered)then
-				return ErrorService.tossError(("API '%s' was already registered as an api."):format(Manifest.Name))
-			end;
-	
-			APIs[Manifest.Name]=ApiFile;
-			return self:GetAPI(Manifest.Name);
-		end;
-		
-		function ClassHandler:WaitForAPI(APIName,Time)
-			if(APIs[APIName])then return self:GetAPI(APIName);end;
-			local timeSpent = 1;
-			Time = Time or 10;
-			--local API;
-			repeat 
-				timeSpent+=1;
-				wait(1);
-			until APIs[APIName] or timeSpent >= Time;
-			
-			return (self:GetAPI(APIName));
-		end
-		
-		function ClassHandler:HasAPI(ApiName)
-			--ApiName = ApiName or Manifest.Name;
-			return APIs[ApiName];
-		end
-		
-		function ClassHandler:GetAPI(ApiName)
-			local API = APIs[ApiName];
-			ErrorService.assert(API, ("'%s' has not been registered as a api, this may be due to the fact that the library is not installed, make sure to add the library to your $Dependencies module"):format(ApiName));
-			
-			--return API
-			
-			UniqueAPIs[Manifest.Name] = UniqueAPIs[Manifest.Name] or {};
-			local SpecialAPIClass = UniqueAPIs[Manifest.Name][ApiName]
-			
-			if(not SpecialAPIClass) then
-				local c = {
-					Name = "APIObject"..ApiName;
-					ClassName = "APIObject"..ApiName;
-				};
-				--c.__registeredFor = Manifest.Name;
-				function c:_Render()
-					return {};
-				end;
-			--//
-				for name,object in pairs(API) do
-					if(name ~= "ClassName" or name ~= "_Render")then
-						c[name]=object;
-					end
-				end;
-				
-				
-				function c:_getIsOwner()
-					if("APIObject"..Manifest.Name == self.ClassName)then
-						return true
-					else
-						return false;
-					end;
-				end
-				function c:GetCurrentAppUsingAPI(APIPseudo)
-					-- print(APIPseudo)
-					ErrorService.assert(APIPseudo and typeof(APIPseudo) == "table", ("Expected Pseudo API Object When Calling :GetCurrentAppUsingAPI, got %s"):format(typeof(APIPseudo)));
-					if(not self:_getIsOwner())then return ErrorService.tossWarn("GetCurrentAppUsingAPI can only be called by the API which created it");end; 
-					return APIPseudo.__registeredFor;
-				end
-				local _class = CustomClassService:Create(c);
-				_class.__registeredFor = Manifest.Name;
-				
-				UniqueAPIs[Manifest.Name][ApiName] = _class;
-			end;
-	
-			return UniqueAPIs[Manifest.Name][ApiName]
-			
-		end
-		]]
 		--//Shipped with all tools
 		
-		
-		local GeneratedClass = CustomClassService:Create(ClassHandler);	
+		local GeneratedClass = CustomClassService:Create(PHePluginLibraryObject);	
 		
 		local s,r = pcall(function()
 			return require(isProperyLibrary.AppFile)(GeneratedClass);
@@ -367,9 +257,6 @@ function m.CreatePHeLibraryObject(LibraryFolder,toolbar,plugin)
 		if(GeneratedClass.onReady)then
 			GeneratedClass.onReady();
 		end;
-		
-		
-		
 		
 		if(LibraryFolder:FindFirstChild("$Docs"))then
 			local _DocsStudioTool = {}
@@ -423,9 +310,7 @@ function m.CreatePHeLibraryObject(LibraryFolder,toolbar,plugin)
 				self._mainWidget.Enabled = false;
 				self._enabled = false;	
 			end;
-			
 			GeneratedClass:CreateStudioTool(_DocsStudioTool)
-		--end)coroutine.resume(thread);
 		end
 	return GeneratedClass;
 	else
@@ -434,4 +319,4 @@ function m.CreatePHeLibraryObject(LibraryFolder,toolbar,plugin)
 	
 end
 
-return m;
+return PHePluginAppHandler;
