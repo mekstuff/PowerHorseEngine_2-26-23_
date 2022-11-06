@@ -6,77 +6,6 @@ local Services = script.Parent.Parent.Parent.Core.Services;
 local PluginService = require(Services.PluginService);
 local TweenService = require(Services.TweenService);
 
-
-local ThemeDefault = PluginService:IsPluginMode() and 
-{
-
-	Alert = Color3.fromRGB(0,0,0),
-	Warning = Color3.fromRGB(0,0,0),
-	Danger = Color3.fromRGB(0,0,0),
-	Success = Color3.fromRGB(0,0,0),
-	Info = Color3.fromRGB(0,0,0),
-
-	Active = Color3.fromRGB(66, 135, 245);
-	Unactive = Color3.fromRGB(87, 87, 87);
-
-	Primary = settings().Studio.Theme:GetColor(Enum.StudioStyleGuideColor.MainButton);
-	PrimaryLite = settings().Studio.Theme:GetColor(Enum.StudioStyleGuideColor.MainButton);
-
-	Secondary = Color3.fromRGB(61, 66, 72);
-	SecondaryLite = Color3.fromRGB(61, 66, 72);
-
-	Disabled = Color3.fromRGB(44, 44, 44);
-	DisabledLite = Color3.fromRGB(44, 44, 44);
-
-	Background = settings().Studio.Theme:GetColor(Enum.StudioStyleGuideColor.MainBackground);
-	BackgroundLite = settings().Studio.Theme:GetColor(Enum.StudioStyleGuideColor.Border);
-
-	Text = settings().Studio.Theme:GetColor(Enum.StudioStyleGuideColor.MainText);
-	TextLite = settings().Studio.Theme:GetColor(Enum.StudioStyleGuideColor.MainText);
-
-	Border = settings().Studio.Theme:GetColor(Enum.StudioStyleGuideColor.Border);
-	BorderLite = settings().Studio.Theme:GetColor(Enum.StudioStyleGuideColor.Border);
-
-	Foreground = Color3.fromRGB(222, 233, 239);
-	ForegroundLite = Color3.fromRGB(222, 233, 239);
-
-	ForegroundText = Color3.fromRGB(30, 30, 30);
-	ForegroundTextLite = Color3.fromRGB(30, 30, 30);
-	Font = Enum.Font.SourceSans;
-}
-or {
-
-	Active = Color3.fromRGB(66, 135, 245);
-	Unactive = Color3.fromRGB(87, 87, 87);
-
-	Primary = Color3.fromRGB(66, 135, 245);
-	PrimaryLite = Color3.fromRGB(66, 135, 245);
-
-	Secondary = Color3.fromRGB(255, 32, 32);
-	SecondaryLite = Color3.fromRGB(255, 32, 32);
-
-	Disabled = Color3.fromRGB(57, 57, 57);
-	DisabledLite = Color3.fromRGB(57,57,57);
-
-	Background = Color3.fromRGB(29, 29, 29);
-	BackgroundLite = Color3.fromRGB(29, 29, 29);
-
-	Text = Color3.fromRGB(236, 236, 236);
-	TextLite = Color3.fromRGB(236, 236, 236);
-
-	Border = Color3.fromRGB(50, 115, 199);
-	BorderLite = Color3.fromRGB(50, 115, 199);
-
-	Foreground = Color3.fromRGB(63, 66, 68);
-	ForegroundLite = Color3.fromRGB(63, 66, 68);
-
-	ForegroundText = Color3.fromRGB(236, 236, 236);
-	ForegroundTextLite = Color3.fromRGB(236, 236, 236);
-
-	Font = Enum.Font.SourceSans;
-}
-
-
 local function getApp()
 	return require(Services.Parent.Parent)
 end;
@@ -85,7 +14,7 @@ end;
 local Config = getApp():GetGlobal("Engine"):RequestConfig();
 if(Config.Theme)then
 	for a,b in pairs(Config.Theme) do
-		ThemeDefault[a] = b;
+		Theme.getDefaultTheme()[a] = b;
 	end;
 end;
 
@@ -106,7 +35,7 @@ function Theme.buildTheme()
 		return {};
 	end;
 	ThemeObject = CustomClassService:Create(ThemeClass);
-	for a,b in pairs(ThemeDefault) do
+	for a,b in pairs(Theme.getDefaultTheme()) do
 		local newState = App.new("State",ThemeObject);
 		newState.Name = a.."-Theme";
 		newState.State = b;
@@ -301,7 +230,74 @@ function Theme.ThemeToggler()
 end;
 --[=[]=]
 function Theme.getDefaultTheme()
-	return ThemeDefault;
+	return PluginService:IsPluginMode() and 
+	{
+	
+		Alert = Color3.fromRGB(0,0,0),
+		Warning = Color3.fromRGB(0,0,0),
+		Danger = Color3.fromRGB(0,0,0),
+		Success = Color3.fromRGB(0,0,0),
+		Info = Color3.fromRGB(0,0,0),
+	
+		Active = Color3.fromRGB(66, 135, 245);
+		Unactive = Color3.fromRGB(87, 87, 87);
+	
+		Primary = settings().Studio.Theme:GetColor(Enum.StudioStyleGuideColor.MainButton);
+		PrimaryLite = settings().Studio.Theme:GetColor(Enum.StudioStyleGuideColor.MainButton);
+	
+		Secondary = Color3.fromRGB(61, 66, 72);
+		SecondaryLite = Color3.fromRGB(61, 66, 72);
+	
+		Disabled = Color3.fromRGB(44, 44, 44);
+		DisabledLite = Color3.fromRGB(44, 44, 44);
+	
+		Background = settings().Studio.Theme:GetColor(Enum.StudioStyleGuideColor.MainBackground);
+		BackgroundLite = settings().Studio.Theme:GetColor(Enum.StudioStyleGuideColor.Border);
+	
+		Text = settings().Studio.Theme:GetColor(Enum.StudioStyleGuideColor.MainText);
+		TextLite = settings().Studio.Theme:GetColor(Enum.StudioStyleGuideColor.MainText);
+	
+		Border = settings().Studio.Theme:GetColor(Enum.StudioStyleGuideColor.Border);
+		BorderLite = settings().Studio.Theme:GetColor(Enum.StudioStyleGuideColor.Border);
+	
+		Foreground = Color3.fromRGB(222, 233, 239);
+		ForegroundLite = Color3.fromRGB(222, 233, 239);
+	
+		ForegroundText = Color3.fromRGB(30, 30, 30);
+		ForegroundTextLite = Color3.fromRGB(30, 30, 30);
+		Font = Enum.Font.SourceSans;
+	}
+	or {
+	
+		Active = Color3.fromRGB(66, 135, 245);
+		Unactive = Color3.fromRGB(87, 87, 87);
+	
+		Primary = Color3.fromRGB(66, 135, 245);
+		PrimaryLite = Color3.fromRGB(66, 135, 245);
+	
+		Secondary = Color3.fromRGB(255, 32, 32);
+		SecondaryLite = Color3.fromRGB(255, 32, 32);
+	
+		Disabled = Color3.fromRGB(57, 57, 57);
+		DisabledLite = Color3.fromRGB(57,57,57);
+	
+		Background = Color3.fromRGB(29, 29, 29);
+		BackgroundLite = Color3.fromRGB(29, 29, 29);
+	
+		Text = Color3.fromRGB(236, 236, 236);
+		TextLite = Color3.fromRGB(236, 236, 236);
+	
+		Border = Color3.fromRGB(50, 115, 199);
+		BorderLite = Color3.fromRGB(50, 115, 199);
+	
+		Foreground = Color3.fromRGB(63, 66, 68);
+		ForegroundLite = Color3.fromRGB(63, 66, 68);
+	
+		ForegroundText = Color3.fromRGB(236, 236, 236);
+		ForegroundTextLite = Color3.fromRGB(236, 236, 236);
+	
+		Font = Enum.Font.SourceSans;
+	}
 end;
 
 --[=[
