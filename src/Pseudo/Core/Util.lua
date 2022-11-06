@@ -711,12 +711,26 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 				hooks.useMapping = function(props:table,dependencies:table):nil
 					if(not quickMap)then
 						quickMap = {};
-						for _,dependency in pairs(dependencies) do
-							if(not quickMap[dependency])then
-								quickMap[dependency] = {};
-							end;
-						end
 					end;
+					for _,dependency in pairs(dependencies) do
+						if(not quickMap[dependency])then
+							quickMap[dependency] = {};
+						end;
+						for _,prop in pairs(props) do
+							if(table.find(quickMap[dependency],prop))then
+								warn(debug.traceback(("Double call on useMapping hook dependency: %s || %s"):format(dependency.Name,prop),2))
+							else
+								table.insert(quickMap[dependency],prop);
+								renderAsync(nil,prop,Pseudo[prop],_ReferenceInstance,quickMap,Pseudo)
+							end;
+						end;
+					end;
+					--[[ OLD VERSION 11/6/2022 : Had DoubleCall errors and did not map properly || new version may need to be optimized using this concept.
+					for _,dependency in pairs(dependencies) do
+						if(not quickMap[dependency])then
+							quickMap[dependency] = {};
+						end;
+					end
 					for _,g in pairs(props) do
 						for dep,x in pairs(quickMap) do
 							if(not table.find(x,g))then
@@ -727,6 +741,7 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 							end
 						end
 					end;
+					]]
 				end;
 				--> returning a nested function will use the useEffect hook so this function is called whenever any component is changed
 				local nestedRenderResults = renderResults(hooks);
