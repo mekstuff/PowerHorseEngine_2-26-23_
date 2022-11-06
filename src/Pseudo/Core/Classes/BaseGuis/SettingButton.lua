@@ -95,7 +95,8 @@ function SettingButton:_Render(App)
 			
 		end,
 		_Components = {
-			Button = Button;	
+			Button = Button;
+			FatherComponent = Button:GetGUIRef();
 		};
 		_Mapping = {
 			[Button] = {
