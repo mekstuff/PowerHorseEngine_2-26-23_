@@ -12,9 +12,11 @@ local Snackbar = {
     Text = "Snackbar";
     PromptClass = "Snackbar";
     Size = UDim2.new(1,-20);
-    Position = UDim2.new(.5,0,1,-10);
+    Lifetime = -1;
+    StartAnchorPoint = Vector2.new(.5,1);
     AnchorPoint = Vector2.new(.5,1);
     StartPosition = UDim2.new(.5,0,2,0);
+    Position = UDim2.new(.5,0,1,-10);
 };
 
 Snackbar.__inherits = {"BaseGui","Text"}
@@ -60,6 +62,49 @@ function Snackbar:_Render(App)
         return ActionButton;
     end;
 
+    return function(Hooks)
+        local useEffect,useMapping = Hooks.useEffect,Hooks.useMapping;
+
+        useEffect(function()
+            if(self.Lifetime > -1)then
+                local lastLifetimeEnabled = true;
+                task.delay(self.Lifetime,function()
+                    if(self._dev and lastLifetimeEnabled)then
+                        self:Destroy();
+                    end
+                end)
+                return function ()
+                    lastLifetimeEnabled = false;
+                end
+            end;
+        end,{"Lifetime"})
+
+        useEffect(function()
+            if(self.ActionButtonText=="")then
+            else
+                getActionButton();
+                ActionButton.Text = self.ActionButtonText;
+            end
+        end,{"ActionButtonText"})
+
+        -- useMapping({
+        --     "ZIndex"
+        -- },{SnackbarText})
+        -- useMapping({
+        --     "ZIndex"
+        -- },{SnackBarPrompt})
+
+        useMapping({
+            "TextColor3","Text","TextWrapped","TextSize","Font","TextScaled","TextTransparency","ZIndex",
+            "TextXAlignment"
+        }, {SnackbarText});
+
+        useMapping({
+            "BackgroundColor3","Visible","ZIndex","Highlighted","PromptClass","Size","Position","StartPosition","AnchorPoint","StartAnchorPoint"
+        }, {SnackBarPrompt});
+    end;
+
+    --[[
     return {
         -- ["ZIndex"] = function(v)
             -- Snac
@@ -78,6 +123,7 @@ function Snackbar:_Render(App)
         },
         }
     };
+    ]]
 end;
 
 return Snackbar;
