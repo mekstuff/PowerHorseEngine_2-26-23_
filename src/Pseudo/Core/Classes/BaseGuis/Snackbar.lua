@@ -36,16 +36,9 @@ function Snackbar:_Render(App)
     PromptModal:GET("Bottom"):Destroy();
 
     local SnackbarText = App.new("Text", SnackBarPrompt);
-    -- SnackbarText:GetGUIRef().Name = "A_$l";
-    -- SnackbarText.BackgroundTransparency = .5;
     SnackbarText.SupportsRBXUIBase = true;
     SnackbarText.Size = UDim2.new(1,-30,0,25);
     SnackbarText.AutomaticSize = Enum.AutomaticSize.Y;
-    
-    -- local UILister = Instance.new("UIListLayout",PromptModal:GET("_Appender"));
-    -- UILister.SortOrder = Enum.SortOrder.Name;
-    -- UILister.FillDirection = Enum.FillDirection.Horizontal;
-
 
     SnackBarPrompt.Parent = self:GetRef();
 
@@ -85,14 +78,7 @@ function Snackbar:_Render(App)
                 getActionButton();
                 ActionButton.Text = self.ActionButtonText;
             end
-        end,{"ActionButtonText"})
-
-        -- useMapping({
-        --     "ZIndex"
-        -- },{SnackbarText})
-        -- useMapping({
-        --     "ZIndex"
-        -- },{SnackBarPrompt})
+        end,{"ActionButtonText"});
 
         useMapping({
             "TextColor3","Text","TextWrapped","TextSize","Font","TextScaled","TextTransparency","ZIndex",
@@ -103,27 +89,6 @@ function Snackbar:_Render(App)
             "BackgroundColor3","Visible","ZIndex","Highlighted","PromptClass","Size","Position","StartPosition","AnchorPoint","StartAnchorPoint"
         }, {SnackBarPrompt});
     end;
-
-    --[[
-    return {
-        -- ["ZIndex"] = function(v)
-            -- Snac
-        -- end;
-        ["ActionButtonText"] = function(v)
-            if(v=="")then
-            else
-                getActionButton();
-                ActionButton.Text = v;
-            end
-        end;
-        _Mapping = {
-            [SnackBarPrompt] = {"BackgroundColor3","Visible","ZIndex","Highlighted","PromptClass","Size","Position","StartPosition","AnchorPoint","StartAnchorPoint"},
-            [SnackbarText] = {"TextColor3","Text","TextWrapped","TextSize","Font","TextScaled","TextTransparency","ZIndex",
-            "TextXAlignment"
-        },
-        }
-    };
-    ]]
 end;
 
 return Snackbar;
