@@ -123,33 +123,47 @@ function TradeService:GetTradeActive(TradeId:string,Player2:Player):Player|boole
 	return false;
 end
 
+--[=[
+	A handler for sending out trade requests, by default it will use prompt service and prompt the reciever, it will then
+	use the reponse from the reciever to either send back "accept" or "decline".
 
+	To add your own TradeRequestOutBound, overwrite the function at the top of your source. You will need to also handle how the client
+	precieves this request, by either using remote events or PromptService:PromptUserAsync
+
+	@return PHeSignal
+	:::warning
+	You must return a [PHeSignal]/[BindableEvent] within your function
+	:::
+	You don't have to worry about if either players are in an active trade because the constructor handles that for you.
+]=]
+function TradeService.TradeRequestOutBound(Sender:Player,Reciever:Player,Header:string?,Body:string?,Blurred:boolean?,Button1:string?,Button2:string?)
+	Header = Header or "Trade Inbound";
+	Body = Body or Sender.Name.." requested to trade with you.";
+	return PromptService:PromptUserAsync(Reciever,{Header=Header;Body=Body;Blurred=Blurred}, {
+		{Text = Button1 or "Trade", Id="accept"};
+		{Text = Button2 or "Decline", Id="decline"};
+	}).Response;
+end
 
 --[=[
 	@return TradeConstructorResults
+	@server
 ]=]
 function TradeService.new(Sender:Player,Reciever:Player,Header:string?,Body:string?,Blurred:boolean?,Button1:string?,Button2:string?):table
-	
-	local inActiveTradeSearch = TradeService:GetTradeActive(Sender,Reciever)
-	if(inActiveTradeSearch)then
+	local inActiveTradeSearch_Initial = TradeService:GetTradeActive(Sender,Reciever)
+	if(inActiveTradeSearch_Initial)then
 		local x = {
 			success = false;
 			response = "failed";
-			error = inActiveTradeSearch.Name.." is already on an active trade channel";
+			error = inActiveTradeSearch_Initial.Name.." is already on an active trade channel";
 		}
 		TradeService.TradeRequest:Fire(Sender,Reciever,x);
 		return x;
 	end
-	
-	Header = Header or "Trade Inbound";
-	Body = Body or Sender.Name.." requested to trade with you.";
-	local TradeInboundRequest = PromptService:PromptUserAsync(Reciever,{Header=Header;Body=Body;Blurred=Blurred}, {
-		{Text = Button1 or "Trade", Id="accept"};
-		{Text = Button2 or "Decline", Id="decline"};
-	});
-	
-	local ResponseID = TradeInboundRequest.Response:Wait();
-	
+	print("new Trade");
+	local ResponseID = TradeService.TradeRequestOutBound(Sender,Reciever,Header,Body,Blurred,Button1,Button2):Wait();
+	print("Got here");
+
 	local inActiveTradeSearch = TradeService:GetTradeActive(Sender,Reciever)
 	if(inActiveTradeSearch)then
 		local x = {
@@ -162,7 +176,6 @@ function TradeService.new(Sender:Player,Reciever:Player,Header:string?,Body:stri
 	end
 	
 	local Content;
-	
 	
 	if(ResponseID == "accept")then
 		local newTrade = CustomClassService:CreateClassAsync(TradeClass);
@@ -236,8 +249,7 @@ function TradeService.new(Sender:Player,Reciever:Player,Header:string?,Body:stri
 			error = "Reciever declined trade request";
 			response = "declined";
 		}
-	end
-	
+	end;
 	TradeService.TradeRequest:Fire(Sender,Reciever,Content);
 	return Content;
 end

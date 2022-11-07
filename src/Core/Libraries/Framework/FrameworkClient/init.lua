@@ -43,31 +43,30 @@ function FrameworkClient:Start()
         Modulars.Name = "@Modulars";
         --//Init
         for _,v in pairs(PortedModulars) do
-            local initRan,initResults = pcall(function()
-                v.Parent = Modulars;
-                local thread = coroutine.create(function()
-                    return v:Init(v._RenderHooksPassOn);  
-                end)coroutine.resume(thread);
-            end);
-            if(not initRan)then
-                reject("Failed to :Init a service at ["..v.ClassName.."] -> "..initResults);
-                return;
-            end;
+            local thread = coroutine.create(function()
+                local initRan,initResults = pcall(function()
+                    v.Parent = Modulars;
+                        return v:Init(v._RenderHooksPassOn);  
+                end);
+                if(not initRan)then
+                    reject("Failed to :Init a service at ["..v.ClassName.."] -> "..initResults);
+                    return;
+                end;
+            end)coroutine.resume(thread);
         end;
         --//Start
         for _,v in pairs(PortedModulars) do
-            local startRan,startResults = pcall(function()
-                local Hooks = v._RenderHooksPassOn;
-                v._RenderHooksPassOn = nil;
-                local thread = coroutine.create(function()
-                    return v:Start(Hooks);
-                end)coroutine.resume(thread);
-            end);
-            if(not startRan)then
-
-                reject("Failed to :Start a service at ["..v.ClassName.."] -> "..startResults);
-                return;
-            end
+            local thread = coroutine.create(function()
+                local startRan,startResults = pcall(function()
+                    local Hooks = v._RenderHooksPassOn;
+                    v._RenderHooksPassOn = nil;
+                        return v:Start(Hooks);
+                end);
+                if(not startRan)then
+                    reject("Failed to :Start a service at ["..v.ClassName.."] -> "..startResults);
+                    return;
+                end
+            end)coroutine.resume(thread);
         end;
         ClientStarted = true;
         resolve(self);
