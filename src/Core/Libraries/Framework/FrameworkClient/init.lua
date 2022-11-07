@@ -32,9 +32,6 @@ local StartPromise;
 ]=]
 function FrameworkClient:Start()
     if(StartPromise)then return StartPromise;end;
-    -- FrameworkFolder = Instance.new("Folder");
-    -- FrameworkFolder.Name = "@Modulars";
-
     local Promise = PowerHorseEngine.new("Promise");
     Promise:Try(function(resolve,reject)
         local PHe_RS = Engine:FetchReplicatedStorage();
@@ -46,10 +43,10 @@ function FrameworkClient:Start()
             local thread = coroutine.create(function()
                 local initRan,initResults = pcall(function()
                     v.Parent = Modulars;
-                        return v:Init(v._RenderHooksPassOn);  
+                    v:Init(v._RenderHooksPassOn);  
                 end);
                 if(not initRan)then
-                    reject("Failed to :Init a service at ["..v.ClassName.."] -> "..initResults);
+                    reject("Failed to :Init a Modular at ["..v.ClassName.."] -> "..initResults);
                     return;
                 end;
             end)coroutine.resume(thread);
@@ -60,10 +57,10 @@ function FrameworkClient:Start()
                 local startRan,startResults = pcall(function()
                     local Hooks = v._RenderHooksPassOn;
                     v._RenderHooksPassOn = nil;
-                        return v:Start(Hooks);
+                    v:Start(Hooks);
                 end);
                 if(not startRan)then
-                    reject("Failed to :Start a service at ["..v.ClassName.."] -> "..startResults);
+                    reject("Failed to :Start a Modular at ["..v.ClassName.."] -> "..startResults);
                     return;
                 end
             end)coroutine.resume(thread);

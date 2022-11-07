@@ -108,7 +108,7 @@ function FrameworkServer:Start()
             local thread = coroutine.create(function()
                 local initRan,initResults = pcall(function()
                     v.Parent = ServicesFolder;
-                        v:Init(v._RenderHooksPassOn);
+                    v:Init(v._RenderHooksPassOn);
                 end);
                 if(not initRan)then
                     reject("Failed to :Init a service at ["..v.ClassName.."] -> "..initResults);
@@ -116,14 +116,13 @@ function FrameworkServer:Start()
                 end;
             end)coroutine.resume(thread);
         end;
-
         --//Start
         for _,v in pairs(PortedServices) do
             local thread = coroutine.create(function()
                 local startRan,startResults = pcall(function()
                     local Hooks = v._RenderHooksPassOn;
                     v._RenderHooksPassOn = nil;
-                        return v:Start(Hooks);
+                    v:Start(Hooks);
                 end);
                 if(not startRan)then
                     reject("Failed to :Start a service at ["..v.ClassName.."] -> "..startResults);
