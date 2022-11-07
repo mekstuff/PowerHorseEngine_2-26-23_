@@ -4,9 +4,9 @@ local TradeCommunicator = Engine:FetchStorageEvent("TradeCommunicator");
 local TradeService = PowerHorseEngine:GetService("TradeService");
 local CustomClassService = PowerHorseEngine:GetService("CustomClassService");
 
-local TradeClass = {
-	Name = "Trade";
-	ClassName = "ClientTrade";	
+local ActiveTrade = {
+	Name = "ActiveClientTrade";
+	ClassName = "ActiveTrade";	
 	Sender = "**Instance";
 	Reciever = "**Instance";
 	--TradeChannel = "**Instance";
@@ -15,46 +15,75 @@ local TradeClass = {
 	Target = "**Instance";
 };
 
-function TradeClass:_Render()
+--[=[
+	@prop Target Instance
+	@client
+	@within ActiveTrade
+	Refers to the target of the trade, client 1 target will be client 2 whereas client 2's target will be client 1.
+]=]
+
+function ActiveTrade:_Render()
 	return{};
 end;
---//
-function TradeClass:AddContent(Content,ContentId)
+--[=[
+	@client
+]=]
+function ActiveTrade:AddContent(Content:any,ContentId:string)
 	self._TradeChannel:FireServer("add-content",Content,ContentId)
 end;
---//
-function TradeClass:RemoveContent(ContentId)
+--[=[
+	@client
+]=]
+function ActiveTrade:RemoveContent(ContentId:string)
 	self._TradeChannel:FireServer("remove-content",ContentId)
 end;
---//
-function TradeClass:SendChannelMessage(...)
+--[=[
+	@client
+]=]
+function ActiveTrade:SendChannelMessage(...:any)
 	self._TradeChannel:FireServer("channel-message",...);
 end;
---//
-function TradeClass:___destroy(...)
+--[=[
+	@client
+	@private
+]=]
+function ActiveTrade:___destroy(...:any)
 	self:GetEventListener("Ended"):Fire(...);
 	self:GetRef():Destroy();
 end;
-function TradeClass:Destroy()
+
+function ActiveTrade:Destroy()
 	self:_GetAppModule():GetService("ErrorService").tossWarn(self.ClassName.."'s cannot be destroyed locally. Only the server can end a trade");
 end
-
 
 TradeCommunicator.OnClientEvent:Connect(function(state,...)
 	local args = {...};
 	if(state == "new-trade")then
 		local TradeInfo = args[1];
-		local Trade = CustomClassService:CreateClassAsync(TradeClass);
+		local Trade = CustomClassService:CreateClassAsync(ActiveTrade);
 		Trade.Reciever = TradeInfo.Reciever;
 		Trade.Sender = TradeInfo.Sender;
 		Trade.IAmSender = TradeInfo._IAMSENDER;
 		Trade.Target = Trade.IAmSender and TradeInfo.Reciever or TradeInfo.Sender;
 		Trade.TradeId = TradeInfo.TradeId;
 		Trade._TradeChannel = TradeInfo.TradeChannel;
-		
+		--[=[
+			@prop ContentAdded PHeSignal
+			@within ActiveTrade
+			@client
+		]=]
 		local caE = Trade:AddEventListener("ContentAdded",true);
+		--[=[
+			@prop ContentRemoved PHeSignal
+			@within ActiveTrade
+			@client
+		]=]
 		local crE = Trade:AddEventListener("ContentRemoved",true);
-		
+		--[=[
+			@prop Ended PHeSignal
+			@within ActiveTrade
+			@client
+		]=]
 		Trade:AddEventListener("Ended",true);
 		
 		Trade._TradeChannel.OnClientEvent:Connect(function(ChannelState,...)

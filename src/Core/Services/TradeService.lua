@@ -20,19 +20,29 @@ local SignalProvider = require(script.Parent.Parent.Providers.SignalProvider);
 local TradeService = {}
 --[=[
 	@prop TradeRequest PHeSignal
+	@server
 	@within TradeService
 ]=]
 TradeService.TradeRequest = SignalProvider.new("TradeRequest");
 --[=[
 	@prop TradeStarted PHeSignal
+	@server
 	@within TradeService
+	On the server, every trade started will be caught but on the client, only trades pertaining that client will be caught.
+
+	Argument 1: [ActiveTrade]
 ]=]
 TradeService.TradeStarted = SignalProvider.new("TradeStarted");
 --[=[
 	@prop TradeEnded PHeSignal
+	@server
 	@within TradeService
+	On the server, every trade ended will be caught but on the client, only trades pertaining that client will be caught.
+
+	Argument 1: [ActiveTrade]
 ]=]
 TradeService.TradeEnded = SignalProvider.new("TradeEnded");
+
 local PromptService = require(script.Parent.PromptService);
 local CustomClassService = require(script.Parent.CustomClassService);
 local Engine = require(script.Parent.Parent.Parent.Engine);
@@ -41,15 +51,36 @@ local TradeCommunicator = Engine:FetchStorageEvent("TradeCommunicator");
 
 local Trades = {};
 
-local TradeClass = {
-	Name = "Trade";
-	ClassName = "Trade";
+--[=[
+	@class ActiveTrade
+]=]
+local ActiveTrade = {
+	Name = "ActiveTrade";
+	ClassName = "ActiveTrade";
 	Sender = "**Instance";
 	Reciever = "**Instance";
 	TradeId = "0";	
 	MaximumContent = 15;
 };
-function TradeClass:_Render()
+
+--[=[
+	@prop Sender Player
+	@within ActiveTrade
+]=]
+--[=[
+	@prop Reciever Player
+	@within ActiveTrade
+]=]
+--[=[
+	@prop TradeId string
+	@within ActiveTrade
+]=]
+--[=[
+	@prop MaximumContent number --defaults to 15
+	@within ActiveTrade
+]=]
+
+function ActiveTrade:_Render()
 	return {};
 end
 --//
@@ -60,8 +91,10 @@ local function len(x)
 	end;
 	return i;
 end
---//
-function TradeClass:AddContent(ToUser,Content,ContentId,IgnoreMaximumLimit)
+--[=[
+	@server
+]=]
+function ActiveTrade:AddContent(ToUser:Player,Content:any,ContentId:string,IgnoreMaximumLimit:boolean?)
 	ContentId = ContentId or tostring(math.random());
 	print("Adding Content To ", ToUser);
 	local Target = ToUser == self.Sender and "Sender" or "Reciever";
@@ -74,16 +107,20 @@ function TradeClass:AddContent(ToUser,Content,ContentId,IgnoreMaximumLimit)
 	
 	return ContentId;
 end;
---//
-function TradeClass:RemoveContent(fromUser,ContentId)
+--[=[
+	@server
+]=]
+function ActiveTrade:RemoveContent(fromUser:Player,ContentId:string)
 	print("Removing Content To ", fromUser);
 	local Target = fromUser == self.Sender and "Sender" or "Reciever";
 	self._Content[Target][ContentId]=nil;
 	self:GetEventListener("ContentRemoved"):Fire(fromUser,ContentId);
 	self._sendInformationToClients("remove-content",fromUser,ContentId);
 end;
---//
-function TradeClass:GetContents(fromUser)
+--[=[
+	@server
+]=]
+function ActiveTrade:GetContents(fromUser:Player)
 	if(fromUser)then
 		local Target = fromUser == self.Sender and "Sender" or "Reciever";
 		return self._Content[Target];
@@ -91,14 +128,16 @@ function TradeClass:GetContents(fromUser)
 	return self._Content
 end;
 --//
-function TradeClass:Destroy(...)
+function ActiveTrade:Destroy(...)
 	self:GetEventListener("Ended"):Fire(...);
 	self._sendInformationToClients("end-trade",...);
 	Trades[self.TradeId] = nil;
 	self:GetRef():Destroy();
 end;
---//
-function TradeClass:End(Reasons)
+--[=[
+	@server
+]=]
+function ActiveTrade:End(Reasons:any)
 	self:Destroy(Reasons);
 end;
 
@@ -108,13 +147,10 @@ local function fetchIsRecSen(a,b)
 	end;
 	return false;
 end
---[=[]=]
-function TradeService:GetTradeActive(TradeId:string,Player2:Player):Player|boolean
-	if(not Player2)then
-		return true or false;
-	end
-	local Player1 = TradeId;
-	
+--[=[
+	@server
+]=]
+function TradeService:GetTradeActive(Player1:Player,Player2:Player?):Player|boolean
 	for _,v in pairs(Trades) do
 		local p1,p2 = fetchIsRecSen(Player1,v),fetchIsRecSen(Player2,v);
 		if(p1)then return Player1;end;
@@ -124,6 +160,7 @@ function TradeService:GetTradeActive(TradeId:string,Player2:Player):Player|boole
 end
 
 --[=[
+	@server
 	A handler for sending out trade requests, by default it will use prompt service and prompt the reciever, it will then
 	use the reponse from the reciever to either send back "accept" or "decline".
 
@@ -160,10 +197,12 @@ function TradeService.new(Sender:Player,Reciever:Player,Header:string?,Body:stri
 		TradeService.TradeRequest:Fire(Sender,Reciever,x);
 		return x;
 	end
-	print("new Trade");
-	local ResponseID = TradeService.TradeRequestOutBound(Sender,Reciever,Header,Body,Blurred,Button1,Button2):Wait();
-	print("Got here");
 
+	local TradeOutBoundResponse = TradeService.TradeRequestOutBound(Sender,Reciever,Header,Body,Blurred,Button1,Button2);
+
+	assert(TradeOutBoundResponse and (typeof(TradeOutBoundResponse) == "table" and TradeOutBoundResponse:IsA("PHeSignal")) or (typeof(TradeOutBoundResponse) == "Instance") and TradeOutBoundResponse:IsA("BindableEvent"), ("PHeSignal or BindableEvent expected from TradeOutBoundResponse, got %s"):format(tostring(TradeOutBoundResponse)));
+	
+	local ResponseID = TradeOutBoundResponse:Wait();
 	local inActiveTradeSearch = TradeService:GetTradeActive(Sender,Reciever)
 	if(inActiveTradeSearch)then
 		local x = {
@@ -178,7 +217,7 @@ function TradeService.new(Sender:Player,Reciever:Player,Header:string?,Body:stri
 	local Content;
 	
 	if(ResponseID == "accept")then
-		local newTrade = CustomClassService:CreateClassAsync(TradeClass);
+		local newTrade = CustomClassService:CreateClassAsync(ActiveTrade);
 		newTrade.TradeId = Sender.Name.."-"..Reciever.Name.."(PHeTrade)";
 		newTrade.Sender = Sender;
 		newTrade.Reciever = Reciever;
@@ -186,9 +225,29 @@ function TradeService.new(Sender:Player,Reciever:Player,Header:string?,Body:stri
 			["Sender"] = {};
 			["Reciever"] = {};
 		};
+		--[=[
+			@prop ContentAdded PHeSignal
+			@within ActiveTrade
+			@server
+		]=]
 		newTrade:AddEventListener("ContentAdded",true);
+		--[=[
+			@prop ContentRemoved PHeSignal
+			@within ActiveTrade
+			@server
+		]=]
 		newTrade:AddEventListener("ContentRemoved",true);
+		--[=[
+			@prop Ended PHeSignal
+			@within ActiveTrade
+			@server
+		]=]
 		newTrade:AddEventListener("Ended",true);
+		--[=[
+			@prop ChannelMessage PHeSignal
+			@within ActiveTrade
+			@server
+		]=]
 		local ChannelMessage = newTrade:AddEventListener("ChannelMessage",true)
 		
 		local TradeChannel = Instance.new("RemoteEvent",workspace);

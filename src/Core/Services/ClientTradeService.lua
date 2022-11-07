@@ -1,9 +1,23 @@
 local SignalProvider = require(script.Parent.Parent.Providers.SignalProvider);
 
 
-local module = {}
-module.TradeStarted = SignalProvider.new("TradeStarted");
-module.TradeEnded = SignalProvider.new("TradeEnded");
+local ClientTradeService = {}
+ClientTradeService.TradeStarted = SignalProvider.new("TradeStarted");
+ClientTradeService.TradeEnded = SignalProvider.new("TradeEnded");
 
+--[=[
+    @prop TradeStarted PHeSignal
+    @within TradeService
+    @client
+    
+    Only trades pertaining the client will be caught.
+]=]
+--[=[
+    @prop TradeEnded PHeSignal
+    @within TradeService
+    @client
 
-return module
+    Only trades pertaining the client will be caught.
+]=]
+
+return ClientTradeService
