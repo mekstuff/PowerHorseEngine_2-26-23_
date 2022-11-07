@@ -37,7 +37,7 @@ classes = [
 "Modal","Navigator","NotificationResponse","PHeSignal","Promise","PromptResponse",
 "Pseudo","RInstance","Servant","State","ToolTip",
 "Waypoint","Widget","PingReader","Transition","Tween","TabGroup","TextComponent","Toast",
-"Toggle","TextInput","TextSlider","ProgressBar","StackProvider","Portal","NotificationGroup","ClientBackpackServiceTool"
+"Toggle","TextInput","TextSlider","ProgressBar","StackProvider","Portal","NotificationGroup"
 ]
 
 [[classOrder]]
