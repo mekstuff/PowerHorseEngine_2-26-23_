@@ -48,9 +48,47 @@ local function hideAll(self)
 end;
 
 --[=[
-
+	Calls :Show and waits for ActionTriggered event to be fired. Will return nil if the .Showing property is set to false before the event is fired.
+	@return ActionMenuAction?
+	@yields
 ]=]
-function ActionMenu:Show(ignoreFocusLost:boolean, CustomAdornee:any)
+function ActionMenu:ShowAsync(...:any)
+	local App = self:_GetAppModule();
+	local SignalProvider = App:GetProvider("SignalProvider");
+	local ShowAsyncRequest = SignalProvider.new(self.Name.."-ShowAsync");
+	local AlreadyResolved = false;
+	self:Show(...);
+	local function DisconnectEvents()
+		if(ShowAsyncRequest._dev.ActionTriggeredConnection)then
+			ShowAsyncRequest._dev.ActionTriggeredConnection:Disconnect();
+			ShowAsyncRequest._dev.ActionTriggeredConnection = nil;	
+		end
+		if(ShowAsyncRequest._dev.ShowingChangedConnection)then
+			ShowAsyncRequest._dev.ShowingChangedConnection:Disconnect();
+			ShowAsyncRequest._dev.ShowingChangedConnection = nil;	
+		end
+	end;
+	ShowAsyncRequest._dev.ActionTriggeredConnection = self:GetEventListener("ActionTriggered"):Connect(function(...)
+		if(not AlreadyResolved and ShowAsyncRequest._dev)then
+			AlreadyResolved = true;
+			DisconnectEvents();
+			ShowAsyncRequest:Fire(...);
+			ShowAsyncRequest:Destroy();
+		end
+	end);
+	ShowAsyncRequest._dev.ShowingChangedConnection = self:GetPropertyChangedSignal("Showing"):Connect(function()
+		if(not AlreadyResolved and ShowAsyncRequest._dev and not self.Showing)then
+			AlreadyResolved = true;
+			DisconnectEvents();
+			ShowAsyncRequest:Fire();
+			ShowAsyncRequest:Destroy();
+
+		end
+	end)
+	return ShowAsyncRequest:Wait();
+end;
+--[=[]=]
+function ActionMenu:Show(ignoreFocusLost:boolean?,CustomAdornee:any?)
 	if(self._dev._Showing)then
 		self:Hide();
 		task.wait();
