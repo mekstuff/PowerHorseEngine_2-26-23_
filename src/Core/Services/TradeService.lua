@@ -96,14 +96,13 @@ end
 ]=]
 function ActiveTrade:AddContent(ToUser:Player,Content:any,ContentId:string,IgnoreMaximumLimit:boolean?)
 	ContentId = ContentId or tostring(math.random());
-	print("Adding Content To ", ToUser);
 	local Target = ToUser == self.Sender and "Sender" or "Reciever";
 	if(len(self._Content[Target]) > self.MaximumContent and not IgnoreMaximumLimit)then
 		return;
 	end
 	self._Content[Target][ContentId]=Content;
-	self:GetEventListener("ContentAdded"):Fire(ToUser,Content);
-	self._sendInformationToClients("add-content",ToUser,Content);
+	self:GetEventListener("ContentAdded"):Fire(ToUser,Content,ContentId);
+	self._sendInformationToClients("add-content",ToUser,Content,ContentId);
 	
 	return ContentId;
 end;
@@ -111,7 +110,6 @@ end;
 	@server
 ]=]
 function ActiveTrade:RemoveContent(fromUser:Player,ContentId:string)
-	print("Removing Content To ", fromUser);
 	local Target = fromUser == self.Sender and "Sender" or "Reciever";
 	self._Content[Target][ContentId]=nil;
 	self:GetEventListener("ContentRemoved"):Fire(fromUser,ContentId);

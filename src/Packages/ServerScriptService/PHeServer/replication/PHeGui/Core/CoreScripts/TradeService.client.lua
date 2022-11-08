@@ -91,7 +91,8 @@ TradeCommunicator.OnClientEvent:Connect(function(state,...)
 			if(ChannelState == "add-content")then
 				local PlayerToAddContentTo = ChannelArgs[1];
 				local Content = ChannelArgs[2];
-				caE:Fire(PlayerToAddContentTo,Content);
+				local ContentId = ChannelArgs[3];
+				caE:Fire(PlayerToAddContentTo,Content,ContentId);
 			elseif(ChannelState == "remove-content")then
 				local PlayerToAddContentTo = ChannelArgs[1];
 				local ContentId = ChannelArgs[2];

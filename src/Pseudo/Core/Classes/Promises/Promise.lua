@@ -1,8 +1,26 @@
+--[=[
+    @class Promise
+]=]
+
+--[=[
+    @interface PromiseState
+    @within Promise
+    .stale string
+    .resolved string
+    .rejected string
+    .cancelled string
+]=]
+
 local Promise = {
     Name = "Promise",
     ClassName = "Promise",
     State = "stale"
 };
+
+--[=[
+    @prop State PromiseState
+    @within Promise
+]=]
 
 function Promise:_Render()
     self._then = {};
