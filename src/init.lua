@@ -91,6 +91,12 @@ PowerHorseEngine.Manifest = Manifest;
 	@within PowerHorseEngine
 ]=]
 PowerHorseEngine.Enumeration = Enumeration;
+--[=[
+	@prop Enum table -- Shorthand for Enumeration.
+	@readonly
+	@within PowerHorseEngine
+]=]
+PowerHorseEngine.Enum = Enumeration;
 
 --[=[
 	Uses [LibraryProvider.loadLibrary] to import the library
