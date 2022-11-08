@@ -17,7 +17,7 @@ local ActionMenu = {
 	TextSize = 14;
 };
 --[=[
-@prop AutomaticHide Boolean
+@prop AutomaticHide Enumeration.ActionMenuAutomaticHide
 @within ActionMenu
 ]=]
 --[=[
@@ -198,6 +198,7 @@ local ActionMenuAction = {
 };
 function ActionMenuAction:_Render()
 	self._ActionButton = self._dev.args;
+	self:AddEventListener("OnAction",true);
 	return {
 		["Text"] = function(v)
 			self._ActionButton.Text = v;
@@ -427,8 +428,8 @@ function ActionMenu:AddAction(ActionName:string,id:string,ActionIcon:string,...:
 
 	self._dev.__TreeContents[id] = Action;
 
-	
 	ActionButton:AddEventListener("MouseButton1Down"):Connect(function()
+		Action:GetEventListener("OnAction"):Fire();
 		self:GetEventListener("ActionTriggered"):Fire(Action);
 	end);
 
