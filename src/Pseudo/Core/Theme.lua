@@ -9,11 +9,11 @@ local TweenService = require(Services.TweenService);
 local _defaultTheme = PluginService:IsPluginMode() and 
 {
 
-	Alert = Color3.fromRGB(0,0,0),
-	Warning = Color3.fromRGB(0,0,0),
-	Danger = Color3.fromRGB(0,0,0),
-	Success = Color3.fromRGB(0,0,0),
-	Info = Color3.fromRGB(0,0,0),
+	Alert = Color3.fromRGB(13, 110, 253),
+	Warning = Color3.fromRGB(255,204,0),
+	Danger = Color3.fromRGB(204,51,0),
+	Success = Color3.fromRGB(153,204,51),
+	Info = Color3.fromRGB(124, 175, 252),
 
 	Active = Color3.fromRGB(66, 135, 245);
 	Unactive = Color3.fromRGB(87, 87, 87);
@@ -44,6 +44,12 @@ local _defaultTheme = PluginService:IsPluginMode() and
 	Font = Enum.Font.SourceSans;
 }
 or {
+
+	Alert = Color3.fromRGB(13, 110, 253),
+	Warning = Color3.fromRGB(255,204,0),
+	Danger = Color3.fromRGB(204,51,0),
+	Success = Color3.fromRGB(153,204,51),
+	Info = Color3.fromRGB(124, 175, 252),
 
 	Active = Color3.fromRGB(66, 135, 245);
 	Unactive = Color3.fromRGB(87, 87, 87);
