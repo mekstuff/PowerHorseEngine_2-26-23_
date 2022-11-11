@@ -73,6 +73,7 @@ function Image:_Render(App)
 	local ImageProvider = App:GetProvider("ImageProvider");
 	
 	local ImageContent = Instance.new("ImageLabel", Container:GetGUIRef());
+	ImageContent.Name = "$l_ImageLabel";
 	ImageContent.Size = UDim2.fromScale(1,1);
 	ImageContent.BackgroundTransparency = 1;
 	ImageContent.ZIndex = self.ZIndex+1;
