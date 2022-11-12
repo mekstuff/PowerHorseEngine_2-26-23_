@@ -30,6 +30,7 @@ local BaseGui = {
 	Disabled = false;
 	SupportsRBXUIBase = false;
 	Rotation = 0;
+	LayoutOrder = 0;
 };
 BaseGui.__inherits = {}
 --[=[
@@ -55,6 +56,10 @@ Sets whether or not the basegui is compatiable with [UIBase] objects, such as [U
 ]=]
 --[=[
 @prop ZIndex Number
+@within BaseGui
+]=]
+--[=[
+@prop LayoutOrder Number
 @within BaseGui
 ]=]
 
@@ -119,6 +124,11 @@ function cssObjectClass:_Render()
 end
 --//
 function BaseGui:_init()
+	local GuiRef = self:GetGUIRef();
+	GuiRef.LayoutOrder = self.LayoutOrder;
+	self._dev._baseGui_LayoutOrder = self:GetPropertyChangedSignal("LayoutOrder"):Connect(function()
+		GuiRef.LayoutOrder = self.LayoutOrder;
+	end);
 	self._dev._baseGui_supportsRBXUIBase = self:GetPropertyChangedSignal("SupportsRBXUIBase"):Connect(function()
 		if(self.SupportsRBXUIBase)then
 			self:GetGUIRef().Parent = self.Parent and ( self.Parent:IsA("Pseudo") and getROBLOXInstance(self.Parent) or self.Parent);
