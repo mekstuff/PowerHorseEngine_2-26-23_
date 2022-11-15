@@ -65,18 +65,21 @@ function module.InvokeClientCommand(Player:Player,cmdName:string,...:any):string
 end
 
 local function convertType(type_,myArg,PlayerExecuter)
-	if(not myArg)then return end;
+	-- if(not myArg)then return end;
 	local arg;
-	if(type_ == "player")then
+	if(type_ == "Player")then
 		if(myArg == "me" or myArg == "Me" and PlayerExecuter)then myArg = PlayerExecuter.Name;end;
 		local targetPlayer = game:GetService("Players"):FindFirstChild(myArg);
 		if(not targetPlayer)then return {success = false; error = "\""..myArg.."\" is not a valid player in the server"}end;
 		arg = targetPlayer;
+	elseif(type_ == "pheapp")then
+		arg = PowerHorseEngine;
 	elseif(type_ == "number")then
 		local asNumber = tonumber(myArg);
 		if(not asNumber)then return {success = false; error = "failed to parse "..myArg.." as number"};end;
 		arg = asNumber;
-	elseif(type_ == "vector3")then
+		
+	elseif(type_ == "Vector3")then
 		local v1,v2,v3 = myArg:match("%s*(%d+)%s*,%s*(%d+)%s*,%s*(%d+)%s*");
 		if(not v1 or not v2 or not v3)then return {success = false; error = "failed to parse "..myArg.." as vector3"};end;
 		arg = Vector3.new(v1,v2,v3);
@@ -149,9 +152,7 @@ function module.executeCommand(PlayerExecuter:Player,commandName:string,t:table?
 		end;
 		local hasMultipleTypes = v.type:match(",")
 		if(hasMultipleTypes)then
-			
 			for _,x in pairs(v.type:gsub(" ",""):split(",")) do
-			
 				local q = convertType(x,myArg,PlayerExecuter);
 				if(q)then 
 					if(typeof(q) == "table" and q.error)then
@@ -164,9 +165,7 @@ function module.executeCommand(PlayerExecuter:Player,commandName:string,t:table?
 			end
 		else
 			newMyArg = convertType(v.type, myArg,PlayerExecuter);
-			--print(newMyArg,v)
 		end
-		
 		if(not newMyArg and errorsCompiled)then
 			return {
 				success = false;
@@ -181,13 +180,9 @@ function module.executeCommand(PlayerExecuter:Player,commandName:string,t:table?
 		if(typeof(newMyArg) == "table" and newMyArg.error )then
 			return newMyArg;
 		end
-		
-		
 		table.insert(toArg, newMyArg);
 	end;
-	
-	--print(toArg)
-	
+
 	local success,executed = pcall(function() return targetCommand.exe(unpack(toArg));end);
 	if(not success)then
 		warn(executed)

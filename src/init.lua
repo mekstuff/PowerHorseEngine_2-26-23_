@@ -72,6 +72,9 @@ local Manifest = require(script["Manifest"]);
 ]=]
 
 local PowerHorseEngine = {};
+
+PowerHorseEngine.Types = require(script.Core.Providers.Types);
+
 --[=[
 	Uses [Pseudo.new] to create a Pseudo component
 	@return Pseudo

@@ -25,6 +25,7 @@ local NotificationGroup = {
 	DefaultNotificationLifetime = -1;
 	ContentAdjustment = Enumeration.Adjustment.Left;
 	SortOrderAdjustment = Enumeration.Adjustment.Bottom;
+	FillDirectionAdjustment = Enumeration.Adjustment.Bottom;
 	Padding = UDim.new(0,5);
 	Position = UDim2.new(0, 5, 1, -5);
 	AnchorPoint = Vector2.new(0,1);
@@ -48,6 +49,10 @@ local NotificationGroup = {
 ]=]
 --[=[
 	@prop SortOrderAdjustment Enumeration.Adjustment
+	@within NotificationGroup
+]=]
+--[=[
+	@prop FillDirectionAdjustment Enumeration.Adjustment
 	@within NotificationGroup
 ]=]
 --[=[
@@ -221,13 +226,14 @@ function NotificationMethods:LinkDismissToNotification(t)
 	end
 end;
 
-local CustomNotificationGroups = {}
 --//
-function NotificationMethods:Sort(NotificationGroup)
+function NotificationMethods:Sort(NotificationGroupObject)
 
 	local String = "";
 
-	local TargetTable = NotificationGroup.SortOrderAdjustment == Enumeration.Adjustment.Top and a_zLowercase or z_aLowercase;
+	local TargetTable = z_aLowercase;
+	-- local TargetTable = NotificationGroupObject.SortOrderAdjustment == Enumeration.Adjustment.Top and a_zLowercase or z_aLowercase;
+	-- local TargetTable = NotificationGroupObject.FillDirectionAdjustment == Enumeration.Adjustment.Bottom and a_zLowercase or z_aLowercase;
 
 	if(self.Pinned)then
 		String = TargetTable[1];
@@ -440,10 +446,20 @@ function NotificationGroup:SendNotification(Element, Priority, AnimationStyle, L
 
 end;
 
---//
-function NotificationGroup:Notify(Data,...)
+--[=[
+	Style toasts created by :Notify method
+	@param StyleHandler function -- Arguments = Toast,Data,AttachedBTN,AttachedBTN2
+]=]
+function NotificationGroup:AddNotificationStyle(StyleName:string,StyleHandler:any)
+	self._dev.Styles[StyleName] = StyleHandler;
+end;
+--[=[
+	Creates a toast notification
+]=]
+function NotificationGroup:Notify(Data:string|table,...:any?)
 
 	Data = Data or {};
+	local ErrorService = self:_GetAppModule():GetService("ErrorService")
 
 	if(typeof(Data)=="string")then
 		local s = {...};
@@ -462,10 +478,10 @@ function NotificationGroup:Notify(Data,...)
 		end
 	else
 		if(Data.IconImage == __PHeImage)then
-			self:_GetAppModule():GetService("ErrorService").tossWarn("Only CoreScripts can use "..Data.IconImage.." as a notification's icon image.");
+			ErrorService.tossWarn("Only CoreScripts can use "..Data.IconImage.." as a notification's icon image.");
 			Data.IconImage = nil;
 		end
-	end
+	end;
 	
 	local App = self:_GetAppModule()
 	local Toast = App.new("Toast");
@@ -492,9 +508,7 @@ function NotificationGroup:Notify(Data,...)
 		After.Size = UDim2.new(1,0,0,55);
 		After.BackgroundTransparency = 1;
 		After.StrokeTransparency = 1;
-
-		local Btn = App.new("Button");
-		
+		local Btn = App.new("Button");	
 		Btn.Position = UDim2.fromScale(.5,.5);
 		Btn.AnchorPoint = Vector2.new(.5,.5);
 		Btn.Text = Data.AttachButton;
@@ -508,8 +522,6 @@ function NotificationGroup:Notify(Data,...)
 		Btn.ButtonFlexSizing = false;
 		Btn.RippleStyle = Enumeration.RippleStyle.None;
 		Btn.Parent = After;
-		
-
 		if(Data.AttachButton2)then
 			local Btn2 = App.new("Button");	
 			Btn2.Position = UDim2.new(0,0,.5);
@@ -525,7 +537,6 @@ function NotificationGroup:Notify(Data,...)
 			Btn2.ButtonFlexSizing = false;
 			Btn2.RippleStyle = Enumeration.RippleStyle.None;
 			Btn2.Parent = After;
-			
 			Btn.Position = UDim2.fromScale(1,.5);
 			Btn.AnchorPoint = Vector2.new(1,.5);
 			Btn.Size = Btn2.Size;
@@ -535,13 +546,19 @@ function NotificationGroup:Notify(Data,...)
 		AttachedBTN=Btn;
 		--Toast._After = After;
 	end
-
+	if(Data.NotificationStyle)then
+		ErrorService.assert(typeof(Data.NotificationStyle) == "string", ("string expected for NotificationStyle, got %s. %s"):format(typeof(Data.NotificationStyle),self.Name));
+		local targetStyle = self._dev.Styles[Data.NotificationStyle];
+		if(targetStyle)then
+			self._dev.Styles[Data.NotificationStyle](Toast,Data,AttachedBTN,AttachedBTN2)
+		else
+			ErrorService.tossWarn(("Could not apply style \"%s\" because it does not yet exist. %s"):format(Data.NotificationStyle, self.Name));
+		end;
+	end
 	local n = self:SendNotification(Toast, Data.Priority, Data.NotificationAnimationStyle,Data.Lifetime);
 	if(Data.Pinned)then
 		n.Pinned = true;
 	end;
-	
-	
 
 	if(Toast:GetEventListener("CloseButtonPressed"))then
 		local closed_;
@@ -554,23 +571,13 @@ function NotificationGroup:Notify(Data,...)
 
 	return n, AttachedBTN, AttachedBTN2, Toast;
 end;
---[[
-function NotificationGroup:RenderOutsidePortal()
-	if(self:GET("Portal"))then
-		local Portal = self:GET("Portal");
-		self:GetGUIRef().Parent = self:GetRef();
-		--Portal:Destroy();
-		self._Components["Portal"]=nil;
-	end
-end;
-]]
+
 --//
 function NotificationGroup:RenderInPortal()
 	if(not self:GET("Portal"))then
 		local Portal = self:_GetAppModule().new("Portal");
 		Portal.IgnoreGuiInset = true;
 		self:GetGUIRef().Parent = Portal:GetGUIRef();
-		
 		self._Components["Portal"] = Portal;
 		Portal.Parent = self:GetRef();
 	end
@@ -578,17 +585,7 @@ end;
 --//
 
 function NotificationGroup:_Render(App)
-	
-	-- local Portal = App.new("Portal");
-	-- Portal.IgnoreGuiInset = true;
-	-- Portal.Parent = self:GetRef();
---[[
-	local NotificationsContainer = App.new("ScrollingFrame",Portal);
-	NotificationsContainer.BackgroundTransparency = 1;
-	NotificationsContainer.AutomaticCanvasSize = Enum.AutomaticSize.Y;
-	NotificationsContainer.ScrollingDirection = Enum.ScrollingDirection.Y;
-]]
-	
+	self._dev.Styles = {};
 	--[=[
 		@prop Notification PHeSignal
 		@within NotificationGroup
@@ -596,26 +593,16 @@ function NotificationGroup:_Render(App)
 	self:AddEventListener("Notification",true);
 
 	local NotificationsContainer = App.new("Frame",self:GetRef());
-	-- NotificationsContainer.BackgroundTransparency = 1;
-	-- NotificationsContainer.StrokeTransparency = 1;
 	NotificationsContainer.ClipsDescendants = true;
 	local ListLayout = Instance.new("UIListLayout", NotificationsContainer:GetGUIRef());
-	
 
 	ListLayout.SortOrder = Enum.SortOrder.Name;
-	
+
 	return {
-		--["Size"] = function(Value)
-			
-		--end,
-		--["Position"] = function(Value)
-			
-		--end,
 		["ContentAdjustment"] = function(Value)
 			ListLayout.HorizontalAlignment = Enum.HorizontalAlignment[Value.Name];
 		end,
 		["SortOrderAdjustment"] = function(Value)
-			-- ListLayout.VerticalAlignment = Value == Enumeration.Adjustment.Top and Enum.VerticalAlignment.Top or Enum.VerticalAlignment.Bottom
 			if(Value == Enumeration.Adjustment.Center)then
 				ListLayout.VerticalAlignment = Enum.VerticalAlignment.Center;
 			elseif(Value == Enumeration.Adjustment.Top)then
@@ -626,7 +613,6 @@ function NotificationGroup:_Render(App)
 		end,
 		_Components = {
 			FatherComponent = NotificationsContainer:GetGUIRef();
-			-- Portal = Portal;
 		};
 		_Mapping = {
 			[ListLayout] = {
@@ -635,7 +621,7 @@ function NotificationGroup:_Render(App)
 			[NotificationsContainer] = {
 				"BackgroundTransparency","BackgroundColor3","StrokeTransparency","StrokeThickness","StrokeColor3",
 				"Size","Position","AnchorPoint","Visible";
-			}	
+			};
 		};
 	};
 end;

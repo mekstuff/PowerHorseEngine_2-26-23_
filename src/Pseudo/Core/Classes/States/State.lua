@@ -108,12 +108,13 @@ function State:useEffect(callback:any,dependencies:table):Instance
         end
     end;
     local useEffectServant = App.new("Servant");
-    local Servant = self._dev.Servant;
-    Servant:Keep(useEffectServant);
-    handleCallback();
     useEffectServant:Connect(self:GetPropertyChangedSignal("State"), function()
         handleCallback();
     end);
+    local Servant = self._dev.Servant;
+    Servant:Keep(useEffectServant);
+    handleCallback();
+
 
     if(dependencies)then
         for key,value in pairs(dependencies) do

@@ -13,7 +13,9 @@ local ProgressBar = {
 	Size = UDim2.new(0,120,0,25);
 	BackgroundColor3 = Color3.fromRGB(248, 248, 248);
 	ForegroundColor3 = Theme.getCurrentTheme().Primary;
-	StrokeThickness = 1;
+	StrokeTransparency = 1;
+	StrokeColor3 = Theme.getCurrentTheme().Border;
+	StrokeThickness = 3;
 	TweenSpeed = .2;
 	Roundness = UDim.new(0);
 };
@@ -61,24 +63,19 @@ function ProgressBar:_Render(App)
 		end;
 		["Value"] = function(Value)
 			local calc = Value
-			-- print(Value);
 			if(Value > 1)then
 				calc = Value/100;
 			end;
-			
 			TweenService:Create(ProgressBar:GetGUIRef(), TweenInfo.new(self.TweenSpeed), {Size = UDim2.new(math.clamp(calc,0,1),0,1,0)}):Play();
 			ValueChanged:Fire(Value);
 		end,
 		["ForegroundColor3"] = function(Value)
 			ProgressBar.BackgroundColor3 = Value;
-			ProgressBarWrapper.StrokeColor3 = Value;
 		end,
 		["Roundness"] = function(Value)
 			ProgressBarWrapper.Roundness = Value;
 			ProgressBar.Roundness = Value;
 		end,["StrokeThickness"] = function(Value)
-			ProgressBarWrapper.StrokeThickness = Value;
-			ProgressBar.StrokeThickness = Value;
 		end,
 		_Components = {
 			FatherComponent = ProgressBarWrapper:GetGUIRef();
@@ -86,9 +83,9 @@ function ProgressBar:_Render(App)
 		};
 		_Mapping = {
 			[ProgressBarWrapper] = {
-				"Size","Position","AnchorPoint","BackgroundColor3","Visible";
+				"Size","Position","AnchorPoint","BackgroundColor3","Visible","StrokeColor3","StrokeTransparency","StrokeThickness";
 			},[ProgressBar] = {
-				"StrokeThickness";
+				-- "StrokeColor3","StrokeTransparency","StrokeThickness"
 			}
 		};
 	};
