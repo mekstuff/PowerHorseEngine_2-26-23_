@@ -20,7 +20,11 @@ function Math.oscillate(min:number,max:number?,Time:number?):number
     local subv = (min - max)/2
                 
     return (addv + subv *(sin(Time*1*pi*2)) );
-end
+end;
+--[=[]=]
+function Math.perc(number:number,max:number?)
+    return (number/number)*max or 100;
+end;
 
 return setmetatable(Math,{
     __index = math
