@@ -105,30 +105,26 @@ function FrameworkServer:Start()
                 end
             end)
             --//Init
-            local thread = coroutine.create(function()
-                local initRan,initResults = pcall(function()
-                    v.Parent = ServicesFolder;
-                    v:Init(v._RenderHooksPassOn);
-                end);
-                if(not initRan)then
-                    reject("Failed to :Init a service at ["..v.ClassName.."] -> "..initResults);
-                    return;
-                end;
-            end)coroutine.resume(thread);
+            local initRan,initResults = pcall(function()
+                v.Parent = ServicesFolder;
+                v:Init(v._RenderHooksPassOn);
+            end);
+            if(not initRan)then
+                reject("Failed to :Init a service at ["..v.ClassName.."] -> "..initResults);
+                return;
+            end;
         end;
         --//Start
         for _,v in pairs(PortedServices) do
-            local thread = coroutine.create(function()
-                local startRan,startResults = pcall(function()
-                    local Hooks = v._RenderHooksPassOn;
-                    v._RenderHooksPassOn = nil;
-                    v:Start(Hooks);
-                end);
-                if(not startRan)then
-                    reject("Failed to :Start a service at ["..v.ClassName.."] -> "..startResults);
-                    return;
-                end
-            end)coroutine.resume(thread);
+            local startRan,startResults = pcall(function()
+                local Hooks = v._RenderHooksPassOn;
+                v._RenderHooksPassOn = nil;
+                v:Start(Hooks);
+            end);
+            if(not startRan)then
+                reject("Failed to :Start a service at ["..v.ClassName.."] -> "..startResults);
+                return;
+            end
         end;
         SharedServicesFolder.Parent = SharedWorkflowFolder;
         ServerStarted = true;

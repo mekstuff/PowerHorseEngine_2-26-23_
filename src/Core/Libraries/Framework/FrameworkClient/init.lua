@@ -40,30 +40,26 @@ function FrameworkClient:Start()
         Modulars.Name = "@Modulars";
         --//Init
         for _,v in pairs(PortedModulars) do
-            local thread = coroutine.create(function()
-                local initRan,initResults = pcall(function()
-                    v.Parent = Modulars;
-                    v:Init(v._RenderHooksPassOn);  
-                end);
-                if(not initRan)then
-                    reject("Failed to :Init a Modular at ["..v.ClassName.."] -> "..initResults);
-                    return;
-                end;
-            end)coroutine.resume(thread);
+            local initRan,initResults = pcall(function()
+                v.Parent = Modulars;
+                v:Init(v._RenderHooksPassOn);  
+            end);
+            if(not initRan)then
+                reject("Failed to :Init a Modular at ["..v.ClassName.."] -> "..initResults);
+                return;
+            end;
         end;
         --//Start
         for _,v in pairs(PortedModulars) do
-            local thread = coroutine.create(function()
-                local startRan,startResults = pcall(function()
-                    local Hooks = v._RenderHooksPassOn;
-                    v._RenderHooksPassOn = nil;
-                    v:Start(Hooks);
-                end);
-                if(not startRan)then
-                    reject("Failed to :Start a Modular at ["..v.ClassName.."] -> "..startResults);
-                    return;
-                end
-            end)coroutine.resume(thread);
+            local startRan,startResults = pcall(function()
+                local Hooks = v._RenderHooksPassOn;
+                v._RenderHooksPassOn = nil;
+                v:Start(Hooks);
+            end);
+            if(not startRan)then
+                reject("Failed to :Start a Modular at ["..v.ClassName.."] -> "..startResults);
+                return;
+            end
         end;
         ClientStarted = true;
         resolve(self);
@@ -234,7 +230,7 @@ local function getModularAsync(n,tries)
   
         if(tries == nil)then tries = 1;end;
         task.wait(tries/4);
-        if(StartPromise and StartPromise.PromiseState == "rejected")then
+        if(StartPromise and StartPromise.State == "rejected")then
             ErrorService.tossError("Framework -> Could not fetch modular : Promise Rejected, Services Were Not Loaded. Check Framework:Start():Catch to view what went wrong")
             return;
         end
@@ -313,7 +309,7 @@ local function getComponentClassAsync(n,tries)
     else
         if(tries == nil)then tries = 1;end;
         task.wait(tries/4);
-        if(StartPromise and StartPromise.PromiseState == "rejected")then
+        if(StartPromise and StartPromise.State == "rejected")then
             ErrorService.tossError("Framework -> Could not fetch component class : Promise Rejected, ComponentClasses Were Not Loaded. Check Framework:Start():Catch to view what went wrong")
             return;
         end
