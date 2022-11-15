@@ -37,15 +37,14 @@ local App = require(script.Parent.Parent.Parent);
 	```
 ]=]
 
-local function getValue(v)
+local function getValue(v:any)
 	if(v == nil)then return "**any";end;
 	return v;
 end;
 
-return function(default)
+return function(default:any)
 	local res = App.new("State");
 	res.State = getValue(default);
-
 	return res,function(newValue)
 		if(typeof(newValue) == "function")then
 			local resfromstatecallback = newValue(res.State);
