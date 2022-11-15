@@ -203,6 +203,15 @@ local function HandleMusic(p)
 end;
 
 local ObjectiveNotificationGroup;
+
+--[=[
+	Uses [NotificationGroup.AddNotificationStyle]
+]=]
+function NotificationService:AddNotificationStyle(StyleName:string,StyleHandler:any)
+	local defaultNotificationGroup = CoreGuiService:WaitFor("NotificationGroup");
+	return defaultNotificationGroup:AddNotificationStyle(StyleName,StyleHandler);
+end;
+
 --[=[
 	@private
 	@within NotificationService
