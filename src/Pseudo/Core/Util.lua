@@ -531,9 +531,10 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 				if(not attributelocked[k])then
 					if(propSheet[k])then --<Make sure property exists
 						attributelocked[k]=true;
-						if(table.find(CurrentlySupportedDATATYPES, typeof(v)))then
+						local AttributeTypeSupported = pcall(function()
 							_ReferenceInstance:SetAttribute(k,v);
-						else
+						end);
+						if(not AttributeTypeSupported)then
 							_ReferenceInstance:SetAttribute(k, getStringValueOfUnknownDataType(v,k))
 						end
 						attributelocked[k]=nil;
@@ -756,9 +757,10 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 	for prop,val in pairs(propSheet) do
 		if(not string.match(prop, "^_")) then
 			if not (prop == "Parent" or prop == "Archivable")then
-				if(table.find(CurrentlySupportedDATATYPES, typeof(val)) )then
+				local AttributeTypeSupported = pcall(function()
 					_ReferenceInstance:SetAttribute(prop,val);
-				else
+				end);
+				if(not AttributeTypeSupported)then
 					_ReferenceInstance:SetAttribute(prop, getStringValueOfUnknownDataType(val,prop))
 				end
 			end	
