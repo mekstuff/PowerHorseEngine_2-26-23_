@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ]] 
 
-local Engine = require(script:WaitForChild("Engine"));
+local Engine:any = require(script:WaitForChild("Engine"));
 local RunService = game:GetService("RunService");
 
 local Flags = require(script:WaitForChild("Util"):WaitForChild("Flags"));
@@ -72,14 +72,14 @@ local Manifest = require(script["Manifest"]);
 ]=]
 
 local PowerHorseEngine = {};
-
-PowerHorseEngine.Types = require(script.Core.Providers.Types);
+local Types = require(script.Types)
+PowerHorseEngine.Types = Types
 
 --[=[
 	Uses [Pseudo.new] to create a Pseudo component
 	@return Pseudo
 ]=]
-function PowerHorseEngine.new(PseudoName:string,...:any)
+function PowerHorseEngine.new(PseudoName:string,...:any):Types.Pseudo
 	return Pseudo.new(PseudoName,...);
 end;
 --[=[
@@ -178,7 +178,7 @@ end
 --[=[
 	@param Instance Pseudo | Instance | string
 ]=]
-function PowerHorseEngine.GetPseudoFromInstance(Instance:any)
+function PowerHorseEngine.GetPseudoFromInstance(Instance:Instance):Types.Pseudo
 	local obj = typeof(Instance) == "table" and Instance:GetRef() or Instance;
 	local PseudoID = obj:FindFirstChild("_pseudoid")
 	assert(PseudoID, obj.Name.." does not have a pseudo id. could not find");
@@ -186,14 +186,8 @@ function PowerHorseEngine.GetPseudoFromInstance(Instance:any)
 end;
 
 --[=[]=]
-function PowerHorseEngine:GetConfig():table?
+function PowerHorseEngine:GetConfig():any?
 	return Engine:RequestConfig()
 end;
 
-
 return PowerHorseEngine;
-
-
-
-
-

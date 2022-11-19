@@ -3,10 +3,10 @@ local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
 local Core = require(script.Parent.Parent.Parent);
 local IsClient = game:GetService("RunService"):IsClient();
 local Player = game.Players.LocalPlayer;
-local Character;local RootPart;
+local Character;local RootPart:any;
+local ReplicatedStorage = game:GetService("ReplicatedStorage");
 Character = Player and (Player.Character or Player.CharacterAdded:Wait());
 RootPart = Character and Character:WaitForChild("HumanoidRootPart");
-
 
 local module = {
 	Name = "AIPet";
@@ -54,7 +54,7 @@ function module:_WeldJoints()
 end;
 
 --//
-function module:_GetBodyMovers()
+function module:_GetBodyMovers():(BodyPosition,BodyGyro)
 	--local p = self.Parent.PrimaryPart or self.Parent:FindFirstChildWhichIsA("BasePart");
 	if not(self._dev._position)then
 		local n = Instance.new("BodyPosition");
@@ -95,13 +95,13 @@ function module:_Render(App)
 
 			if( (RootPart.Position - self.Target.Position).Magnitude > self.RenderDistance)then
 				
-				if(self._dev._targetSKIN and self._dev._targetSKIN.Parent ~= game:GetService("ReplicatedStorage"))then
+				if(self._dev._targetSKIN and self._dev._targetSKIN.Parent ~= ReplicatedStorage)then
 					print("Not rendering");
 					self._Rendering = false;
-					self._dev._targetSKIN.Parent = game:GetService("ReplicatedStorage");
+					self._dev._targetSKIN.Parent = ReplicatedStorage;
 				end
 			else
-				if(self._dev._targetSKIN.Parent == game:GetService("ReplicatedStorage"))then
+				if(self._dev._targetSKIN.Parent == ReplicatedStorage)then
 					print("rendering");
 					self._Rendering = true;
 					self._dev._targetSKIN.Parent = Container;
@@ -164,8 +164,8 @@ function module:_Render(App)
 				local t;
 				if(PrevClone)then 
 					local Pos,Gyro = self:_GetBodyMovers();
-					--self.Parent = nil;
-					Pos.Parent=nil;Gyro.Parent=nil;
+					Pos.Parent= ReplicatedStorage;
+					Gyro.Parent= ReplicatedStorage;
 					PrevClone:Destroy();PrevClone=nil;
 				end;
 				local cloned = v:Clone();

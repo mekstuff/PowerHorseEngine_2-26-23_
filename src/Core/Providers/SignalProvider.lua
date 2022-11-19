@@ -14,7 +14,7 @@ local PHeSignal = {};
 --[=[
 	Fires the bindable event
 ]=]
-function PHeSignal:Fire(...:any):nil
+function PHeSignal:Fire(...:any)
 	self._dev._argData = {...}
 	self._dev._bindableEvent:Fire()
 	self._dev._argData = nil
@@ -22,7 +22,7 @@ end
 --[=[
 	Destroys self and bindable event
 ]=]
-function PHeSignal:Destroy():nil
+function PHeSignal:Destroy()
 	self._dev._bindableEvent:Destroy();
 	setmetatable(self,{});
 	self=nil;
@@ -49,7 +49,7 @@ end
 
 	@return PHeSignal
 ]=]
-function SignalProvider.new(Name:string):RBXScriptSignal
+function SignalProvider.new(Name:string?)
 	local x = {};
 	x._dev = {};
 	x._dev._bindableEvent = Instance.new("BindableEvent");

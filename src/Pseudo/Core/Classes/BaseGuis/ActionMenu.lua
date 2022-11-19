@@ -288,7 +288,7 @@ function ActionMenu:AddSplit()
 
 end;
 --[=[]=]
-function ActionMenu:AddPadding(y:number)
+function ActionMenu:AddPadding(y:number?)
 	local ContentFrame = self:GET("ContentFrame");
 	local UIGrid = self:GET("UIGrid");
 
@@ -301,7 +301,7 @@ function ActionMenu:AddPadding(y:number)
 
 end
 --[=[]=]
-function ActionMenu:AddHeader(Header:string)
+function ActionMenu:AddHeader(Header:string?)
 	local App = self:_GetAppModule()
 	local ContentFrame = self:GET("ContentFrame");
 	local UIGrid = self:GET("UIGrid");
@@ -438,7 +438,7 @@ function ActionMenu:AddAction(ActionName:string,id:string,ActionIcon:string,...:
 end;
 --[=[
 ]=]
-function ActionMenu:UpdateAllIcons(Icon:string, IgnoreList:table, Inverse:boolean)
+function ActionMenu:UpdateAllIcons(Icon:string, IgnoreList:table?, Inverse:boolean?)
 	for _,v in pairs(self._dev.__TreeContents)do
 		if(IgnoreList)then
 
@@ -478,8 +478,6 @@ end
 
 
 function ActionMenu:_Render(App)
-	
-	
 	
 	local MainActionToolTip = App.new("ToolTip")
 	MainActionToolTip.RevealOnMouseEnter = false;

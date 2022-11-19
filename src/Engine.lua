@@ -126,7 +126,7 @@ function Engine:InitClient(Client)
 	end;
 end;
 
-local function waitForContentFolder(tries:number)
+local function waitForContentFolder(tries:number?)
 	local folder = script.Parent:FindFirstChild(".content") or script.Parent:FindFirstChild(".lanzo");
 	if not folder then
 		tries = tries or 0;

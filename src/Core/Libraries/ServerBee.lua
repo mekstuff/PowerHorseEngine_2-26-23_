@@ -3,17 +3,13 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local IsClient = RunService:IsRunning() and RunService:IsClient();
 --[=[
     @class ServerBee
-    @__index ServerBeeClient
     @tag Library
-
 ]=]
 local ServerBee = {
     Name = "ServerBee",
     ClassName = "ServerBee",
 }
---[=[
-    @server
-]=]
+
 local function validateState(State)
     if(typeof(State) == "table" and State:IsA("State"))then
         return true;
@@ -125,6 +121,9 @@ function ServerBee:_Render()
     return {};
 end
 
+--[=[
+    @class ServerBeeClient
+]=]
 local ServerBeeClient = {
     Name = "ServerBeeClient",
     ClassName = "ServerBee",
@@ -135,6 +134,9 @@ function ServerBeeClient:_Render()
     return {};
 end;
 
+--[=[
+    @client
+]=]
 function ServerBeeClient:_GetEventItem(Storage:Folder,ItemName:string,TRIES:number?,TRIES_WARN:number?):RemoteEvent
     local App = self:_GetAppModule();
     local ErrorService = App:GetService("ErrorService");
@@ -185,7 +187,9 @@ function ServerBeeClient:SUBSCRIBE(HOST_KEY:string,Handler:any)
     return Subscription;
 end;
 
---[=[]=]
+--[=[
+    @client
+]=]
 function ServerBeeClient:UBSUBSCRIBE(SubscriptionToken:any)
     SubscriptionToken:Destroy();
 end

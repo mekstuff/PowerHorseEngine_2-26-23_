@@ -68,7 +68,7 @@ end;
 	This will call :FindFirstAncestor on it's parent, so if the parent is a ROBLOX Instance, it will then use FindFirstAncestor of `Instances` not `Pseudos`.
 	@return Pseudo | Instance | nil
 ]=]
-function Pseudo:FindFirstAncestor(name:string,level:number)
+function Pseudo:FindFirstAncestor(name:string,level:number?)
 	self:_GetAppModule():GetService("ErrorService").assert(name, "Argument 1 missing or nil");
 	local Parent = self.Parent;
 	if(not Parent)then return nil;end;
@@ -486,7 +486,7 @@ end
 --[=[
 	@return PHeSignal
 ]=]
-function Pseudo:AddEventListener(EventName:string, CreatingEvent:boolean, BindCreateToEvent:BindableEvent, SharedSignal:boolean):BindableEvent
+function Pseudo:AddEventListener(EventName:string, CreatingEvent:boolean?, BindCreateToEvent:BindableEvent?, SharedSignal:boolean?):BindableEvent
 	SharedSignal = SharedSignal and "_SharedSignals" or "_Signals";
 
 	--if(not self._Signals)then self._Signals = {};end;

@@ -3,10 +3,11 @@
 ]=]
 local Theme = {};
 local Services = script.Parent.Parent.Parent.Core.Services;
+local Types = require(Services.Parent.Parent.Types);
 local PluginService = require(Services.PluginService);
 local TweenService = require(Services.TweenService);
 
-local _defaultTheme = PluginService:IsPluginMode() and 
+local _defaultTheme:{} = PluginService:IsPluginMode() and 
 {
 
 	Alert = Color3.fromRGB(13, 110, 253),
@@ -88,7 +89,7 @@ end;
 --> Support for Config.Theme
 local Config = getApp():GetGlobal("Engine"):RequestConfig();
 if(Config.Theme)then
-	for a,b in pairs(Config.Theme) do
+	for a:string,b in pairs(Config.Theme) do
 		_defaultTheme[a] = b;
 	end;
 end;
@@ -99,7 +100,7 @@ local ThemeObject;
 ]=]
 function Theme.buildTheme()
 	if(ThemeObject)then return ThemeObject;end;
-	local App = getApp();
+	local App:Types.App = getApp()::any;
 	local CustomClassService = App:GetService("CustomClassService");
 	local ThemeClass = {
 		Name = "UseTheme";
@@ -110,7 +111,7 @@ function Theme.buildTheme()
 		return {};
 	end;
 	ThemeObject = CustomClassService:Create(ThemeClass);
-	for a,b in pairs(Theme.getDefaultTheme()) do
+	for a:string,b in pairs(Theme.getDefaultTheme()) do
 		local newState = App.new("State",ThemeObject);
 		newState.Name = a.."-Theme";
 		newState.State = b;
@@ -143,8 +144,8 @@ end
 
 	```
 ]=]
-function Theme.extendTheme(extension:table,uniqueThemeIdentifier:string?)
-	local App = getApp();
+function Theme.extendTheme(extension:{},uniqueThemeIdentifier:string?)
+	local App:Types.App = getApp()::any;
 	if(not ThemeObject)then
 		Theme.buildTheme();
 	end;
@@ -169,7 +170,7 @@ end;
 --[=[
 	@return State
 ]=]
-function Theme.useTheme(theme:string,uniqueThemeIdentifier:string?):Instance
+function Theme.useTheme(theme:string,uniqueThemeIdentifier:string?):Types.State|nil
 	-- print(ThemeDefault[theme], theme)
 	-- return ThemeDefault[theme]
 	--[[ disabled until further notice ]]
@@ -243,7 +244,7 @@ function Theme.ThemeToggler()
 		BackgroundColor3 = Theme.useTheme("BackgroundLite");
 		New "$Frame" {
 			Name = "ContentContainer";
-			Size = UDim2.fromOffset(0); 
+			Size = UDim2.fromOffset(0,0); 
 			AutomaticSize = Enum.AutomaticSize.Y;
 			New "UIListLayout" {
 				-- CellSize = UDim2.new(1,0,0,25);

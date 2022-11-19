@@ -1,5 +1,8 @@
+--!strict
+
 local TweenService = game:GetService("TweenService");
 local SignalProvider = require(script.Parent.Parent.Providers.SignalProvider);
+local Types = require(script.Parent.Parent.Parent.Types);
 
 --[=[
 	@class AudioService
@@ -7,7 +10,7 @@ local SignalProvider = require(script.Parent.Parent.Providers.SignalProvider);
 local AudioService = {}
 AudioService.ChannelCreated = SignalProvider.new();
 
-local Channels = {};
+local Channels:any = {};
 
 --[=[]=]
 function AudioService:GetChannel(Name:string)
@@ -27,19 +30,17 @@ function AudioService:GetChannels() return Channels;end;
 
 --[=[]=]
 function AudioService:RemoveChannel(ChannelName:string)
-	local Channel = Channels[ChannelName];
+	local Channel:Types.AudioChannel = Channels[ChannelName];
 	for _,v in pairs(Channel.Audios)do
 		v:Destroy();
 	end;
-	
 	Channel.MuteChanged:Destroy();
 	Channel.AudioAdded:Destroy();
 	Channel.AudioRemoved:Destroy();
 	Channel.AudioMuteChanged:Destroy();
 	Channel.DefaultAudioTriggered:Destroy();
-	
 	setmetatable(Channels[ChannelName], nil);
-	Channels[ChannelName]=nil;Channel=nil;
+	Channels[ChannelName]=nil;
 	print("Removed Channel: "..ChannelName)
 end
 
@@ -53,7 +54,7 @@ function AudioChannel:Destroy()
 	AudioService:RemoveChannel(self.Name);
 end;
 --[=[]=]
-function AudioChannel:SetAudioMuted(AudioName:string,State:boolean,AudioInstance:any)
+function AudioChannel:SetAudioMuted(AudioName:string?,State:boolean,AudioInstance:any)
 	if(not AudioInstance)then
 		for _,q in pairs(self.Audios)do
 			if(q.Name == AudioName)then	
@@ -81,7 +82,7 @@ function AudioChannel:GetAudios()
 end
 
 --//
-local function getAudioFromChannel(Channel,AudioName)
+local function getAudioFromChannel(Channel:Types.AudioChannel,AudioName:string):Types.AudioChannelAudio
 	if(not Channel.Audios[AudioName])then
 		local ct = 0;
 		local t = 60;
@@ -99,7 +100,6 @@ function AudioChannel:SetDefaultAudio(AudioName:string)
 		v.isDefaultAudio=false
 	end;
 	getAudioFromChannel(self,AudioName).isDefaultAudio=true;
-
 end
 
 
@@ -258,7 +258,7 @@ function AudioObjectMethods:Destroy()
 	self.AudioInstance:Destroy();
 end
 --[=[]=]
-function AudioChannel:AddAudio(AudioName:string,AudioID:number,AudioVolume:number,Looped:boolean,PlayAudio:boolean,Instant:boolean)
+function AudioChannel:AddAudio(AudioName:string,AudioID:string,AudioVolume:number,Looped:boolean,PlayAudio:boolean,Instant:boolean)
 	if(self.Audios[AudioName])then
 		local App = require(script.Parent.Parent.Parent);
 		local ErrorService = App:GetService("ErrorService");
@@ -268,33 +268,34 @@ function AudioChannel:AddAudio(AudioName:string,AudioID:number,AudioVolume:numbe
 	
 	AudioVolume = AudioVolume or self.DefaultVolume;
 	if(typeof(AudioID)~="string")then
-		 AudioID = tostring(AudioID);
+		AudioID = tostring(AudioID);
 	end;
 	AudioID = AudioID and (AudioID:match("^rbxassetid://") and AudioID or "rbxassetid://"..AudioID) or ""
 	-- AudioID = AudioID and "rbxassetid://"..tostring(AudioID) or "";
 	Looped = Looped or self.DefaultLoop;
-	
+
 	local newAudio = Instance.new("Sound");
-	--newAudio.Volume = AudioVolume;
 	newAudio.SoundId = AudioID;
 	newAudio.Volume=0;
 	newAudio.Parent = workspace;
-	
-	local Audio = {};
+	type Audio = {
+		[string]: any
+	}
+	local Audio:Audio = {};
 	local AudioProxy = {
 		Name = AudioName;
 		SoundId = AudioID;
 		Volume = AudioVolume;
 		AudioInstance = newAudio;
 		Looped = Looped;
-		--Channel = self.Name;
 		Channel = self;		
 		Instant = Instant or self.AudiosInstant;
 		Muted=false;
 	};
+
+	local t = {};
 	
-	
-	for prop,v in pairs(AudioProxy)do
+	for prop:any,v:any in pairs(AudioProxy)do
 		if not (prop == "Muted" or prop == "AudioInstance" or prop =="Volume" or prop == "Channel" or prop == "Instant" )then
 			newAudio[prop]=v;
 		end
@@ -337,19 +338,15 @@ end
 --[=[
 	@return AudioChannel
 ]=]
-function AudioService:CreateChannel(ChannelName:string, AudiosAllowedInParallel:number, DefaultVolume:number, DefaultLoop:boolean, AudiosInstant:boolean):Instance
+function AudioService:CreateChannel(ChannelName:string, AudiosAllowedInParallel:number?, DefaultVolume:number?, DefaultLoop:boolean?, AudiosInstant:boolean?)
 	
 	if(Channels[ChannelName])then  return Channels[ChannelName];end;
-	--local SignalProvider = require(script.Parent.Parent.Parent.):GetProvider("SignalProvider");
-	
 	
 	local ChannelMuteChangedSignal = SignalProvider.new();
 	local ChannelAudioAddedSignal = SignalProvider.new();
 	local ChannelAudioRemovedSignal = SignalProvider.new();
 	local ChannelAudioMuteChangedSignal = SignalProvider.new();
 	local ChannelAudioDefaultTriggeredSignal = SignalProvider.new();
-	
-	
 	
 	AudiosAllowedInParallel = AudiosAllowedInParallel or 1;
 	DefaultVolume = DefaultVolume or 1;

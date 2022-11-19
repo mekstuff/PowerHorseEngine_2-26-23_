@@ -1,4 +1,5 @@
-local Theme = require(script.Parent.Parent.Parent.Theme);
+local Types = require(script.Parent.Parent.Parent.Parent.Parent.Types);
+local Theme:Types.Theme = require(script.Parent.Parent.Parent.Theme)::any;
 local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
 local TextService = game:GetService("TextService");
 
@@ -38,7 +39,7 @@ BaseText.__inherits = {"GUI","BaseGui"};
 	```
 ]=]
 
-function BaseText:GetUserTextAsync(ShowText:any)
+function BaseText:GetUserTextAsync(ShowText:string?):(string|nil,boolean)
 	local App = self:_GetAppModule();
 	local Replacement = App.new("TextInput");
 	Replacement.Size = UDim2.fromOffset(self:GetGUIRef().AbsoluteSize.X,self:GetGUIRef().AbsoluteSize.Y);

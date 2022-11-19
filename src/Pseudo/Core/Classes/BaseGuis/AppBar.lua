@@ -1,4 +1,5 @@
-local Theme = require(script.Parent.Parent.Parent.Theme);
+local Types = require(script.Parent.Parent.Parent.Parent.Parent.Types);
+local Theme:Types.Theme = require(script.Parent.Parent.Parent.Theme)::any;
 
 --[=[
     @class AppBar

@@ -1,4 +1,5 @@
-local Theme = require(script.Parent.Parent.Parent.Theme);
+local Types = require(script.Parent.Parent.Parent.Parent.Parent.Types);
+local Theme:Types.Theme = require(script.Parent.Parent.Parent.Theme)::any;
 local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
 local Core = require(script.Parent.Parent.Parent);
 local IsClient = game:GetService("RunService"):IsClient();
@@ -257,6 +258,7 @@ function Accordion:_Render(App)
 	};
 	]]
 end;
+
 
 
 return Accordion

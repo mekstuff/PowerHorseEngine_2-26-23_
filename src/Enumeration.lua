@@ -1,5 +1,9 @@
 local TweenService = game:GetService("TweenService");
 
+type EnumItem = {
+    Name: string,
+    EnumType: string,
+};
 -- [ Enumeration ] --
 
 --[=[
@@ -7,29 +11,34 @@ local TweenService = game:GetService("TweenService");
 	PowerHorseEngine's Enums
 ]=]
 local Enumeration = {}
--- [ Ease ] --
-
-Enumeration.Ease = {};
-Enumeration.Ease.Linear = {
-	f = function(cv:number,i:number,ti:number, sv:number):number
-		return cv*i/ti+sv;
-	end;
-};
 
 Enumeration.TransitionDirection = {};
 -- [ Transition Directions ] --
-
+type TransitionDirection = {
+    TopBottom: EnumItem,
+};
 Enumeration.TransitionDirection = {};
 Enumeration.TransitionDirection.TopBottom = {};
 -- [ Close Button Behaviour ] --
-
+type CloseButtonBehaviour = {
+    None: EnumItem,
+    Hide: EnumItem,
+    Destroy: EnumItem,
+    Display: EnumItem,
+};
 Enumeration.CloseButtonBehaviour = {};
 Enumeration.CloseButtonBehaviour.None = {};
 Enumeration.CloseButtonBehaviour.Hide = {};
 Enumeration.CloseButtonBehaviour.Destroy = {};
 Enumeration.CloseButtonBehaviour.Display = {};
 -- [ Connection Status ] -
-
+type ConnectionStatus = {
+    Excellent: EnumItem,
+    Good: EnumItem,
+    Moderate: EnumItem,
+    Bad: EnumItem,
+    Awful: EnumItem,
+};
 Enumeration.ConnectionStatus = {};
 Enumeration.ConnectionStatus.Excellent = {n = 60};
 Enumeration.ConnectionStatus.Good = {n = 120};
@@ -37,41 +46,68 @@ Enumeration.ConnectionStatus.Moderate = {n = 300};
 Enumeration.ConnectionStatus.Bad = {n = 600};
 Enumeration.ConnectionStatus.Awful = {n = 1000};
 --[ Face Directions ] --
-
+type FaceDirection = {
+    None: EnumItem,
+    Relative: EnumItem,
+    LookAt: EnumItem,
+};
 Enumeration.FaceDirection = {};
 Enumeration.FaceDirection.None = {};
 Enumeration.FaceDirection.Relative = {};
 Enumeration.FaceDirection.LookAt = {};
 -- [ AITypes ] --
-
+type AI = {
+    Human: EnumItem,
+};
 Enumeration.AI = {};
 Enumeration.AI.Human = {};
 
 -- [ AutoAccordionBehaviour ] --
-
+type AccordionButtonPosition = {
+    Partial: EnumItem,
+    Entire: EnumItem,
+    Icon: EnumItem,
+    None: EnumItem,
+};
 Enumeration.AccordionButtonPosition = {};
 Enumeration.AccordionButtonPosition.Partial = {};
 Enumeration.AccordionButtonPosition.Entire = {};
 Enumeration.AccordionButtonPosition.Icon = {};
 Enumeration.AccordionButtonPosition.None = {};
 -- [ Ligament ] --
-
+type LigamentType = {
+    Constraint: EnumItem,
+    Weld: EnumItem,
+};
 Enumeration.LigamentType = {};
 Enumeration.LigamentType.Constraint = {ins = "WeldConstraint"};
 Enumeration.LigamentType.Weld = {ins = "Weld"};
 
 -- [ CameraMovementType ] --
-
+type CameraMovementType = {
+    Default: EnumItem,
+    DeltaLocked: EnumItem,
+    CharacterLocked: EnumItem,
+};
 Enumeration.CameraMovementType = {};
 Enumeration.CameraMovementType.Default = {Name="Default",EnumType = "PromptType"};
 Enumeration.CameraMovementType.DeltaLocked = {Name="DeltaLocked",EnumType = "PromptType"};
 Enumeration.CameraMovementType.CharacterLocked = {Name="CharacterLocked",EnumType = "PromptType"};
-
+-- [ ProductPurchaseState ] --
+type ProductPurchaseState = {
+    Declined: EnumItem,
+    Purchased: EnumItem,
+};
 Enumeration.ProductPurchaseState = {};
 Enumeration.ProductPurchaseState.Declined = {};
 Enumeration.ProductPurchaseState.Purchased = {};
 -- [ PromptType ] --
-
+type PromptType = {
+    None: EnumItem,
+    Warning: EnumItem,
+    Info: EnumItem,
+    Error: EnumItem,
+};
 Enumeration.PromptType = {};
 Enumeration.PromptType.None = {Name="None",EnumType = "PromptType"};
 Enumeration.PromptType.Warning = {Name="Warning",EnumType = "PromptType",icon = "rbxasset://textures/StudioSharedUI/alert_warning@2x.png"; c=Color3.fromRGB(245, 164, 33)};
@@ -79,26 +115,43 @@ Enumeration.PromptType.Info = {Name="Info",EnumType = "PromptType",icon = "rbxas
 Enumeration.PromptType.Error = {Name="Info",EnumType = "PromptType",icon = "rbxasset://textures/StudioSharedUI/alert_error@2x.png"; c=Color3.fromRGB(237, 64, 64)};
 
 -- [ Device ] --
-
+type Device = {
+    XBOX: EnumItem,
+    Mobile: EnumItem,
+    PC: EnumItem,
+};
 Enumeration.Device = {};
 Enumeration.Device.XBOX = {Name="XBOX",EnumType="Device",};
 Enumeration.Device.Mobile = {Name="Mobile",EnumType="Device"};
 Enumeration.Device.PC = {Name="PC",EnumType="Device"};
 
 -- [ ProximityPromptExclusivity ] --
-
+type Exclusivity = {
+    AlwaysShow: EnumItem,
+    OneGlobally: EnumItem,
+    OnePerButton: EnumItem,
+};
 Enumeration.Exclusivity = {};
 Enumeration.Exclusivity.AlwaysShow = {Name="AlwaysShow",EnumType = "ProximityPromptExclusivity"};
 Enumeration.Exclusivity.OneGlobally = {Name="OneGlobally",EnumType = "ProximityPromptExclusivity"};
 Enumeration.Exclusivity.OnePerButton = {Name="OnePerButton",EnumType = "ProximityPromptExclusivity"};
 
 -- [ NotificationAnimationStyle ] --
-
+type NotificationAnimationStyle = {
+    Popup: EnumItem,
+    Slide: EnumItem,
+};
 Enumeration.NotificationAnimationStyle = {};
 Enumeration.NotificationAnimationStyle.Popup = {Name="Popup",EnumType = "NotificationAnimationStyle"};
 Enumeration.NotificationAnimationStyle.Slide = {Name="Popup",EnumType = "NotificationAnimationStyle"};
 -- [ NotificationGroupPriority ] --
 
+type NotificationPriority = {
+    Low: EnumItem,
+    Medium: EnumItem,
+    High: EnumItem,
+    Critical: EnumItem,
+};
 Enumeration.NotificationPriority = {};
 Enumeration.NotificationPriority.Low = {Name="Low",EnumType = "NotificationPriority",prNumber = 14};
 Enumeration.NotificationPriority.Class1 = {Name="Class1",EnumType = "NotificationPriority",prNumber = 13};
@@ -116,42 +169,106 @@ Enumeration.NotificationPriority.High = {Name="High",EnumType = "NotificationPri
 Enumeration.NotificationPriority.Critical = {Name="Critical",EnumType = "NotificationPriority",prNumber = 1};
 
 -- [ ActionMenuAutomaticHide ] --
+type ActionMenuAutomaticHide = {
+    None: EnumItem,
+    TreeOnly: EnumItem,
+    All: EnumItem,
+};
 Enumeration.ActionMenuAutomaticHide = {};
 Enumeration.ActionMenuAutomaticHide.None = {Name="None",EnumType = "ActionMenuAutomaticHide"};
 Enumeration.ActionMenuAutomaticHide.TreeOnly = {Name="TreeOnly",EnumType = "ActionMenuAutomaticHide"};
 Enumeration.ActionMenuAutomaticHide.All = {Name="All",EnumType = "ActionMenuAutomaticHide"};
 -- [ PositionBehaviour ] --
+type PositionBehaviour = {
+    FollowMouse: EnumItem,
+    Static: EnumItem,
+};
 Enumeration.PositionBehaviour = {};
 Enumeration.PositionBehaviour.FollowMouse = {Name="FollowMouse",EnumType="PositionBehaviour"};
 Enumeration.PositionBehaviour.Static = {Name="Static",EnumType="PositionBehaviour"};
 
 -- [ HoverEffect ] --
+type HoverEffect = {
+    Highlight: EnumItem,
+    Reveal: EnumItem,
+    None: EnumItem,
+};
 Enumeration.HoverEffect = {};
 Enumeration.HoverEffect.Highlight = {Name="Highlight",EnumType="HoverEffect"};
 Enumeration.HoverEffect.Reveal = {Name="Reveal",EnumType="HoverEffect"};
 Enumeration.HoverEffect.None = {Name="None",EnumType="HoverEffect"};
 
 -- [ Active Behaviour ] --
-
+type ActiveBehaviour = {
+    ExpandedStroke: EnumItem,
+    BorderStroke: EnumItem,
+    None: EnumItem,
+};
 Enumeration.ActiveBehaviour = {};
 Enumeration.ActiveBehaviour.ExpandedStroke = {Name="ExpandedStroke",EnumType="ActiveBehaviour"};
 Enumeration.ActiveBehaviour.BorderStroke = {Name="BorderStroke",EnumType="ActiveBehaviour"};
 Enumeration.ActiveBehaviour.None = {Name="None",EnumType="ActiveBehaviour"};
 
 -- [ Ripple Style ] --
-
+type RippleStyle = {
+    Dynamic: EnumItem,
+    Static: EnumItem,
+    None: EnumItem,
+};
 Enumeration.RippleStyle = {};
 Enumeration.RippleStyle.Dynamic = {Name="Dynamic",EnumType="RippleStyle"};
 Enumeration.RippleStyle.Static = {Name="Static",EnumType="RippleStyle"};
 Enumeration.RippleStyle.None = {Name="None",EnumType="RippleStyle"};
 
 -- [ DropdownState ] --
+type DropdownState = {
+    Collapsed: EnumItem,
+    Expanded: EnumItem,
+};
 Enumeration.DropdownState = {};
 Enumeration.DropdownState.Collapsed = {Name="Collapsed",EnumType="DropdownState"};
 Enumeration.DropdownState.Expanded = {Name="Expanded",EnumType="DropdownState"};
 
 -- [ KeyCode ] --
-
+type KeyCode = {
+    Unknown: EnumItem,
+    Zero: EnumItem,
+    One: EnumItem,
+    Two: EnumItem,
+    Three: EnumItem,
+    Four: EnumItem,
+    Five: EnumItem,
+    Six: EnumItem,
+    Seven: EnumItem,
+    Eight: EnumItem,
+    Nine: EnumItem,
+    A: EnumItem,
+    B: EnumItem,
+    C: EnumItem,
+    D: EnumItem,
+    E: EnumItem,
+    F: EnumItem,
+    G: EnumItem,
+    H: EnumItem,
+    I: EnumItem,
+    J: EnumItem,
+    K: EnumItem,
+    L: EnumItem,
+    M: EnumItem,
+    N: EnumItem,
+    O: EnumItem,
+    P: EnumItem,
+    Q: EnumItem,
+    R: EnumItem,
+    S: EnumItem,
+    T: EnumItem,
+    U: EnumItem,
+    V: EnumItem,
+    W: EnumItem,
+    X: EnumItem,
+    Y: EnumItem,
+    Z: EnumItem,
+};
 --//Keyboard
 Enumeration.KeyCode = {};
 Enumeration.KeyCode.Unknown = {Name = "Unknown",ReferenceImage = nil,ConsoleLink = nil,EnumType="KeyCode"};
@@ -222,6 +339,14 @@ Enumeration.KeyCode.Thumbstick2 = {};
 
 
 -- [ Adjustment ] --
+type Adjustment = {
+	Center: EnumItem,
+	Left: EnumItem,
+	Right: EnumItem,
+	Flex: EnumItem,
+	Top: EnumItem,
+	Bottom: EnumItem,
+};
 Enumeration.Adjustment = {};
 Enumeration.Adjustment.Center = {};
 Enumeration.Adjustment.Left = {};
@@ -231,11 +356,19 @@ Enumeration.Adjustment.Top = {};
 Enumeration.Adjustment.Bottom = {};
 
 -- [ DoorActivationType ] --
+type DoorActivationType = {
+	Prompt: EnumItem,
+	Proximity: EnumItem,
+};
 Enumeration.DoorActivationType = {};
 Enumeration.DoorActivationType.Prompt = {};
 Enumeration.DoorActivationType.Proximity = {};
 
 -- [ PlaceholderBehaviour ] --
+type PlaceholderBehaviour = {
+	Default: EnumItem,
+	Margin: EnumItem,
+};
 Enumeration.PlaceholderBehaviour = {};
 Enumeration.PlaceholderBehaviour.Default = {};
 Enumeration.PlaceholderBehaviour.Margin = {};
@@ -313,5 +446,33 @@ for EnumerationReference,EnumerationData in pairs(Enumeration) do
 	
 	EnumObjects[EnumerationReference]=newEnumObject;
 end;
+
+export type Enumeration = {
+    NotificationPriority: NotificationPriority,
+	TransitionDirection: TransitionDirection,
+	CloseButtonBehaviour: CloseButtonBehaviour,
+	ConnectionStatus: ConnectionStatus,
+	FaceDirection: FaceDirection,
+	AI: AI,
+	AccordionButtonPosition: AccordionButtonPosition,
+	LigamentType: LigamentType,
+	CameraMovementType: CameraMovementType,
+	ProductPurchaseState: ProductPurchaseState,
+	PromptType: PromptType,
+	Device: Device,
+	Exclusivity: Exclusivity,
+	NotificationAnimationStyle: NotificationAnimationStyle,
+	ActionMenuAutomaticHide: ActionMenuAutomaticHide,
+	PositionBehaviour: PositionBehaviour,
+	HoverEffect: HoverEffect,
+	ActiveBehaviour: ActiveBehaviour,
+	RippleStyle: RippleStyle,
+	DropdownState: DropdownState,
+	KeyCode: KeyCode,
+	Adjustment: Adjustment,
+	DoorActivationType: DoorActivationType,
+	PlaceholderBehaviour: PlaceholderBehaviour,
+	
+};
 
 return EnumObjects;

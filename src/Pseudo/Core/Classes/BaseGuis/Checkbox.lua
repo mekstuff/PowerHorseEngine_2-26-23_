@@ -1,4 +1,5 @@
-local Theme = require(script.Parent.Parent.Parent.Theme);
+local Types = require(script.Parent.Parent.Parent.Parent.Parent.Types);
+local Theme:Types.Theme = require(script.Parent.Parent.Parent.Theme)::any;
 local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
 
 local Checkbox = {
@@ -38,7 +39,7 @@ Checkbox.__inherits = {"BaseGui","Frame"}
 	having a Checkbox followed by a license agreement, you may want to allow
 	the user to click the license agreeement text and trigger the toggle on the checkbox
 ]=]
-function Checkbox:Link(Pseudo:Instance):nil
+function Checkbox:Link(Pseudo:Types.Button):nil
 	local function trigger()
 		if(not self.AutoToggle)then return end;
 		self.Toggle = not self.Toggle;

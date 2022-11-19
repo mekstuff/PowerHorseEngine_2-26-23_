@@ -10,8 +10,8 @@
 local LanzoCoreUtil = {}
 local App;
 local Classes = script.Parent.Classes;
-local Core = require(script.Parent);
-local ModuleFetcher = require(script.Parent.Parent.Parent.Core.Providers.Constants.ModuleFetcher);
+local Core = require(script.Parent)::any;
+local ModuleFetcher = require(script.Parent.Parent.Parent.Core.Providers.Constants.ModuleFetcher)::any;
 local ReplicationService = ModuleFetcher("ReplicationService",script.Parent.Parent.Parent.Core.Services);
 local SerializationService = ModuleFetcher("SerializationService",script.Parent.Parent.Parent.Core.Services);
 
@@ -26,9 +26,9 @@ local function getIsComponentOf(x)
 end
 
 local PseudoModule;
-local function getPseudo(...:any):table
+local function getPseudo(...:any):any
 	if(not PseudoModule)then 
-		PseudoModule = require(script.Parent.Parent);
+		PseudoModule = require(script.Parent.Parent)::any;
 	end;
 	return PseudoModule.getPseudo(...);
 end
@@ -70,7 +70,7 @@ local function getStringValueOfUnknownDataType(Value:any,k:string):string|nil
 end
 
 --//
-local function _getParent(v:any):Instance
+local function _getParent(v:any):Instance|nil
 	if(not v)then return nil;end;
 	if(typeof(v) == "string" and v:match("^%*%*")) then
 		return nil;
@@ -104,7 +104,7 @@ local function getClassModule(Class:string):any
 	return ModuleFetcher(Class,Classes,nil,true);
 end;
 --
-local function getModuleProps(Module:table,Sheet:string):nil
+local function getModuleProps(Module:table,Sheet:any):nil
 	for property,value in pairs(Module)do		
 		if(Sheet[property] == nil and not string.match(property, "^__%a"))then
 			Sheet[property]=value;
@@ -114,7 +114,7 @@ local function getModuleProps(Module:table,Sheet:string):nil
 end
 
 --> Main Rendering for :_Render
-local function renderAsync(renderMap:table,prop:string,value:any,_ReferenceInstance:Instance,QuickMap:table?, me:any):nil
+local function renderAsync(renderMap:table?,prop:string,value:any,_ReferenceInstance:Instance,QuickMap:table?, me:any):nil
 	if(typeof(value) == "string" and value:match("^%*%*"))then
 		return;
 	end;
@@ -348,9 +348,9 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 					if(getIsComponentOf(ReferenceInstanceParent))then
 						ReferenceInstanceParent = ReferenceInstanceParent.Parent;
 					end;
-
 					if(ReferenceInstanceParent and ReferenceInstanceParent:FindFirstChild("_pseudoid"))then
-						ReferenceInstanceParent = getPseudo(ReferenceInstanceParent["_pseudoid"].Value);
+						local _pseudoid:StringValue = ReferenceInstanceParent:FindFirstChild("_pseudoid");
+						ReferenceInstanceParent = getPseudo(_pseudoid.Value);
 					end;
 				end
 				return ReferenceInstanceParent;
