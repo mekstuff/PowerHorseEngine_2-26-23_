@@ -176,7 +176,6 @@ end;
 ]=]
 function PHePluginAppHandler.CreatePHeLibraryObject(LibraryFolder:Folder,toolbar:PluginToolbar,plugin:Plugin)
     local App = require(script.Parent.Parent.Parent.Parent);
-	-- local App = PHePluginAppHandler._app;
 	local ErrorService = App:GetService("ErrorService");
 	local CustomClassService = App:GetService("CustomClassService");
 	
