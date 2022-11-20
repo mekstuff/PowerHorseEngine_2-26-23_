@@ -423,7 +423,7 @@ export type Engine = {
     InitServer: (self:any,PushPackages:boolean?)->nil,
     InitClient: (self:any,Client:Player?)->nil,
     RequestContentFolder: (self:any)->Folder,
-    RequestConfig: (self:any)->userConfigModule,
+    RequestConfig: (self:any,NotImportant:boolean?)->{}|nil,
     RequestUserGameContent: (self:any)->userConfigGameContent,
     FetchReplicatedStorage: (self:any)->Folder,
     FetchWorkspaceStorage: (self:any)->Folder,

@@ -143,7 +143,15 @@ function Engine:RequestContentFolder()
 	return waitForContentFolder();
 end;
 --[=[]=]
-function Engine:RequestConfig()
+function Engine:RequestConfig(NotImportant:boolean?):{}|nil
+	if(NotImportant)then
+		local x = self:RequestContentFolder():FindFirstChild("Config");
+		if(x)then
+			return require(x);
+		else
+			return nil;
+		end;
+	end
 	return require(self:RequestContentFolder():WaitForChild("Config"));
 end
 --[=[]=]

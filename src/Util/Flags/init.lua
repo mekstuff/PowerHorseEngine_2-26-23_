@@ -19,9 +19,11 @@ function Flags:Init()
     if(PluginService:IsPluginMode())then
         return;
     end
-    local Config = Engine:RequestConfig();
+    local Config = Engine:RequestConfig(true);
+    if(not Config)then
+        return;
+    end;
     local flags = Config["-flags"] or Config["-lanzo"] or {};
-
     for _,flag in pairs(flags) do
         local flagname,flagvalue = flag:match("(.*){(.*)}");
         flagname = flagname:gsub(" ",""):gsub("_","-");
