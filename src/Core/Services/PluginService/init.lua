@@ -12,7 +12,7 @@ local PHeAppHandler = require(script.PHeAppHandler);
 --[=[
 	@return PHePluginLibraryObject
 ]=]
-function PluginService:BuildAsPHeApp(pluginApp:table,toolbar:PluginToolbar?,plugin:Plugin?)
+function PluginService:BuildAsPHeApp(pluginApp:Folder,toolbar:PluginToolbar?,plugin:Plugin?)
 	if(not plugin)then plugin = self:ReadSync().currentPlugin;end;
 	assert(pluginApp and plugin,("PluginApp file or plugin is missing when trying to :BuildAsPHeApp. You passed %s as your app and %s as your plugin."):format(tostring(pluginApp),tostring(plugin)))
 	if(not toolbar)then

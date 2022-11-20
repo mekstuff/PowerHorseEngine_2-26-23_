@@ -14,7 +14,7 @@ type CreateCustomClassMethod = (self:any,ClassData:PseudoClass)->(Pseudo);
 type x = (("a") -> true);
 
 
-export type App = any&{
+export type App = {
     new:
 --> BaseGui's 
         (("Accordion") -> Accordion)
@@ -22,14 +22,18 @@ export type App = any&{
         &(("AppBar") -> AppBar)
         &(("Button") -> Button)
         &(("Checkbox") -> Checkbox)
+        &(("Frame") -> Frame)
         &(("Modal") -> Modal)
         &(("Prompt") -> Prompt)
         &(("Promise") -> Promise)
         &(("BaseCharacterRig") -> BaseCharacterRig)
         &(("AICharacterRig") -> AICharacterRig)
-        &(("AIPet") -> AIPet)
+        &(("TabGroup") -> TabGroup)
         &(("Text") -> Text)
+--> States
+        &(("State") -> State)
 --> AI
+        &(("AIPet") -> AIPet)
         &(("AICharacterRig") -> AICharacterRig)
 --> Servants
         &(("Servant") -> Servant),
@@ -175,11 +179,24 @@ export type GUI = {
 
 };
 export type PHeGUI = GUI;
+
+export type TabGroup = Pseudo&BaseGui&{
+    HighlighterColor3: Color3,
+    HighlighterThickness: number,
+    HighlighterPadding: number,
+    AddTab: (self:any,TabContent:(Pseudo|Instance|any),TabName:string|{},TabIcon:string?,TabId:any?,TabButtonProps:{}?)->Button,
+    OpenTab: (self:any,TabId:any)->nil,
+    TabSwitched: PHeSignal<any>
+};
+
+export type PHeTabGroup = TabGroup;
+
 export type Text = {
 
 };
 export type PHeText = Text;
-export type Frame = {
+
+export type Frame = Pseudo&BaseGui&{
     MouseButton1Down: PHeSignal<nil>,
     MouseButton2Down: PHeSignal<nil>,
     MouseButton1Up: PHeSignal<nil>,
@@ -305,6 +322,50 @@ export type PHeModalPrompt = Prompt;
 
 
 --> Services
+type PHePluginStudioTool_dev = {}
+type PHePluginStudioTool_initreturn = {
+    name: string,
+    id: string,
+    icon: string?,
+    toolboxbutton:boolean?,
+}
+
+type launch = (self:any)->nil;
+export type PHePluginStudioTool = {
+    init: ()->PHePluginStudioTool_initreturn,
+    launch: launch?,
+    initiated: (self:any)->nil,
+    open: (self:any)->nil,
+    close: (self:any)->nil,
+    [string]: any
+};
+
+export type PHePluginLibraryObject = Pseudo&{
+    onReady: ()->nil,
+    CreateStudioTool: (self:any,ClassInfo:PHePluginStudioTool)->nil,
+    CreateDockWidgetPluginGui: (self:any,WidgetName:string,WidgetInfo:DockWidgetPluginGuiInfo)->DockWidgetPluginGui,
+    CreatePluginMenu: (self:any,id:any,name:string?)->PluginMenu,
+    SavePluginData: (self:any,key:any,value:any)->nil,
+    GetPluginData: (self:any,key:any,value:any)->nil,
+    SendNotification: (self:any,t:any)->nil,
+}
+
+
+
+export type PHePluginAppHandler = {
+    IsProperLibraryFile: (libfile:Folder)->boolean,
+    getModulesfolder: (libfile:Folder)->Folder,
+    addTool: (App:App,ToolData:table,ManifestName:string,toolbar:PluginToolbar)->Folder,
+    createPHeLibraryObject: (LibraryFolder:Folder,toolbar:PluginToolbar,plugin:Plugin)->nil,
+};
+
+export type PluginService = {
+    BuildAsPHeApp: (self:any,pluginApp:Folder,PluginToolbar:PluginToolbar?,plugin:Plugin?)->nil,
+    IsPluginMode: (self:any)->boolean,
+    ReadSync: (self:any)->{}?,
+};
+export type PHePluginService = PluginService;
+
 export type AudioChannelAudio = Pseudo&{
     Play:(self:any)->nil,
     Resume:(self:any)->nil,

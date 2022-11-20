@@ -182,7 +182,7 @@ function PHePluginAppHandler.CreatePHeLibraryObject(LibraryFolder:Folder,toolbar
 	
 	local isProperyLibrary = PHePluginAppHandler.IsProperLibrary(LibraryFolder);
 	if(isProperyLibrary.success)then
-		local Manifest = require(LibraryFolder["$Manifest"]);
+		local Manifest = require(LibraryFolder:FindFirstChild("$Manifest"));
 		
 		--[=[
 			@class PHePluginLibraryObject
@@ -233,7 +233,7 @@ function PHePluginAppHandler.CreatePHeLibraryObject(LibraryFolder:Folder,toolbar
 			return PHePluginAppHandler._plugin:SetSetting(key,value);
 		end;
 		--[=[]=]
-		function PHePluginLibraryObject:GetPluginData(key:any,value:any)
+		function PHePluginLibraryObject:GetPluginData(key:any)
 			key = key.."-"..Manifest.Name;
 			return PHePluginAppHandler._plugin:GetSetting(key);
 		end;
@@ -297,7 +297,7 @@ function PHePluginAppHandler.CreatePHeLibraryObject(LibraryFolder:Folder,toolbar
 					end
 					
 					local PHeDocs = GeneratedClass:GetAPI("PHeDocs");
-					PHeDocs.CreateDocumentation(LibraryFolder["$Docs"]).Parent = self._mainWidget;
+					PHeDocs.CreateDocumentation(LibraryFolder:FindFirstChild("$Docs")).Parent = self._mainWidget;
 					
 				self._mainWidget.Enabled = true;
 				self._enabled = true;
