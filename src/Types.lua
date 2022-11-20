@@ -9,15 +9,35 @@ local App = script.Parent;
 local Types = {};
 
 type CreateCustomClass = (ClassData:PseudoClass)->(Pseudo);
-type CreateCustomClassMethod = <T>(self:any,ClassData:PseudoClass)->(Pseudo);
+type CreateCustomClassMethod = (self:any,ClassData:PseudoClass)->(Pseudo);
+
+type x = (("a") -> true);
+
 
 export type App = any&{
-	new: (PseudoName:string,...any)->any,
+    new:
+--> BaseGui's 
+        (("Accordion") -> Accordion)
+        &(("ActionMenu") -> ActionMenu)
+        &(("AppBar") -> AppBar)
+        &(("Button") -> Button)
+        &(("Checkbox") -> Checkbox)
+        &(("Modal") -> Modal)
+        &(("Prompt") -> Prompt)
+        &(("Promise") -> Promise)
+        &(("BaseCharacterRig") -> BaseCharacterRig)
+        &(("AICharacterRig") -> AICharacterRig)
+        &(("AIPet") -> AIPet)
+        &(("Text") -> Text)
+--> AI
+        &(("AICharacterRig") -> AICharacterRig)
+--> Servants
+        &(("Servant") -> Servant),
 	-- Enumeration: Enumeration.Enumeration,
 	-- Enum: Enumeration.Enumeration,
 	Create: CreateCustomClass,
 	GetGlobal: (self:any,GlobalName:string)->any,
-	GetService: (self:any,ServiceName:string)->any,
+    GetService: (self:any,ServiceName:string)->any,
 	GetProvider: (self:any,ProviderName:string)->any,
 	Import: (self:any,libraryName:string)->any,
 	GetConfig: (self:any)->any,
@@ -35,40 +55,41 @@ export type Pseudo = {
 	Name: string,
 	ClassName: string,
 	Parent: Instance|Pseudo|any,
-    GetFullName: <T>(self:Pseudo)->string,
-    WaitForChild: <T>(self:Pseudo,Name:string,onlyPseudo:boolean?,tries:number?)->Pseudo|Instance,
-    FindFirstAncestor: <T>(self:Pseudo,Name:string,level:number?)->Pseudo|Instance,
-    FindFirstAncestorOfClass: <T>(self:Pseudo,Name:string,level:number?)->Pseudo|Instance,
-    FindFirstAncestorWhichIsA: <T>(self:Pseudo,Name:string,level:number?)->Pseudo|Instance,
-    FindFirstChild: <T>(self:Pseudo,Name:string,recursive:boolean?,onlyPseudo:boolean?)->Pseudo|Instance,
-    FindFirstChildOfClass: <T>(self:Pseudo,Name:string)->Pseudo|Instance,
-    FindFirstChildWhichIsA: <T>(self:Pseudo,Name:string)->Pseudo|Instance,
-    GetDescendants: <T>(self:Pseudo)->any,
-    GetChildren: <T>(self:Pseudo,onlyPseudo:boolean?)->any,
-    SerializePropsAsync: <T>(self:Pseudo)->string,
-    DeserializePropsAsync: <T>(self:Pseudo,Serialized:string,Apply:boolean?)->any,
-    GET: <T>(self:Pseudo,Target:string)->any?,
-    Clone: <T>(self:Pseudo)->Pseudo?,
-    Destroy: <T>(self:Pseudo)->nil,
-    GetPropertyChangedSignal: <T>(self:Pseudo)->nil,
-    IsA: <T>(self:Pseudo,ClassQuery:string)->boolean,
-    _GetAppModule: <T>(self:any)->App,
-    _GetCompRef: <T>(self:Pseudo)->Instance,
-    GetRef: <T>(self:Pseudo)->Folder,
-    AddEventListener: <T>(self:Pseudo,EventName:string,CreatingEvent:boolean?,BindCreateToEvent:BindableEvent?,SharedSignal:boolean?)->PHeSignal<nil>,
-    RemoveEventListener: <T>(self:Pseudo,Events:string|any)->nil,
-    RemoveEventListeners: <T>(self:Pseudo)->nil,
-    GetEventListener: <T>(self:Pseudo)->PHeSignal<nil>,
-    _lockProperty: <T>(self:Pseudo,propertyName:string,propertyCallback:any)->nil,
-    _lockProperties: <T>(self:Pseudo,properties:string|any)->nil,
-    _unlockProperty: <T>(self:Pseudo,propertyNames:string|any)->nil,
+    GetFullName: (self:Pseudo)->string,
+    WaitForChild: (self:Pseudo,Name:string,onlyPseudo:boolean?,tries:number?)->Pseudo|Instance,
+    FindFirstAncestor: (self:Pseudo,Name:string,level:number?)->Pseudo|Instance,
+    FindFirstAncestorOfClass: (self:Pseudo,Name:string,level:number?)->Pseudo|Instance,
+    FindFirstAncestorWhichIsA: (self:Pseudo,Name:string,level:number?)->Pseudo|Instance,
+    FindFirstChild: (self:Pseudo,Name:string,recursive:boolean?,onlyPseudo:boolean?)->Pseudo|Instance,
+    FindFirstChildOfClass: (self:Pseudo,Name:string)->Pseudo|Instance,
+    FindFirstChildWhichIsA: (self:Pseudo,Name:string)->Pseudo|Instance,
+    GetDescendants: (self:Pseudo)->any,
+    GetChildren: (self:Pseudo,onlyPseudo:boolean?)->any,
+    SerializePropsAsync: (self:Pseudo)->string,
+    DeserializePropsAsync: (self:Pseudo,Serialized:string,Apply:boolean?)->any,
+    GET: (self:Pseudo,Target:string)->any?,
+    Clone: (self:Pseudo)->Pseudo?,
+    Destroy: (self:Pseudo)->nil,
+    GetPropertyChangedSignal: (self:Pseudo)->nil,
+    IsA: (self:Pseudo,ClassQuery:string)->boolean,
+    _GetAppModule: (self:any)->App,
+    _GetCompRef: (self:Pseudo)->Instance,
+    GetRef: (self:Pseudo)->Folder,
+    AddEventListener: (self:Pseudo,EventName:string,CreatingEvent:boolean?,BindCreateToEvent:BindableEvent?,SharedSignal:boolean?)->PHeSignal<nil>,
+    RemoveEventListener: (self:Pseudo,Events:string|any)->nil,
+    RemoveEventListeners: (self:Pseudo)->nil,
+    GetEventListener: (self:Pseudo)->PHeSignal<nil>,
+    _lockProperty: (self:Pseudo,propertyName:string,propertyCallback:any)->nil,
+    _lockProperties: (self:Pseudo,properties:string|any)->nil,
+    _unlockProperty: (self:Pseudo,propertyNames:string|any)->nil,
     [string]: any?
     -- _Render: PseudoRender
 }
 
 
-type useEffect = (Handler:any, Depedencies:any?) -> nil
-type useRender = () -> nil
+type useEffect = (Handler:any, Depedencies:any?) -> Servant
+type useRender = (Handler:any, Depedencies:any?) -> Servant
+type useMapping = (props:{string},depedencies:{Instance|Pseudo|any}) -> nil
 
 type StateFunctionalCall = () -> any
 export type State = Pseudo&StateFunctionalCall&{
@@ -79,6 +100,7 @@ export type PHeState = State;
 export type PseudoHooks = {
     useEffect: useEffect,
     useRender: useRender,
+    useMapping: useMapping,
 }
 
 -- export type Enumeration = Enumeration.Enumeration;
@@ -97,14 +119,31 @@ export type Servant = Pseudo&{
 export type PHeServant = Servant;
 --> Promises
 export type Promise = Pseudo&{
-    Try: <T>(self:any,handler:(resolve:any,reject:any,cancel:any)->nil) -> Promise,
-    Then: <T>(self:any,handler:(res:any)->nil) -> Promise,
-    Catch: <T>(self:any,handler:(err:any)->nil) -> Promise,
-    Cancel: <T>(self:any,handler:(err:any)->nil) -> Promise,
+    Try: (self:any,handler:(resolve:any,reject:any,cancel:any)->nil) -> Promise,
+    Then: (self:any,handler:(res:any)->nil) -> Promise,
+    Catch: (self:any,handler:(err:any)->nil) -> Promise,
+    Cancel: (self:any,handler:(err:any)->nil) -> Promise,
 };
 export type PHePromise = Promise;
 
 --> AI
+export type AI = {
+
+};
+export type BaseCharacterRig = {
+    GetClothing: (self:any)->{};
+    DestroyClothing: (self:any)->nil;
+    GetCharactersInRadius: (self:any, Radius:number?)->{}
+};
+export type PHeBaseCharacterRig = BaseCharacterRig;
+
+export type AICharacterRig = Pseudo&AI&BaseCharacterRig&{
+    ShirtTemplate: string,
+    PantsTemplate: string,
+    WalkToPoint: Vector3,
+    WalkToPart: BasePart,
+};
+export type PHeAICharacterRig = AICharacterRig;
 export type AIPet = Pseudo&{
     IdleAnimation: string,
     WalkAnimation: string,
@@ -267,25 +306,25 @@ export type PHeModalPrompt = Prompt;
 
 --> Services
 export type AudioChannelAudio = Pseudo&{
-    Play:<T>(self:any)->nil,
-    Resume:<T>(self:any)->nil,
-    Pause:<T>(self:any)->nil,
-    Stop:<T>(self:any)->nil,
+    Play:(self:any)->nil,
+    Resume:(self:any)->nil,
+    Pause:(self:any)->nil,
+    Stop:(self:any)->nil,
     isDefaultAudio: boolean,
 };
 export type PHeAudioChannelAudio = AudioChannelAudio;
 export type AudioChannel = Pseudo&{
-    AddAudio:<T>(self:Pseudo,AudioName:string,AudioID:number,AudioVolume:number?,Looped:boolean?,PlayAudio:boolean?,Instant:boolean?)->AudioChannelAudio,
-    SetAudioMuted:<T>(self:any,AudioName:string,State:boolean,AudioInstance:any)->nil,
-    GetAudio:<T>(self:any,AudioName:string)->AudioChannelAudio,
-    GetAudios:<T>(self:any)->nil,
-    SetDefaultAudio:<T>(self:any,AudioName:string)->nil,
-    SetVolume:<T>(self:any,Volume:number)->nil,
-    Mute:<T>(self:any)->nil,
-    UnMute:<T>(self:any)->nil,
-    PlayAudio:<T>(self:any,AudioName:string,FromPaused:boolean?)->nil,
-    StopAudio:<T>(self:any,AudioName:string,ignoreDefault:boolean?)->nil,
-    PauseAudio:<T>(self:any,AudioName:string,ignoreDefault:boolean?,DoNotRemove:boolean?)->nil,
+    AddAudio:(self:Pseudo,AudioName:string,AudioID:number,AudioVolume:number?,Looped:boolean?,PlayAudio:boolean?,Instant:boolean?)->AudioChannelAudio,
+    SetAudioMuted:(self:any,AudioName:string,State:boolean,AudioInstance:any)->nil,
+    GetAudio:(self:any,AudioName:string)->AudioChannelAudio,
+    GetAudios:(self:any)->nil,
+    SetDefaultAudio:(self:any,AudioName:string)->nil,
+    SetVolume:(self:any,Volume:number)->nil,
+    Mute:(self:any)->nil,
+    UnMute:(self:any)->nil,
+    PlayAudio:(self:any,AudioName:string,FromPaused:boolean?)->nil,
+    StopAudio:(self:any,AudioName:string,ignoreDefault:boolean?)->nil,
+    PauseAudio:(self:any,AudioName:string,ignoreDefault:boolean?,DoNotRemove:boolean?)->nil,
     MuteChanged: PHeSignal<nil>,
     AudioAdded: PHeSignal<nil>,
     AudioRemoved: PHeSignal<nil>,
@@ -295,13 +334,13 @@ export type AudioChannel = Pseudo&{
 };
 export type PHeAudioChannel = AudioChannel;
 export type AudioService = {
-    GetChannel:<T>(self:any,ChannelName:string)->AudioChannel,
-    GetChannels:<T>(self:any)->any,
-    RemoveChannel:<T>(self:any,ChannelName:string)->nil,
-    CreateSoundEffectsChannel:<T>(self:any,ChannelName:string?)->AudioChannel,
-    CreateChannel:<T>(self:any,ChannelName:string,AudiosAllowedInParallel:number?,DefaultVolume:number?,DefaultLoop:boolean?,AudiosInstant:boolean?)->AudioChannel,
-    MuteChannel:<T>(self:any,ChannelName:string)->nil,
-    UnmuteChannel:<T>(self:any,ChannelName:string)->nil,  
+    GetChannel:(self:any,ChannelName:string)->AudioChannel,
+    GetChannels:(self:any)->any,
+    RemoveChannel:(self:any,ChannelName:string)->nil,
+    CreateSoundEffectsChannel:(self:any,ChannelName:string?)->AudioChannel,
+    CreateChannel:(self:any,ChannelName:string,AudiosAllowedInParallel:number?,DefaultVolume:number?,DefaultLoop:boolean?,AudiosInstant:boolean?)->AudioChannel,
+    MuteChannel:(self:any,ChannelName:string)->nil,
+    UnmuteChannel:(self:any,ChannelName:string)->nil,  
 };
 export type PHeAudioService = AudioService;
 export type PseudoClassFunctionalRender = (PseudoHooks:PseudoHooks) -> nil
@@ -355,18 +394,18 @@ export type Theme = {
 export type PHeTheme = Theme;
 
 export type FormatGlobalObject = {
-    concat: <T>(self:any,ConcatVal:any) -> FormatGlobalObject,
-    toNumber: <T>(self:any) -> FormatGlobalObject,
-    toString: <T>(self:any) -> FormatGlobalObject,
-    atStart: <T>(self:any,State:any) -> FormatGlobalObject,
-    atEnd: <T>(self:any,State:any) -> FormatGlobalObject,
-    toTimeDifference: <T>(self:any,format:string) -> (FormatGlobalObject,any),
-    toDateFormat: <T>(self:any,useString:boolean?,shortenString:boolean?,indicateDayAsNumber:boolean?) -> (string),
-    toTimeFormat: <T>(self:any) -> (string),
-    fromUnixStamp: <T>(self:any,is12Hour:boolean) -> FormatGlobalObject,
-    toNumberAbbreviation: <T>(self:any,tuple:any?) -> FormatGlobalObject,
-    toNumberCommas: <T>(self:any) -> FormatGlobalObject,
-    End: <T>(self:any) -> any,
+    concat: (self:any,ConcatVal:any) -> FormatGlobalObject,
+    toNumber: (self:any) -> FormatGlobalObject,
+    toString: (self:any) -> FormatGlobalObject,
+    atStart: (self:any,State:any) -> FormatGlobalObject,
+    atEnd: (self:any,State:any) -> FormatGlobalObject,
+    toTimeDifference: (self:any,format:string) -> (FormatGlobalObject,any),
+    toDateFormat: (self:any,useString:boolean?,shortenString:boolean?,indicateDayAsNumber:boolean?) -> (string),
+    toTimeFormat: (self:any) -> (string),
+    fromUnixStamp: (self:any,is12Hour:boolean) -> FormatGlobalObject,
+    toNumberAbbreviation: (self:any,tuple:any?) -> FormatGlobalObject,
+    toNumberCommas: (self:any) -> FormatGlobalObject,
+    End: (self:any) -> any,
 };
 export type PHeFormatGlobalObject = FormatGlobalObject;
 export type FormatGlobal = (defaultValues:any) -> FormatGlobalObject;
@@ -380,17 +419,17 @@ type userConfigModule = {
 }
 
 export type Engine = {
-    InitPlugin: <T>(self:any,plugin:Plugin)->nil,
-    InitServer: <T>(self:any,PushPackages:boolean?)->nil,
-    InitClient: <T>(self:any,Client:Player?)->nil,
-    RequestContentFolder: <T>(self:any)->Folder,
-    RequestConfig: <T>(self:any)->userConfigModule,
-    RequestUserGameContent: <T>(self:any)->userConfigGameContent,
-    FetchReplicatedStorage: <T>(self:any)->Folder,
-    FetchWorkspaceStorage: <T>(self:any)->Folder,
-    FetchLocalEvents: <T>(self:any)->Folder,
-    FetchServerStorage: <T>(self:any)->Folder,
-    FetchStorageEvent: <T>(self:any,EventType:string,EventType:string?)->RemoteEvent|RemoteFunction|BindableEvent?,
+    InitPlugin: (self:any,plugin:Plugin)->nil,
+    InitServer: (self:any,PushPackages:boolean?)->nil,
+    InitClient: (self:any,Client:Player?)->nil,
+    RequestContentFolder: (self:any)->Folder,
+    RequestConfig: (self:any)->userConfigModule,
+    RequestUserGameContent: (self:any)->userConfigGameContent,
+    FetchReplicatedStorage: (self:any)->Folder,
+    FetchWorkspaceStorage: (self:any)->Folder,
+    FetchLocalEvents: (self:any)->Folder,
+    FetchServerStorage: (self:any)->Folder,
+    FetchStorageEvent: (self:any,EventType:string,EventType:string?)->RemoteEvent|RemoteFunction|BindableEvent?,
 }
 export type PHeEngine = Engine;
 --> Built in libraries
@@ -402,42 +441,53 @@ export type PHeStateLibrary = StateLibrary;
 export type PointerLibrary = (Instance:Instance,Parent:any?) -> Pseudo;
 
 export type FrameworkLibraryService = {
-    Init: <T>(self:any)->(nil)?,
-    Start: <T>(self:any)->nil,
-    GetService: <T>(self:any,ServiceName:string)->FrameworkLibraryService,
-    GetComponentClass: <T>(self:any,ComponentClassName:string)->any,
-    UseChannel: <T>(self:any, ChannelName:string)->RemoteEvent,
+    Init: (self:any)->(nil)?,
+    Start: (self:any)->nil,
+    GetService: (self:any,ServiceName:string)->FrameworkLibraryService,
+    GetComponentClass: (self:any,ComponentClassName:string)->any,
+    UseChannel: (self:any, ChannelName:string)->RemoteEvent,
     Shared: any?
 };
 export type PHeFrameworkLibraryService = FrameworkLibraryService;
 export type FrameworkLibraryServer = {
-    Start: <T>(self:any)->Promise,
-    PortService: <T>(self:any,Service:ModuleScript)->FrameworkLibraryService,
-    PortServices: <T>(self:any,Services:Folder|any)->nil,
-    PortComponentClass: <T>(self:any,ComponentClass:ModuleScript)->nil,
-    PortComponentClasses: <T>(self:any,ComponentClasses:Folder|any)->nil,
-    GetComponentClass: <T>(self:any,ComponentClassName:string)->any,
-    GetService: <T>(self:any,ServiceName:string)->FrameworkLibraryService,
+    Start: (self:any)->Promise,
+    PortService: (self:any,Service:ModuleScript)->FrameworkLibraryService,
+    PortServices: (self:any,Services:Folder|any)->nil,
+    PortComponentClass: (self:any,ComponentClass:ModuleScript)->nil,
+    PortComponentClasses: (self:any,ComponentClasses:Folder|any)->nil,
+    GetComponentClass: (self:any,ComponentClassName:string)->any,
+    GetService: (self:any,ServiceName:string)->FrameworkLibraryService,
 };
 export type PHeFrameworkLibraryServer = FrameworkLibraryServer;
 export type FrameworkLibraryModular = Pseudo&{
-    Init: <T>(self:any)->nil,
-    Start: <T>(self:any)->nil,
-    GetModular: <T>(self:any,ServiceName:string)->FrameworkLibraryModular,
-    GetComponentClass: <T>(self:any,ComponentClassName:string)->any,
-    UseChannel: <T>(self:any, ChannelName:string)->RemoteEvent,
+    Init: (self:any)->nil,
+    Start: (self:any)->nil,
+    GetModular: (self:any,ServiceName:string)->FrameworkLibraryModular,
+    GetComponentClass: (self:any,ComponentClassName:string)->any,
+    UseChannel: (self:any, ChannelName:string)->RemoteEvent,
 };
 export type PHeFrameworkLibraryModular = FrameworkLibraryModular;
 export type FrameworkLibraryClient = {
-    Start: <T>(self:any)->Promise,
-    PortModular: <T>(self:any,Service:ModuleScript)->FrameworkLibraryModular,
-    PortModulars: <T>(self:any,Services:Folder|any)->nil,
-    PortComponentClass: <T>(self:any,ComponentClass:ModuleScript)->nil,
-    PortComponentClasses: <T>(self:any,ComponentClasses:Folder|any)->nil,
-    GetComponentClass: <T>(self:any,ComponentClassName:string)->any,
-    GetService: <T>(self:any,ServiceName:string)->FrameworkLibraryModular,
-    GetModular: <T>(self:any,ServiceName:string)->FrameworkLibraryModular,
+    Start: (self:any)->Promise,
+    PortModular: (self:any,Service:ModuleScript)->FrameworkLibraryModular,
+    PortModulars: (self:any,Services:Folder|any)->nil,
+    PortComponentClass: (self:any,ComponentClass:ModuleScript)->nil,
+    PortComponentClasses: (self:any,ComponentClasses:Folder|any)->nil,
+    GetComponentClass: (self:any,ComponentClassName:string)->any,
+    GetService: (self:any,ServiceName:string)->FrameworkLibraryModular,
+    GetModular: (self:any,ServiceName:string)->FrameworkLibraryModular,
 };
-export type PHeFrameworkLibraryClient = FrameworkLibraryClient
+export type PHeFrameworkLibraryClient = FrameworkLibraryClient;
+
+export type CollectorLibrary = Pseudo&{
+    Bind: (self:any,Tag:string,handler:(Pseudo|Instance)->()?) -> Servant,
+    Unbind: (self:any,Binded:Servant) -> nil,
+    Tag: (self:any,Instances:table|Instance|Pseudo,TagName:string) -> nil,
+    AddTag: (self:any,Instances:table|Instance|Pseudo,TagName:string) -> nil,
+    RemoveTag: (self:any,Instances:table|Instance|Pseudo) -> nil,
+    Has: (self:any,Instance:Pseudo|Instance,TagName:string) -> boolean,
+    GetTagged: (self:any,TagName:string) -> table,
+};
+export type PHeCollectorLibrary = CollectorLibrary;
 
 return Types;

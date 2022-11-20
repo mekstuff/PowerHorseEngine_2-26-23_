@@ -14,7 +14,7 @@ local module = {
 	--AIType = Enumeration.AI.Human;
 };
 
-module.__inherits = {}
+module.__inherits = {"AI"}
 
 function module:GetTargetPosition()
 	if(not self.Target)then return Vector3.new(0,0,0);end;

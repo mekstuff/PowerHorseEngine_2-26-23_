@@ -31,12 +31,7 @@ local function getPseudo(...:any):any
 		PseudoModule = require(script.Parent.Parent)::any;
 	end;
 	return PseudoModule.getPseudo(...);
-end
-
-local CurrentlySupportedDATATYPES = {
-	"string","boolean","number","UDim","UDim2","BrickColor","Color3",
-	"Vector2","Vector3","NumberSequence","ColorSequence","NumberRange","Rect"
-};
+end;
 
 local readOnlyProperties = {"ClassName"};
 

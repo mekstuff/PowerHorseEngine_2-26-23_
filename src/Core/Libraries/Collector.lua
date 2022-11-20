@@ -1,4 +1,5 @@
 local CollectionService = game:GetService("CollectionService");
+local Types = require(script.Parent.Parent.Parent.Types);
 local CustomClassService = require(script.Parent.Parent.Services.CustomClassService);
 local PseudoService = require(script.Parent.Parent.Services.PseudoService);
 
@@ -82,7 +83,7 @@ end;
 --[=[
     @return Servant
 ]=]
-function Collector:Bind(Tag:string,Callback:any)
+function Collector:Bind(Tag:string,Callback:any):Types.Servant
     local App = self:_GetAppModule();
     local BindID = tostring(Callback);
     local BindServant = App.new("Servant");
@@ -129,7 +130,7 @@ end;
 --[=[
     @param Binded Servant
 ]=]
-function Collector:Unbind(Binded:Instance):nil
+function Collector:Unbind(Binded:Types.Servant):nil
     Binded:Destroy();
 end
 
