@@ -7,7 +7,7 @@ local Types = require(Services.Parent.Parent.Types);
 local PluginService = require(Services.PluginService);
 local TweenService = require(Services.TweenService);
 
-local _defaultTheme:{} = PluginService:IsPluginMode() and 
+local _defaultTheme:{[any]:any} = PluginService:IsPluginMode() and 
 {
 
 	Alert = Color3.fromRGB(13, 110, 253),
@@ -87,8 +87,8 @@ local function getApp()
 end;
 
 --> Support for Config.Theme
-local Config = getApp():GetGlobal("Engine"):RequestConfig();
-if(Config.Theme)then
+local Config = getApp():GetGlobal("Engine"):RequestConfig(true)
+if(Config and Config.Theme)then
 	for a:string,b in pairs(Config.Theme) do
 		_defaultTheme[a] = b;
 	end;
