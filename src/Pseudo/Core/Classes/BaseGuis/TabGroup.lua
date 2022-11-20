@@ -44,8 +44,10 @@ function TabGroup:AddTab(TabContent:Instance,TabName:string|table,TabIcon:string
 		TabButtonProps.TabName = nil;
 		TabButtonProps.TabIcon = nil;
 		TabButtonProps.TabId = nil;
-	end
-
+	end;
+	if(not self._dev._tabs)then
+		self._dev._tabs = {};
+	end;
 	TabId = TabId or tostring(#self._dev._tabs);
 	local App = self:_GetAppModule();
 	local Navigator = self:GET("Navigator");
@@ -53,10 +55,6 @@ function TabGroup:AddTab(TabContent:Instance,TabName:string|table,TabIcon:string
 	local TabGroupTopSection = self:GET("TabGroupTopSection");
 	local Top_List = self:GET("Top_List");
 	local TabGroupTopSection_Highlighter = self:GET("TabGroupTopSection_Highlighter");
-	
-	if(not self._dev._tabs)then
-		self._dev._tabs = {};
-	end
 	
 	local RespectListLayout = Instance.new("Frame");
 	RespectListLayout.BackgroundTransparency = 1;
