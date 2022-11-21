@@ -197,7 +197,9 @@ function PHePluginAppHandler.CreatePHeLibraryObject(LibraryFolder:Folder,toolbar
 		PHePluginLibraryObject.onReady = "**function";
 
 		function PHePluginLibraryObject:_Render()
-			return {}
+			return function(Hooks)
+				self._PHeAppPseudoHooks = Hooks;	
+			end
 		end;
 
 		--//Shipped with all tools
@@ -210,7 +212,8 @@ function PHePluginAppHandler.CreatePHeLibraryObject(LibraryFolder:Folder,toolbar
 			
 			local classObject,toolbarButton = PHePluginAppHandler.addTool(App,ClassInfo, Manifest.Name, toolbar);
 			classObject._App = self;
-			classObject:initiated();
+			classObject:initiated(self._PHeAppPseudoHooks);
+			self._PHeAppPseudoHooks = nil;
 			if(classObject._mainWidget and classObject._mainWidget.Enabled)then
 				classObject:launch();
 				classObject.___phestudiotoollaunched=true;

@@ -9,7 +9,7 @@ local App = script.Parent;
 local Types = {};
 
 type CreateCustomClass = (ClassData:PseudoClass)->(Pseudo);
-type CreateCustomClassMethod = (self:any,ClassData:PseudoClass)->(Pseudo);
+-- type CreateCustomClassMethod = 
 
 type x = (("a") -> true);
 
@@ -334,7 +334,7 @@ type launch = (self:any)->nil;
 export type PHePluginStudioTool = {
     init: ()->PHePluginStudioTool_initreturn,
     launch: launch?,
-    initiated: (self:any)->nil,
+    initiated: (self:any,Hooks:PseudoHooks)->nil,
     open: (self:any)->nil,
     close: (self:any)->nil,
     [string]: any
@@ -412,8 +412,8 @@ export type PseudoClass = {
     [string]: any?
 }
 export type CustomClassService = {
-	CreateClassAsync: CreateCustomClassMethod,
-	Create: CreateCustomClassMethod
+	CreateClassAsync: (self:any,ClassData:PseudoClass,DirectParent:any?,PropArguments:any?)->(Pseudo),
+	Create: (self:any,ClassData:PseudoClass,DirectParent:any?,PropArguments:any?)->(Pseudo),
 };
 export type PHeCustomClassService = CustomClassService;
 --> Globals
