@@ -453,8 +453,8 @@ function Modal:_Render(App)
 				Bottom_List.HorizontalAlignment = Enum.HorizontalAlignment.Right;
 			end;
 		end,
-		["Visible"] = function()
-			self._MainFrame.Visible = false;
+		["Visible"] = function(Value)
+			self._MainFrame.Visible = Value;
 		end;
 		_Components = {
 			_Appender = Center;	

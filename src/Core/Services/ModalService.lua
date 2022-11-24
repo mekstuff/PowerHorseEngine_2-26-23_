@@ -6,7 +6,10 @@ local ModalService = {
     ClassName = "ModalService",
 };
 
-function ModalService:ConvertToModal(Frame:any,TargetModal:Types.PHeModal?,ModalCloseButton:any?,ModalAppender:any?,ModalHeader:any?)
+--[=[
+    Converts the target frame into a modal. For prompt usage, use Prompt:GET("Modal")
+]=]
+function ModalService:ConvertToModal(Frame:any,TargetModal:Types.Modal|any?,ModalCloseButton:any?,ModalAppender:any?,ModalHeader:any?)
     local App = self:_GetAppModule();
     local ErrorService = App:GetService("ErrorService");
     if not(Frame:IsA("Pseudo"))then
