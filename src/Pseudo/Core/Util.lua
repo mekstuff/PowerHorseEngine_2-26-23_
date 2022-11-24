@@ -399,7 +399,7 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 			if(string.match(k,"^_"))then return propSheet[k];end;
 		
 			--> Errors if the index is not a member
-			error(tostring(k).." is not a valid memmber of "..tostring(propSheet.ClassName).." / "..tostring(propSheet.Name))
+			error(tostring(k).." is not a valid memmber of "..tostring(propSheet.ClassName).." / "..tostring(propSheet.Name).."$-"..debug.traceback())
 		end,
 
 		
@@ -503,7 +503,7 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 							typeexpected = propSheet[k]:gsub("**","");
 						end
 					end
-					error(typeexpected.." expected".._afterStr);
+					error(typeexpected.." expected".._afterStr.."$-"..debug.traceback());
 					return;
 					end;
 				end;
@@ -538,7 +538,7 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 
 			--> Property does not exist, cannot assign 
 			else
-				error(tostring(k).." is not a valid memmber of !! "..tostring(propSheet.ClassName).." / "..tostring(propSheet.Name))
+				error(tostring(k).." is not a valid memmber of "..tostring(propSheet.ClassName).." / "..tostring(propSheet.Name).."$-"..debug.traceback())
 			end;
 			
 			--> Fire Any Signal Property Events;
@@ -805,7 +805,7 @@ function LanzoCoreUtil.Create(Class:table,Parent:any?,...:any?):any
 end;
 --//
 local function handleClassDoesntExist(ClassName:string):nil
-	error("Unable to create Pseudo \""..ClassName.."\". \""..ClassName.."\" is not a valid Pseudo Class");
+	error("Unable to create Pseudo \""..ClassName.."\". \""..ClassName.."\" is not a valid Pseudo Class $-"..debug.traceback());
 end;
 local function handleClassBlocked(ClassName:string):nil
 	error("\""..ClassName.."\" cannot be created but only read or inherited.");
