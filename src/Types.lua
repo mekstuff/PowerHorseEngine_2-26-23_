@@ -71,7 +71,7 @@ export type Pseudo = {
     GetChildren: (self:Pseudo,onlyPseudo:boolean?)->any,
     SerializePropsAsync: (self:Pseudo)->string,
     DeserializePropsAsync: (self:Pseudo,Serialized:string,Apply:boolean?)->any,
-    GET: (self:Pseudo,Target:string)->any?,
+    GET: (self:Pseudo,Target:string)->Pseudo|Instance|nil?,
     Clone: (self:Pseudo)->Pseudo?,
     Destroy: (self:Pseudo)->nil,
     GetPropertyChangedSignal: (self:Pseudo)->nil,
@@ -98,6 +98,7 @@ type useMapping = (props:{string},depedencies:{Instance|Pseudo|any}) -> nil
 type StateFunctionalCall = () -> any
 export type State = Pseudo&StateFunctionalCall&{
     State: any,
+    useEffect: (self:any,Handler:any,Depedencies:any?) -> Servant,
 };
 export type PHeState = State;
 
@@ -301,7 +302,7 @@ export type Modal = Pseudo&BaseGui&GUI&{
     ButtonClicked: PHeSignal<Button>,
     ButtonAdded: PHeSignal<Button>,
     CaptureUserFocus: (self:any,Pulse:number)->nil,
-    AddButton: (self:any,Text:string,styles:{}?,ID:any?)->Button,
+    AddButton: (self:any,Text:string,styles:{[string]:any}?,ID:any?)->Button,
     OnHighlightClicked: (self:any, handler:()->nil) -> nil
     -- CloseButtonBehaviour: Enumeration.CloseButtonBehaviour,
 };
@@ -416,6 +417,12 @@ export type CustomClassService = {
 	Create: (self:any,ClassData:PseudoClass,DirectParent:any?,PropArguments:any?)->(Pseudo),
 };
 export type PHeCustomClassService = CustomClassService;
+
+export type ModalService = {
+    ConvertToModal: (self:any,Frame:any,TargetModal:Modal?,ModalCloseButton:Button|CloseButton?,ModalAppender:any?,ModalHeader:Text|TextLabel|any?)->Modal
+};
+export type PHeModalService = ModalService;
+
 --> Globals
 type themeDefaults = {
     Alert: Color3,

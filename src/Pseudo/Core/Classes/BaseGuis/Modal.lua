@@ -247,10 +247,10 @@ end;
 --//
 function Modal:_Render(App)
 	
-	local Modal = App.new("Frame", self:GetRef());
+	self._MainFrame = App.new("Frame", self:GetRef());
 	--Modal.AutomaticSize = Enum.AutomaticSize.XY; 15/11/2021
-	Modal.AutomaticSize = Enum.AutomaticSize.Y;
-	local ModalContainer = Modal:GetGUIRef()
+	self._MainFrame.AutomaticSize = Enum.AutomaticSize.Y;
+	local ModalContainer = self._MainFrame:GetGUIRef()
 	-- Modal.StrokeTransparency = 1;
 	
 	local ListLayout = Instance.new("UIListLayout",ModalContainer);
@@ -271,16 +271,16 @@ function Modal:_Render(App)
 	Top.Size = UDim2.new(1);
 	Top.Name = "A";
 
-	local Header = App.new("Button");
-	Header.TextColor3 = Theme.getCurrentTheme().ForegroundText;
-	Header.BackgroundTransparency = 1;
-	Header.StrokeTransparency = 1;
-	Header.Font = Theme.getCurrentTheme().Font;
-	Header.RippleStyle = App.Enumeration.RippleStyle.None;
+	self._Header = App.new("Button");
+	self._Header.TextColor3 = Theme.getCurrentTheme().ForegroundText;
+	self._Header.BackgroundTransparency = 1;
+	self._Header.StrokeTransparency = 1;
+	self._Header.Font = Theme.getCurrentTheme().Font;
+	self._Header.RippleStyle = App.Enumeration.RippleStyle.None;
 	-- Header.ActiveBehaviour = App.Enumeration.ActiveBehaviour.None;
-	Header.IconAdaptsTextColor = false;
-	Header.HoverEffect = Enumeration.HoverEffect.None; --< HoverEffect.None 
-	Header.Parent = Top;
+	self._Header.IconAdaptsTextColor = false;
+	self._Header.HoverEffect = Enumeration.HoverEffect.None; --< HoverEffect.None 
+	self._Header.Parent = Top;
 	
 --[=[
 	@prop ButtonClicked PHeSignal
@@ -350,9 +350,9 @@ function Modal:_Render(App)
 
 	return {
 		["ZIndex"] = function(v)
-			Modal.ZIndex = v;
+			self._MainFrame.ZIndex = v;
 			Top.ZIndex = v;
-			Header.ZIndex = v;
+			self._Header.ZIndex = v;
 			CloseButton.ZIndex = v;
 			Center.ZIndex = v;
 			Bottom.ZIndex = v;
@@ -413,18 +413,18 @@ function Modal:_Render(App)
 			end
 		end,
 		["Header"] = function(Value)
-			Header.Text = Value;
+			self._Header.Text = Value;
 		end,["HeaderIcon"] = function(Value)
-			Header.Icon = Value;
+			self._Header.Icon = Value;
 		end,["HeaderTextSize"] = function(Value)
-			Header.TextSize = Value;
+			self._Header.TextSize = Value;
 		end,
 		["HeaderTextColor3"] = function(Value)
-			Header.TextColor3 = Value;
+			self._Header.TextColor3 = Value;
 			CloseButton.Color = Value;
 		end,
 		["HeaderTextFont"] = function(Value)
-			Header.Font = Value;
+			self._Header.Font = Value;
 		end,["BodyTextFont"] = function(Value)
 			if(self._dev.__ModalBody)then
 				self._dev.__ModalBody.Font = Value;
@@ -437,11 +437,11 @@ function Modal:_Render(App)
 		end,
 		["HeaderAdjustment"] = function(Value)
 			if(Value == Enumeration.Adjustment.Left)then
-				Header.Position = UDim2.new(0);
-				Header.AnchorPoint = Vector2.new(0);
+				self._Header.Position = UDim2.new(0);
+				self._Header.AnchorPoint = Vector2.new(0);
 			else
-				Header.Position = UDim2.fromScale(.5);
-				Header.AnchorPoint = Vector2.new(.5);
+				self._Header.Position = UDim2.fromScale(.5,0);
+				self._Header.AnchorPoint = Vector2.new(.5);
 			end
 		end,
 		["ButtonsAdjustment"] = function(Value)
@@ -453,24 +453,26 @@ function Modal:_Render(App)
 				Bottom_List.HorizontalAlignment = Enum.HorizontalAlignment.Right;
 			end;
 		end,
+		["Visible"] = function()
+			self._MainFrame.Visible = false;
+		end;
 		_Components = {
 			_Appender = Center;	
-			FatherComponent = Modal:GetGUIRef();
+			FatherComponent = self._MainFrame:GetGUIRef();
 			Bottom = Bottom;
 			Bottom_List = Bottom_List;
 			Top = Top;
-			Header = Header;
+			Header = self._Header;
 			Center = Center;
 			CloseButton = CloseButton;
-			Wrapper = Modal;
+			Wrapper = self._MainFrame;
 			ModalContainer = ModalContainer;
-			Modal = Modal;
-		
+			Modal = self._MainFrame;
 		};
 		_Mapping = {
-			[Modal] = {
+			[self._MainFrame] = {
 				"BackgroundColor3","BackgroundTransparency","Size","Position",
-				"AnchorPoint","Roundness","Visible","StrokeColor3","StrokeTransparency","StrokeThickness"
+				"AnchorPoint","Roundness","StrokeColor3","StrokeTransparency","StrokeThickness"
 			}
 		};
 	};
