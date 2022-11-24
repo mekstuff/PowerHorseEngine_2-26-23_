@@ -18,7 +18,7 @@ local Button = {
 	Loading = false;
 	TextAdjustment = Enumeration.Adjustment.Flex;
 	IconAdjustment = Enumeration.Adjustment.Flex;
-	ButtonFlexSizing = true;
+	ButtonFlexSizing = false;
 	Roundness = UDim.new(0,4);
 	
 	RippleColor = Theme.getCurrentTheme().Text;
