@@ -17,7 +17,7 @@ local Image = {
 	SliceScale = 1;
 };
 
-Image.__inherits = {"BaseGui","Frame"}
+Image.__inherits = {"BaseGui","Frame","GUI"}
 
 --[=[
 	@class Image
@@ -158,7 +158,8 @@ function Image:_Render(App)
 		};
 		_Mapping = {
 			[Container] = {
-				"AnchorPoint","Position","Visible","ZIndex","Size","BackgroundTransparency","BackgroundColor3","Roundness","Rotation"
+				"AnchorPoint","Position","Visible","ZIndex","Size","BackgroundTransparency","BackgroundColor3","Roundness","Rotation",
+				"StrokeColor3","StrokeThickness","StrokeTransparency"
 			};
 			[ImageContent] = {
 				"ScaleType",
