@@ -542,14 +542,16 @@ end
 --[=[
 	@private
 ]=]
-function Pseudo:_lockProperty(propertyName:string, propertyCallback:string)
+function Pseudo:_lockProperty(propertyName:string,propertyCallback:string?)
+	--[[
 	local CoreGuiService = self:_GetAppModule():GetService("CoreGuiService");
 	if not(CoreGuiService:GetIsCoreScript())then
 		self:_GetAppModule():GetService("ErrorService").tossError("_lockProperty can only be performed by select script sources.");
 		return;	
 	end;
+	]]
 	local Prop = self[propertyName];
-	self.__lockedProperties[propertyName]=propertyCallback or "\""..propertyName.."\" property is locked for "..self.Name;
+	self.__lockedProperties[propertyName]= propertyCallback or "\""..propertyName.."\" property is locked for "..self.Name;
 end;
 --[=[
 	@private
@@ -563,11 +565,13 @@ end;
 	@private
 ]=]
 function Pseudo:_unlockProperty(...:any)
+	--[[
 	local CoreGuiService = self:_GetAppModule():GetService();
 	if not(CoreGuiService:GetIsCoreScript())then
 		self:_GetAppModule():GetService("ErrorService").tossError("_unlockProperty can only be performed by select script sources.");
 		return;	
 	end;
+	]]
 	for _,v in pairs({...}) do
 		self.__lockedProperties[v]=nil;
 	end;

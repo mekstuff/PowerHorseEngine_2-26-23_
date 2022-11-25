@@ -321,7 +321,6 @@ local function getComponentClassAsync(n,tries)
 end
 --[=[]=]
 function FrameworkClient:GetComponentClass(ClassName:string)
-
     if(not ClientStarted)then
         return getComponentClassAsync(ClassName);
     end

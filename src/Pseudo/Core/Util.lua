@@ -450,7 +450,7 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 		
 		--> For locked properties
 			if(propSheet.__lockedProperties[k])then
-				return warn(k.." is locked and cannot be modified at this time.");
+				return warn("\""..k.."\" is locked. "..propSheet.__lockedProperties[k]);
 			end
 	
 		--> Attempting to assign signal

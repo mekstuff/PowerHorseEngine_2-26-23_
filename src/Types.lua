@@ -527,6 +527,20 @@ export type PHeStateLibrary = StateLibrary;
 
 export type PointerLibrary = (Instance:Instance,Parent:any?) -> Pseudo;
 
+export type FrameworkBranch = Pseudo&FrameworkLibrary&{
+    -- GetService: (self:any, ServiceName:string)->nil,
+    -- GetModular: (self:any, ServiceName:string)->nil,
+    -- PortService: (self:any, Service:any)->nil,
+    -- PortServices: (self:any, ...any)->nil?,
+    -- PortModular: (self:any, Modular:any)->nil,
+    -- PortModulars: (self:any, ...any)->nil,
+    -- GetComponentClass: (self:any, ComponentClass:string)->nil,
+    -- PortComponentClass: (self:any, Component:any)->nil,
+    -- PortComponentClasses: (self:any, ...any)->nil,
+    -- GetBranch: (self:any, BranchName:string)->FrameworkBranch,
+    -- HasBranch: (self:any, BranchName:string)->FrameworkBranch?,
+}
+
 export type FrameworkLibraryService = {
     Init: (self:any)->(nil)?,
     Start: (self:any)->nil,
@@ -536,16 +550,22 @@ export type FrameworkLibraryService = {
     Shared: any?
 };
 export type PHeFrameworkLibraryService = FrameworkLibraryService;
-export type FrameworkLibraryServer = {
+
+export type FrameworkLibrary = {
     Start: (self:any)->Promise,
-    PortService: (self:any,Service:ModuleScript)->FrameworkLibraryService,
-    PortServices: (self:any,Services:Folder|any)->nil,
-    PortComponentClass: (self:any,ComponentClass:ModuleScript)->nil,
-    PortComponentClasses: (self:any,ComponentClasses:Folder|any)->nil,
+    PortService: (self:any, Service:any)->FrameworkLibrary,
+    PortServices: (self:any, ...any)->FrameworkLibrary?,
+    PortModular: (self:any, Modular:any)->FrameworkLibrary,
+    PortModulars: (self:any, ...any)->FrameworkLibrary,
+    PortComponentClass: (self:any,ComponentClass:ModuleScript)->FrameworkLibrary,
+    PortComponentClasses: (self:any,ComponentClasses:Folder|any)->FrameworkLibrary,
     GetComponentClass: (self:any,ComponentClassName:string)->any,
     GetService: (self:any,ServiceName:string)->FrameworkLibraryService,
+    GetBranch: (self:any, BranchName:string)->FrameworkBranch,
+    HasBranch: (self:any, BranchName:string)->(boolean,FrameworkBranch?),
 };
-export type PHeFrameworkLibraryServer = FrameworkLibraryServer;
+export type PHeFrameworkLibrary = FrameworkLibrary;
+
 export type FrameworkLibraryModular = Pseudo&{
     Init: (self:any)->nil,
     Start: (self:any)->nil,
@@ -557,7 +577,7 @@ export type PHeFrameworkLibraryModular = FrameworkLibraryModular;
 export type FrameworkLibraryClient = {
     Start: (self:any)->Promise,
     PortModular: (self:any,Service:ModuleScript)->FrameworkLibraryModular,
-    PortModulars: (self:any,Services:Folder|any)->nil,
+    PortModulars: (self:any,...Folder|any)->nil,
     PortComponentClass: (self:any,ComponentClass:ModuleScript)->nil,
     PortComponentClasses: (self:any,ComponentClasses:Folder|any)->nil,
     GetComponentClass: (self:any,ComponentClassName:string)->any,
