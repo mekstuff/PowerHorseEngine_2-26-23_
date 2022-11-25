@@ -208,6 +208,7 @@ function FrameworkBranch:Start()
                         BranchShare = Instance.new("Folder");
                         BranchShare.Name = self.Name;
                         BranchShare.Parent = Engine:FetchReplicatedStorage():WaitForChild("Framework_Workflow:Shared"):WaitForChild("@Shared");
+                        self._branchShare = BranchShare;
                     end
                     local SharedContainer = Instance.new("Folder");
                     SharedContainer.Name = v.ClassName;

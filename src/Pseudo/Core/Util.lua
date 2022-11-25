@@ -38,7 +38,7 @@ local readOnlyProperties = {"ClassName"};
 -- Handles showing unknown datatypes as attributes
 local function getStringValueOfUnknownDataType(Value:any,k:string):string|nil
 	if(k and string.match(k, "^_"))then return nil;end;
-	local str = "unknown";
+	local str = typeof(Value) or "unknown";
 	if(typeof(Value) == "Instance")then
 		str = Value.ClassName;
 	elseif(typeof(Value) == "function")then

@@ -74,7 +74,6 @@ end;
 
 
 local mainBranch = Framework:CreateBranch("main") --> Main branch
-
 --> metatable so we can call :CreateBranch from the import, or use the main branch.
 return setmetatable(Framework, {
     __index = mainBranch;
