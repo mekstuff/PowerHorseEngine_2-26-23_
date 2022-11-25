@@ -467,9 +467,9 @@ function FrameworkBranch:GetService(ServiceName:string)
         end;
     
         function newServiceObject:UseChannel(ChannelName:string)
-            local ContainsChannel = hasShared:FindFirstChild("Channels");
+            local ContainsChannel = hasShared:FindFirstChild("@Channels");
             if(not ContainsChannel)then
-                return self:_GetAppFramework():GetService("ErrorService").tossWarn("No Channel Provided For \""..self.Name.."\"");
+                return self:_GetAppModule():GetService("ErrorService").tossWarn("No Channel Provided For \""..self.Name.."\"");
             end;
             return ContainsChannel:WaitForChild(ChannelName);
             -- return hasShared:FindFirstChild(ChannelName); 
