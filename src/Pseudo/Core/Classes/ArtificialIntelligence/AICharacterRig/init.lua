@@ -1,9 +1,7 @@
---!strict
---[=[
-	@class AICharacterRIg
-]=]
 local Types = require(script.Parent.Parent.Parent.Parent.Parent.Types);
-
+--[=[
+	@class AICharacterRig
+]=]
 local AICharacterRig = {
 	Name = "AICharacterRig",
 	ClassName = "AICharacterRig",
@@ -17,7 +15,6 @@ AICharacterRig.__inherits = {"BaseCharacterRig"};
 --[=[
 	@private
 ]=]
-
 function AICharacterRig:_InitializeParent()
 	local Character:Model = self.Parent;
 	local Clothing = self:GetClothing();

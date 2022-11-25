@@ -1,8 +1,9 @@
-local Theme = require(script.Parent.Parent.Parent.Theme);
 local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
-local Core = require(script.Parent.Parent.Parent);
-local IsClient = game:GetService("RunService"):IsClient();
 
+--[=[
+	@class DropdownButton
+	inherites [Button],[BaseGui],[Frame],[GUI],[Text]
+]=]
 local DropdownButton = {
 	Name = "DropdownButton";
 	ClassName = "DropdownButton";
@@ -14,6 +15,16 @@ local DropdownButton = {
 	Expanded = false;
 };
 DropdownButton.__inherits = {"Button","BaseGui","Frame","GUI","Text"};
+
+--[=[
+	@prop ContentSize Vector2
+	@within DropdownButton
+]=]
+--[=[
+	@prop Expanded boolean
+	@within DropdownButton
+]=]
+
 --//
 function DropdownButton:AddButton(Text,id)
 	if(not self._dev._grid)then

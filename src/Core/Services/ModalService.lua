@@ -1,6 +1,9 @@
 local CustomClassService = require(script.Parent.CustomClassService);
 local Types = require(script.Parent.Parent.Parent.Types);
 
+--[=[
+    @class ModalService
+]=]
 local ModalService = {
     Name = "ModalService",
     ClassName = "ModalService",
@@ -8,6 +11,7 @@ local ModalService = {
 
 --[=[
     Converts the target frame into a modal. For prompt usage, use Prompt:GET("Modal")
+    if target Frame is an Instance, the [Pointer] Library will be used to convert to Pseudo.
 ]=]
 function ModalService:ConvertToModal(Frame:any,TargetModal:Types.Modal|any?,ModalCloseButton:any?,ModalAppender:any?,ModalHeader:any?)
     local App = self:_GetAppModule();

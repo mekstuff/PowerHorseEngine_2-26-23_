@@ -1,8 +1,7 @@
-local Theme = require(script.Parent.Parent.Parent.Theme);
 local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
-local Core = require(script.Parent.Parent.Parent);
-local IsClient = game:GetService("RunService"):IsClient();
-
+--[=[
+	@class CloseButton
+]=]
 local CloseButton = {
 	Name = "CloseButton";
 	ClassName = "CloseButton";
@@ -34,6 +33,11 @@ function CloseButton:_Render(App)
 	--CloseBtn.RippleStyle = Enumeration.RippleStyle.None;
 	--CloseBtn.ActiveBehaviour = Enumeration.ActiveBehaviour.None;
 	
+	--[=[
+		@prop Activated PHeSignal
+		@within CloseButton
+		Fired whenever the CloseButton is clicked
+	]=]
 	self:AddEventListener("Activated",true,CloseBtn:GetEventListener("MouseButton1Down"));
 
 	CloseBtn:RemoveEventListener("MouseButton1Up","MouseButton2Down","MouseButton2Up","MouseEnter","MouseExit");

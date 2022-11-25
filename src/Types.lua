@@ -1,7 +1,6 @@
 -- type definitions for PowerHorseEngine
 -- written by Olanzo James @ Lanzo Inc
 -- contributors:
---- template.x
 
 local App = script.Parent;
 -- local Enumeration = App.Enumeration;
@@ -27,7 +26,6 @@ export type App = {
         &(("Prompt") -> Prompt)
         &(("Promise") -> Promise)
         &(("BaseCharacterRig") -> BaseCharacterRig)
-        &(("AICharacterRig") -> AICharacterRig)
         &(("TabGroup") -> TabGroup)
         &(("Text") -> Text)
 --> States
@@ -135,11 +133,7 @@ export type PHePromise = Promise;
 export type AI = {
 
 };
-export type BaseCharacterRig = {
-    GetClothing: (self:any)->{};
-    DestroyClothing: (self:any)->nil;
-    GetCharactersInRadius: (self:any, Radius:number?)->{}
-};
+
 export type PHeBaseCharacterRig = BaseCharacterRig;
 
 export type AICharacterRig = Pseudo&AI&BaseCharacterRig&{
@@ -197,7 +191,7 @@ export type Text = {
 };
 export type PHeText = Text;
 
-export type Frame = Pseudo&BaseGui&{
+export type Frame = {
     MouseButton1Down: PHeSignal<nil>,
     MouseButton2Down: PHeSignal<nil>,
     MouseButton1Up: PHeSignal<nil>,
@@ -262,6 +256,19 @@ export type AppBar = Pseudo&BaseGui&{
     ActionButtonPressed: PHeSignal<nil>
 };
 export type PHeAppBar = AppBar;
+
+export type Badge = {
+    Text: string,
+    TextColor3: Color3,
+    TextScaled: boolean,
+    StrokeTransarepcny: number,
+    StrokeThickness: number,
+    StrokeColor3: number,
+    -- xAdjustment: Enumeration,
+    Roundness: UDim,
+};
+export type PHeBadge = Badge;
+
 export type Button = Pseudo&Frame&Text&BaseGui&{
     Icon: string,
     IconSize: UDim2,
@@ -278,6 +285,7 @@ export type Button = Pseudo&Frame&Text&BaseGui&{
     Padding: Vector2,
 };
 export type PHeButton = Button;
+
 export type Checkbox = BaseGui&Frame&{
     Icon: string,
     Toggle: boolean,
@@ -285,6 +293,17 @@ export type Checkbox = BaseGui&Frame&{
     Toggled: PHeSignal<boolean>
 };
 export type PHeCheckbox = Checkbox;
+
+export type CloseButton = Pseudo&BaseGui&{
+    Actvated: PHeSignal<true>
+};
+export type PHeCloseButton = CloseButton;
+
+export type DropdownButton = {
+    ContentSize: Vector2,
+    Expanded: boolean,
+};
+export type PHeDropdownButton = DropdownButton;
 
 export type Modal = Pseudo&BaseGui&GUI&{
     Header: string,
