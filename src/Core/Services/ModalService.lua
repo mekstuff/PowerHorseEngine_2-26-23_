@@ -41,8 +41,9 @@ function ModalService:ConvertToModal(Frame:any,TargetModal:Types.Modal|any?,Moda
     if(TargetModal._dev._closebuttonconnection)then
         TargetModal._dev._closebuttonconnection:Disconnect();
         TargetModal._dev._closebuttonconnection = nil;
-    end
-
+    end;
+    
+    Frame.Visible = TargetModal.Visible;
     Frame.Parent = TargetModal:GetRef();
 
     Modal:Destroy();
