@@ -443,6 +443,8 @@ export type ModalService = {
 export type PHeModalService = ModalService;
 
 --> Globals
+
+export type PHeimport = (...string) -> any?
 type themeDefaults = {
     Alert: Color3,
 	Warning: Color3,

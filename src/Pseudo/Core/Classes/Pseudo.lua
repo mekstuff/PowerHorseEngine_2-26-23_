@@ -44,6 +44,23 @@ local Pseudo = {
 	:::
 ]=]
 
+--[=[
+	Creates a new replication token for the pseudo
+]=]
+function Pseudo:Replicate()
+	local App = self:_GetAppModule();
+	local ErrorService = App:GetService("ErrorService");
+	if(IsClient)then
+		return ErrorService.tossWarn("Only the server can replicate pseudo's.");
+	end;
+	if(not self._REPLICATEDTOCLIENTS)then
+		ErrorService.tossWarn(("%s has _REPLICATEDTOCLIENTS as false, cannot :Replicate"):format(self.Name));
+		return;
+	end;
+	-- local isReplicated = self._REPLICATEDTOCLIENTS
+	local ReplicationService = App:GetService("ReplicationService");
+	ReplicationService.newReplicationToken(self)
+end;
 --[=[]=]
 function Pseudo:GetFullName():string
 	return self:GetRef():GetFullName();

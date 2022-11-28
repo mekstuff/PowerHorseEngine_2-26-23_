@@ -12,7 +12,7 @@ local App;
 local Classes = script.Parent.Classes;
 local Core = require(script.Parent)::any;
 local ModuleFetcher = require(script.Parent.Parent.Parent.Core.Providers.Constants.ModuleFetcher)::any;
-local ReplicationService = ModuleFetcher("ReplicationService",script.Parent.Parent.Parent.Core.Services);
+-- local ReplicationService = ModuleFetcher("ReplicationService",script.Parent.Parent.Parent.Core.Services); --> We use :Replicate on Pseudo's now instead. Deprecated 11/27/2022
 local SerializationService = ModuleFetcher("SerializationService",script.Parent.Parent.Parent.Core.Services);
 
 local IsRunning = game:GetService("RunService"):IsRunning();
@@ -513,7 +513,7 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 			
 				--> Triggers render
 				renderAsync(renderMap,k,v,_ReferenceInstance, quickMap, Pseudo);
-
+				--[[
 				--> Replicate Change
 				if(game:GetService("RunService"):IsServer()  and ReplicationStatus.ReplicateProperties)then
 					--> Do not replicate hidden properties
@@ -521,7 +521,7 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 						ReplicationService.ReplicatePseudo(Pseudo);
 					end;
 				end;
-				
+				]]
 				--> Updating the attribute
 				if(not attributelocked[k])then
 					if(propSheet[k])then --<Make sure property exists
@@ -772,12 +772,12 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 	
 	--> Initiates the Pseudo Class
 	Pseudo:_pseudoInit();
-	
+	--[[
 	--> Creates ReplicationToken for Pseudo
 	if(IsServer and ReplicationStatus.ReplicateObject)then	
 		ReplicationService.newReplicationToken(Pseudo);
 	end;
-
+	]]
 	return Pseudo,id;
 end;
 
