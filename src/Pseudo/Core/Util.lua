@@ -469,6 +469,19 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 				return;
 			end;
 
+		--> useRawsets
+			if(propSheet.____useRawsets)then
+				if(propSheet.____useRawsets[k])then
+					for _,x in pairs(propSheet.____useRawsets[k]) do
+						local res = x(v);
+						if(res)then
+							Pseudo[k] = res;
+							return;
+						end;
+					end
+				end
+			end
+
 			--> Parents are rendered outside checks.
 			if(k == "Parent")then
 				renderAsync(renderMap,k,v,_ReferenceInstance,quickMap,Pseudo);
@@ -668,11 +681,40 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 					```
 				]=]
 				hooks.useEffect = function(callback:any,dependencies:table?)
+					assert(typeof(callback) == "function", ("got %s on useEffect callback expected function"):format(typeof(dependencies)));
 					if(not Pseudo._dev._useEffectState)then 
 						Pseudo._dev._useEffectState = StateLibrary("nil");
 					end;
 					dependencies = _organizeuseEffectHookDependencies(Pseudo,dependencies or Pseudo._getCurrentPropSheetState(true,true,nil,true))
 					return Pseudo._dev._useEffectState:useEffect(callback,dependencies)
+				end;
+				--> useRawset
+				--[=[
+					@class useRawset
+				]=]
+				--[=[
+					@function useRawset
+					@within useRawset
+					@param callback ()
+					@param dependency string
+
+					Whenever a pseudo property is set to change, given the dependency your handler will be called.
+					You will be given the parameter of the given value, if you return nil, then the pseudo property
+					will be updated as usual, returning a value will cause a sort of a "rerender" on the pseudo.
+					This might be useful incases where you want to check that the given property value is supported
+					or locking properties, though, there's already a __lockproperties method for pseudo's.
+				]=]
+				hooks.useRawset = function(callback:any,dependency:string)
+					assert(typeof(callback) == "function", ("got %s on useRawset callback expected function"):format(typeof(callback)));
+					assert(typeof(dependency) == "string", ("got %s on useRawset dependency expected string"):format(typeof(dependency)));
+					if(not propSheet.____useRawsets)then
+						propSheet.____useRawsets = {};
+					end;
+					if(propSheet.____useRawsets[dependency])then
+						warn("Using \"useRawset\" on "..Pseudo.Name.." with dependency \""..dependency.."\" multiple times, this may cause unwanted effects.")
+					end;
+					propSheet.____useRawsets[dependency] = propSheet.____useRawsets[dependency] or {};
+					table.insert(propSheet.____useRawsets[dependency], callback);
 				end;
 				--> useRender
 				--[=[
@@ -689,6 +731,7 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 					A useEffect hook wrapper that only runs your callback after the first useEffect call.
 				]=]
 				hooks.useRender = function(callback:any,dependencies:table?)
+					assert(typeof(callback) == "function", ("got %s on useRender callback expected function"):format(typeof(callback)));
 					local usedEffect = false;
 					return hooks.useEffect(function(...:any)
 						if(usedEffect)then
@@ -709,6 +752,8 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 					@param dependencies table
 				]=]
 				hooks.useMapping = function(props:table,dependencies:table):nil
+					assert(typeof(props) == "table", ("got %s on useMapping props expected table"):format(typeof(props)));
+					assert(typeof(dependencies) == "function", ("got %s on useMapping dependencies expected table"):format(typeof(dependencies)));
 					if(not quickMap)then
 						quickMap = {};
 					end;
@@ -776,7 +821,7 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 	
 	--> Initiates the Pseudo Class
 	Pseudo:_pseudoInit();
-	
+
 	--> Creates ReplicationToken for Pseudo
 	if(IsServer and ReplicationStatus.ReplicateObject)then	
 		if(Flags:GetFlag("pseudo-replication"))then

@@ -93,6 +93,7 @@ export type Pseudo = {
 type useEffect = (Handler:any, Depedencies:any?) -> Servant
 type useRender = (Handler:any, Depedencies:any?) -> Servant
 type useMapping = (props:{string},depedencies:{Instance|Pseudo|any}) -> nil
+type useRawset = (handler:(newValue:any)->any,dependency:string) -> nil
 
 type StateFunctionalCall = () -> any
 export type State = Pseudo&StateFunctionalCall&{
@@ -105,6 +106,7 @@ export type PseudoHooks = {
     useEffect: useEffect,
     useRender: useRender,
     useMapping: useMapping,
+    useRawset: useRawset,
 }
 
 -- export type Enumeration = Enumeration.Enumeration;
