@@ -79,8 +79,9 @@ end;
 
 --[=[
 	Updates the replication suite, use by the newToken, you do not need to call this method,
+	@param pseudo Pseudo
 ]=]
-function ReplicationService.ReplicatePseudo(pseudo)
+function ReplicationService.ReplicatePseudo(pseudo:any)
 	local propsSerialized = pseudo:SerializePropsAsync();
 	local AllowedReplication = ReplicationService.canReplicate(pseudo);
 	if(not AllowedReplication)then
