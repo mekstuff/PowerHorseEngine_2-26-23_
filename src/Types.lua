@@ -57,6 +57,7 @@ export type Pseudo = {
 	Name: string,
 	ClassName: string,
 	Parent: Instance|Pseudo|any,
+    Replicate: (self:Pseudo)->nil,
     GetFullName: (self:Pseudo)->string,
     WaitForChild: (self:Pseudo,Name:string,onlyPseudo:boolean?,tries:number?)->Pseudo|Instance,
     FindFirstAncestor: (self:Pseudo,Name:string,level:number?)->Pseudo|Instance,
@@ -342,6 +343,14 @@ export type PHeModalPrompt = Prompt;
 
 
 --> Services
+
+export type ReplicationService = {
+    destroyReplicationToken: (id:string) -> nil,
+    newReplicationToken: (pseudo:Pseudo) -> nil,
+    ReplicatePseudo: (pseudo:Pseudo) -> nil,
+};
+export type PHeReplicationService = ReplicationService;
+
 type PHePluginStudioTool_dev = {}
 type PHePluginStudioTool_initreturn = {
     name: string,

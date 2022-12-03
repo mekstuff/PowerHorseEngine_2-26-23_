@@ -16,6 +16,7 @@ Engine.ErrorService = ServiceProvider:LoadServiceAsync("ErrorService");
 Engine.Manifest = require(script.Parent["Manifest"]);
 
 local ServerInitiated=false;
+--> Optimize so we only use events that are used.
 local StorageEvents = {
 	["RemoteFunction"] = {
 		"ShareEnumerationAsync_CLIENT";
@@ -39,6 +40,7 @@ local StorageEvents = {
 		"MagicBuild_ExecuteBuild";
 		"CoreFunc_ClientEngineProvider";
 		"SSRENDERV1_SUBSCRIBEREQUEST";
+		"CODESERVICE_COMMUNICATION";
 		--"KEYSERVICESHAREDKEYGRABBER";
 		
 	};["BindableEvent"]={

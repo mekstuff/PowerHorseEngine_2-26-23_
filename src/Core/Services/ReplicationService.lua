@@ -1,163 +1,100 @@
+-- Written By Olanzo James @ Lanzo Inc
+-- Responsible for sending replication tokens to clients.
+-- Currently replication is too slow and bad, serializationservice should be optimized to drastically improve replications.
 local Server = game:GetService("RunService"):IsServer();
 local ReplicationEvent;
 local IsRunning = game:GetService("RunService"):IsRunning();
-local SerializationService = require(script.Parent.SerializationService);
-
 
 if(Server and IsRunning)then
-	-- if(script.Parent.Parent.Parent.Parent ~= game:GetService("ReplicatedStorage"))then
-	-- 	return {
-	-- 		--// Proxy functions
-	-- 	}
-	-- end
-	-- ReplicationEvent = Instance.new("RemoteEvent",script.Parent.Parent.Parent);
-	-- ReplicationEvent.Name = "Replicator";
+	ReplicationEvent = Instance.new("RemoteEvent");
+	ReplicationEvent.Name = "Replicator";
+	ReplicationEvent.Parent = script.Parent.Parent.Parent;
 end;
-
 
 local ReplicatedSuite = {};
 
--- if(Server and IsRunning)then
--- 	game.Players.PlayerAdded:Connect(function(Plr)
-
--- 		ReplicationEvent:FireClient(Plr,"rep-suite",ReplicatedSuite);
--- 	end)
--- end;
-
-
-local module = {}
+if(Server and IsRunning)then
+	game.Players.PlayerAdded:Connect(function(Plr)
+		ReplicationEvent:FireClient(Plr,"rep-suite",ReplicatedSuite);
+	end)
+end;
 
 
-local ReplicatedYieldTime = 1;
+--[=[
+	@class ReplicationService
+]=]
+local ReplicationService = {}
 
-function module:_FetchSuite()
+
+--[=[
+	@private
+]=]
+function ReplicationService:_FetchSuite()
 	return ReplicatedSuite;
 end
 
-
-
---[[
-if(Server)then
-	for _,v in pairs(game:GetService("Players"):GetPlayers()) do
-		--local thread = coroutine.create(function()
-			--wait(ReplicatedYieldTime);
-			ReplicationEvent:FireClient(v,"rep-suite",ReplicatedSuite);
-		--end)coroutine.resume(thread);
-		
-	end;
+--[=[
+	Removes the replication token from the suite
+]=]
+function ReplicationService.destroyReplicationToken(id:string)
+	if(not IsRunning)then return end;
+	ReplicationEvent:FireAllClients("remove-rep",id);
+	ReplicatedSuite[id]=nil;
 end;
---]]
 
-local function getPropValue(Value)
-	if(typeof(Value) == "table")then
-		
-		if(not Value.PowerHorseEnumType)then
-			return Value;
+local SupportedReplicationAncestors = {
+	workspace,game:GetService("ReplicatedStorage"),game:GetService("ReplicatedFirst"),
+	game:GetService("StarterGui"),game:GetService("StarterPlayer"),game:GetService("Teams"),
+	game:GetService("StarterPlayer");
+}
+--[=[]=]
+function ReplicationService.canReplicate(pseudo:any)
+	local Ref = pseudo:_GetCompRef();
+	for _,x in pairs(SupportedReplicationAncestors)do
+		if(Ref:IsDescendantOf(x))then
+			return true;
 		end
-		
-		return "_&_:ENUM:"..Value.PowerHorseEnumType..":"..Value.Name;
+	end;
+	return false;
+end
+--[=[]=]
+function ReplicationService.newReplicationToken(pseudo:any)
+	local id = pseudo.__id;
+
+	local AllowedReplication = ReplicationService.canReplicate(pseudo);
+
+	if(AllowedReplication)then
+		pseudo:GetPropertyChangedSignal():Connect(function()
+			ReplicationService.ReplicatePseudo(pseudo);
+		end);
+		pseudo.Destroying:Connect(function()
+			ReplicationService.destroyReplicationToken(id);
+			id = nil;
+		end)
+		local propsSerialized = pseudo:SerializePropsAsync();
+		ReplicatedSuite[pseudo._dev.__id]=propsSerialized;
+		ReplicationEvent:FireAllClients("add-suite",pseudo._dev.__id,propsSerialized,pseudo:GetRef());
+	end
+end;
+
+--[=[
+	Updates the replication suite, use by the newToken, you do not need to call this method,
+]=]
+function ReplicationService.ReplicatePseudo(pseudo)
+	local propsSerialized = pseudo:SerializePropsAsync();
+	local AllowedReplication = ReplicationService.canReplicate(pseudo);
+	if(not AllowedReplication)then
+		ReplicationService.destroyReplicationToken(pseudo.__id);
 	else
-		return Value;	
+		if(not ReplicatedSuite[pseudo.__id])then
+			ReplicationService.newReplicationToken(pseudo);
+		else
+			ReplicatedSuite[pseudo._dev.__id]=propsSerialized;
+			ReplicationEvent:FireAllClients("update-suite",pseudo._dev.__id,propsSerialized,pseudo:GetRef());
+		end;
 	end
-end
-
---//
-function module.destroyReplicationToken(id)
-	-- if(not IsRunning)then return end;
-	-- ReplicationEvent:FireAllClients("remove-rep",id);
-	-- ReplicatedSuite[id]=nil;
-end;
---//
-function module.newReplicationToken(pseudo)
-	-- local props = pseudo._getCurrentPropSheetState(true,true,true);
-	-- ReplicatedSuite[pseudo._dev.__id] = props;
-	-- ReplicationEvent:FireAllClients("add-suite",pseudo._dev.__id,props,pseudo:GetRef());
-
-	--[[
-	local propsSerialized = pseudo:SerializePropsAsync();
-	ReplicatedSuite[pseudo._dev.__id]=propsSerialized;
-	ReplicationEvent:FireAllClients("add-suite",pseudo._dev.__id,propsSerialized,pseudo:GetRef());
-	]]
-end;
-	
---[[
-function module.newReplicationToken(ref,id,propSheet)
-	if(not IsRunning)then return end;
-	if not (Server)then warn("Replication Tokens can only be created by the server.") return end;
-	
-	local RepProps = {};
-	
-	
-	for p,v in pairs(propSheet)do
-		if(typeof(v) ~= "function" and  not string.match(p, "^_")) then	
-			RepProps[p]=getPropValue(v);
-		end
-	end;
---[[
-	if(propSheet._CONSTRCUTED__BY___CREATE____FUNC)then
-		RepProps._CONSTRCUTED__BY___CREATE____FUNC=true;
-	end;
-]
-	
-
-	ReplicatedSuite[id]={
-		id = id;
-		props =  RepProps;
-		serverRef = ref;
-	};
-	
-	
-	ReplicationEvent:FireAllClients("add-suite",ReplicatedSuite[id]);
-
-end;
-]]
---[[
-function module.InterceptObjectCreate(Object,id)
-	if(ReplicationEvent)then
-		--NonReplicatedInstances[id]=Object;
-		ReplicationEvent:FireAllClients("intercept",Object);
-	end;
-end;
-]]
---//
-function module.ReplicatePseudo(pseudo)
-	
-	-- local props = pseudo._getCurrentPropSheetState(true,true,true);
-	-- ReplicatedSuite[pseudo._dev.__id] = props;
-	-- ReplicationEvent:FireAllClients("update-suite",pseudo._dev.__id,props,pseudo:GetRef());
-	
-	
---[[
-	local propsSerialized = pseudo:SerializePropsAsync();
-	
-	ReplicatedSuite[pseudo._dev.__id]=propsSerialized;
-	ReplicationEvent:FireAllClients("update-suite",pseudo._dev.__id,propsSerialized,pseudo:GetRef());
-]]
 end;
 
---[[
-function module.ReplicatePseudo(id,Property,Value)
-	if(not IsRunning)then return end;
-	if not (Server)then warn("Replications can only be distributed by the server.")end;
-	if(ReplicatedSuite[id])then
-		--print("Property Replication Called");
-		if(ReplicatedSuite[id][Property])then ReplicatedSuite[id][Property]= getPropValue(Value);end;
-
-		local Thread=coroutine.create(function()
-			wait();
-		
-			ReplicationEvent:FireAllClients("update-suite",id,Property,getPropValue(Value));
-
-		end)coroutine.resume(Thread);
-			
-		--end)coroutine.resume(Thread);
-		
-		
-		--print("KK")
-	end
-	--ReplicationEvent:FireAllClients(PseudoInstance,Property,Value);
-end
-]]
-return module
+return ReplicationService
 
 

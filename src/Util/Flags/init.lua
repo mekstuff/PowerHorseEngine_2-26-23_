@@ -4,11 +4,15 @@
     List of flags:
 
     `force-env {game|plugin|misc} -- force the environment that PowerHorseEngine will be built`
+    `pseudo-replication {true|false} -- will pseudo's created on the server be replicated to the client? (default true) CustomClasses need to call :Replicate to replicate."
 
 ]=]
 
 local Flags = {
-    _flags = {};
+    _flags = {
+        ["force-env"] = nil;
+        ["pseudo-replication"] = true;
+    };
 };
 
 --[=[]=]

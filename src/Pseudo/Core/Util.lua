@@ -12,6 +12,7 @@ local App;
 local Classes = script.Parent.Classes;
 local Core = require(script.Parent)::any;
 local ModuleFetcher = require(script.Parent.Parent.Parent.Core.Providers.Constants.ModuleFetcher)::any;
+local Flags = require(script.Parent.Parent.Parent.Util.Flags);
 -- local ReplicationService = ModuleFetcher("ReplicationService",script.Parent.Parent.Parent.Core.Services); --> We use :Replicate on Pseudo's now instead. Deprecated 11/27/2022
 local SerializationService = ModuleFetcher("SerializationService",script.Parent.Parent.Parent.Core.Services);
 
@@ -284,6 +285,8 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 		return x;
 	end;
 
+	
+	
 	--> Replication initiaition
 	local ReplicationStatus = {ReplicateObject = false;ReplicateProperties = false;};
 	if(propSheet["_REPLICATEDTOCLIENTS"] and IsRunning and IsServer and propSheet["_CONSTRCUTED__BY___CREATE____FUNC"] ~= true)then
@@ -293,6 +296,7 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 	if(ReplicationStatus.ReplicateObject)then 
 		propSheet["_REPLICATED"] = id;
 	end;
+	
 
 	local _allowPassForAny = {};
 	local _renderCausedByState = false;
@@ -772,12 +776,14 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 	
 	--> Initiates the Pseudo Class
 	Pseudo:_pseudoInit();
-	--[[
+	
 	--> Creates ReplicationToken for Pseudo
 	if(IsServer and ReplicationStatus.ReplicateObject)then	
-		ReplicationService.newReplicationToken(Pseudo);
+		if(Flags:GetFlag("pseudo-replication"))then
+			Pseudo:Replicate();
+		end
 	end;
-	]]
+
 	return Pseudo,id;
 end;
 
