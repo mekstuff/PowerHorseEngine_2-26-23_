@@ -88,8 +88,11 @@ function PseudoService:GetPseudoObjects(Specific:table?):table
 			end
 		end;
 	end;
-	
 	return Specific and PseudoCache[Specific] or PseudoCache;
+end;
+
+function PseudoService:GetPseudoModule(name:string)
+	return Pseudo.Core.Classes:FindFirstChild(name,true);
 end;
 
 
