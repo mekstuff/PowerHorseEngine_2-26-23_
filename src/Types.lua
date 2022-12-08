@@ -39,9 +39,66 @@ export type App = {
 	-- Enum: Enumeration.Enumeration,
 	Create: CreateCustomClass,
 	GetGlobal: (self:any,GlobalName:string)->any,
-    GetService: (self:any,ServiceName:string)->any,
+    GetService: (
+        ((self:any,"AudioService")->AudioService)
+        &((self:any,"BanService")->BanService)
+        &((self:any,"ChatTagService")->ChatTagService)
+        &((self:any,"ClientTradeService")->ClientTradeService)
+        &((self:any,"CodeService")->CodeService)
+        &((self:any,"CommandService")->CommandService)
+        &((self:any,"CoordinateService")->CoordinateService)
+        &((self:any,"CoreGuiService")->CoreGuiService)
+        &((self:any,"CoreProviderService")->CoreProviderService)
+        &((self:any,"CustomClassService")->CustomClassService)
+        &((self:any,"DataStoreService")->DataStoreService)
+        &((self:any,"EncryptionService")->EncryptionService)
+        &((self:any,"ErrorService")->ErrorService)
+        &((self:any,"FormatService")->FormatService)
+        &((self:any,"GridPlacementService")->GridPlacementService)
+        &((self:any,"InGamePurchaseService")->InGamePurchaseService)
+        &((self:any,"KEYSERVICE")->KEYSERVICE)
+        &((self:any,"MessagingService")->MessagingService)
+        &((self:any,"ModalService")->ModalService)
+        &((self:any,"NotificationBannerService")->NotificationBannerService)
+        &((self:any,"NotificationService")->NotificationService)
+        &((self:any,"PingService")->PingService)
+        &((self:any,"PromptService")->PromptService)
+        &((self:any,"PseudoService")->PseudoService)
+        &((self:any,"QuickWeldService")->QuickWeldService)
+        &((self:any,"RagdollService")->RagdollService)
+        &((self:any,"ReplciationService")->ReplciationService)
+        &((self:any,"SerializationService")->SerializationService)
+        &((self:any,"SmartTextService")->SmartTextService)
+        &((self:any,"SplashScreenSequence")->SplashScreenSequence)
+        &((self:any,"TextService")->TextService)
+        &((self:any,"TopBarService")->TopBarService)
+        &((self:any,"TradeService")->TradeService)
+        &((self:any,"TweenService")->TweenService)
+        &((self:any,"UserIdService")->UserIdService)
+        &((self:any,"UserKeybindService")->UserKeybindService)
+        &((self:any,"UserThumbnailService")->UserThumbnailService)
+        &((self:any,"VoteKickService")->VoteKickService)
+        &((self:any,"WaypointService")->WaypointService)
+    ),
+    -- GetService: (self:any,ServiceName:string)->any,
 	GetProvider: (self:any,ProviderName:string)->any,
-	Import: (self:any,libraryName:string)->any,
+    Import: (
+        ((self:any,"DirectionalArrow3D")->DirectionalArrow3DLibrary)
+        &((self:any,"Framework")->FrameworkLibrary)
+        &((self:any,"Collector")->CollectorLibrary)
+        &((self:any,"Contextor")->ContextorLibrary)
+        &((self:any,"Math")->MathLibrary)
+        &((self:any,"Pointer")->PointerLibrary)
+        &((self:any,"Query")->QueryLibrary)
+        &((self:any,"ReClasser")->ReClasserLibrary)
+        &((self:any,"ServerBee")->ServerBeeLibrary)
+        &((self:any,"SpatialArea")->SpatialAreaLibrary)
+        &((self:any,"Stack")->StackLibrary)
+        &((self:any,"State")->StateLibrary)
+        &((self:any,"StateManager")->StateManagerLibrary)
+        &((self:any,"Whiplash")->WhiplashLibrary)
+    ),
+	-- Import: (self:any,libraryName:string)->any,
 	GetConfig: (self:any)->any,
 	-- GetPseudoFromInstance: typeof(PowerHorseEngine.GetPseudoFromInstance),
 }
