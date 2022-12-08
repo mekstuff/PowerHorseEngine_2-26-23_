@@ -77,7 +77,7 @@ end;
 
 	@return PHePluginStudioTool
 ]=]
-function PHePluginAppHandler.addTool(App:table,ToolData:table,ManifestName:string,toolbar:PluginToolbar)
+function PHePluginAppHandler.addTool(App:table,ToolData:table,ManifestName:string,toolbar:PluginToolbar,AppStorage:Folder)
 	local PHeModules = PHePluginAppHandler.getModulesfolder();
 
 	local ImageProvider = App:GetProvider("ImageProvider");
@@ -105,12 +105,12 @@ function PHePluginAppHandler.addTool(App:table,ToolData:table,ManifestName:strin
 	data.name = data.name or data.id;
 	if(data.toolboxbutton == nil)then data.toolboxbutton = true;end;
 
-	local AppStorage = PHeModules:FindFirstChild(data.id);
-	if(not AppStorage)then
+	local TargetStorage = AppStorage:FindFirstChild(data.name);
+	if(not TargetStorage)then
 		local s = Instance.new("Folder");
-		s.Name = data.id;
-		s.Parent = PHeModules;
-		AppStorage = s;
+		s.Name = data.name;
+		s.Parent = AppStorage;
+		TargetStorage = s;
 	end;
 	
 	ToolData.ClassName = ToolData.ClassName or data.name;
@@ -147,7 +147,7 @@ function PHePluginAppHandler.addTool(App:table,ToolData:table,ManifestName:strin
     PHePluginStudioTool._dev.button = ToolClassButton;
 	PHePluginStudioTool._dev.info = data;
 	PHePluginStudioTool._enabled = false;
-	PHePluginStudioTool._storage = AppStorage;
+	PHePluginStudioTool._storage = TargetStorage;
 	
 	if(data.toolboxbutton)then
 		ToolClassButton.Click:Connect(function()
@@ -178,11 +178,18 @@ function PHePluginAppHandler.CreatePHeLibraryObject(LibraryFolder:Folder,toolbar
     local App = require(script.Parent.Parent.Parent.Parent);
 	local ErrorService = App:GetService("ErrorService");
 	local CustomClassService = App:GetService("CustomClassService");
-	
+
 	local isProperyLibrary = PHePluginAppHandler.IsProperLibrary(LibraryFolder);
 	if(isProperyLibrary.success)then
 		local Manifest = require(LibraryFolder:FindFirstChild("$Manifest"));
-		
+		local PHeModules = PHePluginAppHandler.getModulesfolder();
+		local AppStorage = PHeModules:FindFirstChild(Manifest.Name);
+		if(not AppStorage)then
+			local s = Instance.new("Folder");
+			s.Name = Manifest.Name;
+			s.Parent = PHeModules;
+			AppStorage = s;
+		end;
 		--[=[
 			@class PHePluginLibraryObject
 		]=]
@@ -210,7 +217,7 @@ function PHePluginAppHandler.CreatePHeLibraryObject(LibraryFolder:Folder,toolbar
 		function PHePluginLibraryObject:CreateStudioTool(ClassInfo:table)
 			ErrorService.assert(ClassInfo and typeof(ClassInfo) == "table", ("Table expected when calling :CreatetoolbarButton, got %s"):format(typeof(ClassInfo)));
 			
-			local classObject,toolbarButton = PHePluginAppHandler.addTool(App,ClassInfo, Manifest.Name, toolbar);
+			local classObject,toolbarButton = PHePluginAppHandler.addTool(App,ClassInfo, Manifest.Name, toolbar, AppStorage);
 			classObject._App = self;
 			classObject:initiated(self._PHeAppPseudoHooks);
 			self._PHeAppPseudoHooks = nil;
