@@ -46,6 +46,7 @@ function Snackbar:_Render(App)
     local function getActionButton()
         if(ActionButton)then return end;
         ActionButton = App.new("Button");
+        ActionButton.ButtonFlexSizing = true;
         ActionButton.TextColor3 = Theme.getCurrentTheme().Foreground;
         ActionButton.BackgroundColor3 = Theme.getCurrentTheme().ForegroundText;
         ActionButton.SupportsRBXUIBase = true;

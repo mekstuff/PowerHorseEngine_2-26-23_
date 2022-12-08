@@ -5,16 +5,10 @@ local module = {}
 
 local Util = require(script.Core:WaitForChild("Util"));
 
-function module.new(Pseudo:string,Parent:Instance?,...:any)
-	assert(typeof(Pseudo) == "string", ("String expectd for Pseudo name, got %s. {%s}"):format(typeof(Pseudo), tostring(Pseudo)));
-	local name,type_ = unpack(Pseudo:split("@"));
+function module.new(PseudoName:string,Parent:Instance?,...:any)
+	assert(typeof(PseudoName) == "string", ("String expectd for Pseudo name, got %s. {%s}"):format(typeof(PseudoName), tostring(PseudoName)));
+	local name,type_ = unpack(PseudoName:split("@"));
 	local Pseudo, id = Util.Produce(name,Parent,type_,...);
-	
-	if(Pseudo and id)then
-		pcall(function()
-			if(Pseudo._init)then Pseudo:_init();end;
-		end)
-	end;
 	
 	if(name == "RInstance" and type_)then
 		Pseudo.Instance = type_;

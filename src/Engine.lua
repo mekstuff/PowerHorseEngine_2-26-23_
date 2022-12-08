@@ -49,9 +49,7 @@ local StorageEvents = {
 };
 
 function Engine:InitPlugin(plugin)
-
 	local Manifest = require(script.Parent["Manifest"]);
-
 	local PluginService = ServiceProvider:LoadServiceAsync("PluginService");
 	PluginService:Sync(plugin);
 	print("\nRunning", Manifest.Name, "v-", Manifest.Upd.Version, "for plugin \"", plugin,"\"");

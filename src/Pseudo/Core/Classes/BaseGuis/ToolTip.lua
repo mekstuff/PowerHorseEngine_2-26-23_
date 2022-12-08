@@ -15,7 +15,7 @@ local ToolTip = {
 	Name = "ToolTip";
 	ClassName = "ToolTip";
 	ContentPadding = Vector2.new(5,5);
-	Offset = Vector2.new(10,10);
+	Offset = Vector2.new(10,25);
 	RevealOnMouseEnter = true;
 	IdleTimeRequired = 1;
 	PositionBehaviour = Enumeration.PositionBehaviour.FollowMouse;
@@ -60,7 +60,7 @@ local function Listen(self)
 	end);
 	self._dev.__prevAdorneeConnectionB = AdorneeObject.MouseLeave:Connect(function()
 		if(self.RevealOnMouseEnter)then
-			-- self:_Hide();
+			self:_Hide();
 		end;
 	end);
 end;
@@ -72,6 +72,30 @@ end;
 function ToolTip:Show(...:any)
 	return self:_Show(...);
 end;
+
+--[=[
+	Creates a [Text] Pseudo and parents it to the tooltip
+]=]
+function ToolTip:AddTipText(Text:string|{[string]:any}?,TextProps:{[string]:any}?)
+	if(typeof(Text) == "table")then
+		TextProps = Text;
+		Text = nil;
+	end
+	local App = self:_GetAppModule();
+	local TextObject = App.new("Text");
+	TextObject.TextWrapped = true;
+	TextObject.AutomaticSize = Enum.AutomaticSize.Y;
+	TextObject.Text = Text or TextObject.Text;
+	TextObject.Size = UDim2.new(0,120,0,0);
+	if(TextProps)then
+		for a,b in pairs(TextProps) do
+			TextObject[a] = b;
+		end;
+	end;
+	TextObject.Parent = self;
+	return TextObject;
+end;
+
 --[=[]=]
 function ToolTip:_Track()
 	--local ViewportRespectiveFrame = self:GetComponent();
@@ -229,7 +253,7 @@ function ToolTip:_Render(App)
 		};
 		_Mapping = {
 			[Frame] = {
-				"BackgroundColor3","BackgroundTransparency","Roundness";
+				"BackgroundColor3","BackgroundTransparency","Roundness","StrokeTransparency","StrokeColor3","StrokeThickness";
 			}	
 		};
 	};

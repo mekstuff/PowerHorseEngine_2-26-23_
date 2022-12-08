@@ -94,6 +94,7 @@ type useEffect = (Handler:any, Depedencies:any?) -> Servant
 type useRender = (Handler:any, Depedencies:any?) -> Servant
 type useMapping = (props:{string},depedencies:{Instance|Pseudo|any}) -> nil
 type useRawset = (handler:(newValue:any)->any,dependency:string) -> nil
+type useComponents = (components:{[string]:any}) -> nil
 
 type StateFunctionalCall = () -> any
 export type State = Pseudo&StateFunctionalCall&{
@@ -107,6 +108,7 @@ export type PseudoHooks = {
     useRender: useRender,
     useMapping: useMapping,
     useRawset: useRawset,
+    useComponents: useComponents,
 }
 
 -- export type Enumeration = Enumeration.Enumeration;
@@ -346,6 +348,14 @@ export type PHeModalPrompt = Prompt;
 
 --> Services
 
+export type QuickWeldService = {
+    AnchorAll: (self:any,Object:Instance,Ignore:{string}?)->nil,
+    UnAnchorAll: (self:any,Object:Instance,Ignore:{string}?)->nil,
+    SetCanCollideAll: (self:any,Object:Instance,State:boolean?,Ignore:{string}?)->nil,
+    WeldAll: (self:any,Object:Instance,WeldTo:Instance?,DontWeldDescendants:boolean?)->nil,
+}
+export type PHeQuickWeldService = QuickWeldService;
+
 export type ReplicationService = {
     destroyReplicationToken: (id:string) -> nil,
     newReplicationToken: (pseudo:Pseudo) -> nil,
@@ -533,6 +543,12 @@ export type Engine = {
 }
 export type PHeEngine = Engine;
 --> Built in libraries
+
+export type SillitoLibrary = {
+    Screen: (self:any,ScreenProps:{[string]:any},...any) -> TabGroup
+}
+export type PHeSillitoLibrary = SillitoLibrary;
+
 export type StateSetterFunc = (value:any) -> nil;
 export type PHeStateSetterFunc = StateSetterFunc;
 export type StateLibrary = (defaultValue:any?) -> (State,StateSetterFunc);

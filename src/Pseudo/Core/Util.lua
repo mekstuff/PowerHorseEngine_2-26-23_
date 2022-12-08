@@ -257,7 +257,7 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 	propSheet["_children"] = {};
 	propSheet["__lockedProperties"] = {};
 	propSheet["_stateControlledProperties"] = {};
-	propSheet["_getCurrentPropSheetState"] = function(ignoreFunctions:boolean?,ignoreHiddenProps:boolean?,serializeUnsupportedROBLOXProps:boolean?,onlykeys:boolean?):table
+	propSheet["_getCurrentPropSheetState"] = function(ignoreFunctions:boolean?,ignoreHiddenProps:boolean?,serializeUnsupportedROBLOXProps:boolean?,onlykeys:boolean?):{}
 		local x = {};
 		for a,b in pairs(propSheet)do
 			if not( (ignoreHiddenProps and string.match(a,"^_")) or (ignoreFunctions and typeof(b) == "function"))then
@@ -753,7 +753,7 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 				]=]
 				hooks.useMapping = function(props:table,dependencies:table):nil
 					assert(typeof(props) == "table", ("got %s on useMapping props expected table"):format(typeof(props)));
-					assert(typeof(dependencies) == "function", ("got %s on useMapping dependencies expected table"):format(typeof(dependencies)));
+					assert(typeof(dependencies) == "table", ("got %s on useMapping dependencies expected table"):format(typeof(dependencies)));
 					if(not quickMap)then
 						quickMap = {};
 					end;
@@ -821,6 +821,11 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 	
 	--> Initiates the Pseudo Class
 	Pseudo:_pseudoInit();
+
+	--> _init, mostly for basegui
+	pcall(function()
+		if(Pseudo._init)then Pseudo:_init();end;
+	end)
 
 	--> Creates ReplicationToken for Pseudo
 	if(IsServer and ReplicationStatus.ReplicateObject)then	

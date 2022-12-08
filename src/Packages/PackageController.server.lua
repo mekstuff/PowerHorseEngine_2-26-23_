@@ -15,7 +15,6 @@ if(script.Parent == sss)then
 end;
 
 if(script.Parent.Parent.Parent ~= sss)then
-	print("not releasing packages");
 	script.Parent:Destroy() --> no need for packages to run, PowerHorseEngine is proabably being used by a external source or something
 	return;
 end;
