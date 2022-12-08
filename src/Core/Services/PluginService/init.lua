@@ -35,6 +35,10 @@ end
 
 --[=[]=]
 function PluginService:ReadSync():table?
+	if(not currentPlugin)then
+		--> Try to grab plugin (this fixes trying to run plugin in runmode)
+		currentPlugin = getfenv(0).plugin or script:FindFirstAncestorWhichIsA("Plugin");
+	end
 	return currentPlugin and {
 		app = currentApp;
 		currentPlugin = currentPlugin
