@@ -22,8 +22,11 @@ function Math.oscillate(min:number,max:number?,Time:number?):number
     return (addv + subv *(sin(Time*1*pi*2)) );
 end;
 --[=[]=]
-function Math.perc(number:number,max:number?)
-    return (number/number)*max or 100;
+function Math.perc(x:number,y:number,max:number?)
+    if(x == 0 and y == 0)then
+        return 0;
+    end
+    return (x/y)*(max or 100);
 end;
 
 return setmetatable(Math,{
