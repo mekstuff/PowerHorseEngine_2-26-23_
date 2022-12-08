@@ -14,7 +14,7 @@ local TextInput = {
 	ClassName = "TextInput";
 	Size = UDim2.fromOffset(120,20);
 	PlaceholderText = "Text Input";
-	PlaceholderColor3 = Color3.fromRGB(178, 178, 178);
+	PlaceholderTextColor3 = Color3.fromRGB(178, 178, 178);
 	PlaceholderTextTransparency = 0;
 
 	PlaceholderBehaviour = Enumeration.PlaceholderBehaviour.Default;
@@ -52,7 +52,7 @@ TextInput.__inherits = {"BaseGui","GUI","Frame","Text"};
 	@within TextInput
 ]=]
 --[=[
-	@prop PlaceholderColor3 Color3
+	@prop PlaceholderTextColor3 Color3
 	@within TextInput
 ]=]
 --[=[
@@ -143,8 +143,26 @@ function TextInput:_Render(App)
 	TextBox.BackgroundTransparency = 1;
 	
 	
+	--[=[
+		@prop Focused PHeSignal
+		@within TextInput
+	]=]
 	local focused = self:AddEventListener("Focused",true,TextBox.Focused);
+	--[=[
+		@prop FocusLost PHeSignal
+		@within TextInput
+	]=]
 	local focuslost = self:AddEventListener("FocusLost",true,TextBox.FocusLost);
+	--[=[
+		@prop MouseEnter PHeSignal
+		@within TextInput
+	]=]
+	self:AddEventListener("MouseEnter",true,TextBox.MouseEnter)
+	--[=[
+		@prop Mouseleave PHeSignal
+		@within TextInput
+	]=]
+	self:AddEventListener("MouseLeave",true,TextBox.MouseLeave);
 	
 	
 	focused:Connect(function()
@@ -266,6 +284,9 @@ function TextInput:_Render(App)
 			Wrapper.ZIndex = Value;
 			TextBox.ZIndex = Value;
 			PlaceholderText.ZIndex = Value;
+			if(ErrorText)then
+				ErrorText.ZIndex = Value;
+			end
 		end;
 		["PlaceholderTextColor3"] = function(Value)
 			PlaceholderText.TextColor3 = Value;
@@ -291,6 +312,7 @@ function TextInput:_Render(App)
 				ErrorText.BackgroundTransparency = 1;
 				ErrorText.TextXAlignment = Enum.TextXAlignment.Left;
 				ErrorText.TextYAlignment = Enum.TextYAlignment.Top;
+				ErrorText.ZIndex = self.ZIndex;
 			end;
 			if(Value ~= "")then
 				ErrorText.Visible = true;

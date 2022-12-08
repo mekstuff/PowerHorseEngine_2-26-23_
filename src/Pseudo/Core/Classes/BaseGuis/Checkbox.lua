@@ -91,6 +91,16 @@ function Checkbox:_Render(App)
 ]=]
 	self:AddEventListener("MouseButton2Up",true,CheckboxButton.MouseButton2Up);
 --[=[
+	@prop MouseEnter PHeSignal
+	@within Checkbox
+]=]
+	self:AddEventListener("MouseEnter",true,CheckboxButton.MouseEnter);
+--[=[
+	@prop MouseLeave PHeSignal
+	@within Checkbox
+]=]
+	self:AddEventListener("MouseLeave",true,CheckboxButton.MouseLeave);
+--[=[
 	@prop Toggled PHeSignal
 	@within Checkbox
 ]=]
