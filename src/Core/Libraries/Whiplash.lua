@@ -128,7 +128,7 @@ local function getThisValue(object:any,thispath:string):any
     return lastDirectory;
 end;
 
-function Whiplash.New(class:string):Instance
+function Whiplash.New(class:string):any
     local Obj = _getInstance(class);
     return function (props)
         local targetParent;
@@ -191,7 +191,7 @@ end;
 
 
 --[=[]=]
-function Whiplash.this(followOrder:boolean):table
+function Whiplash.this(followOrder:boolean?):table
     if(followOrder == nil)then followOrder = true;end;
     local _path = "";
     local scope = {
@@ -239,7 +239,7 @@ end;
         };
     ```
 ]=]
-function Whiplash.ForEach(loop:table)
+function Whiplash.ForEach(loop:{})
     return function (p,callback)
        for i,v in pairs(loop) do
             local res = callback(v,i);

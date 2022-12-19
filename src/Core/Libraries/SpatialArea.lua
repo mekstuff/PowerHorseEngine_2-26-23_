@@ -1,8 +1,14 @@
 local CustomClassService = require(script.Parent.Parent.Services.CustomClassService);
 local Players = game:GetService("Players");
 
-local module = {}
+--[=[
+	@class SpatialArea
+]=]
+local SpatialArea = {}
 
+--[=[
+	@class SpatialAreaClass
+]=]
 local SpatialAreaClass = {
 	Name = "SpitialArea",
 	ClassName = "SpitialArea",
@@ -13,7 +19,29 @@ local SpatialAreaClass = {
 	Enabled = true;
 };
 
-function SpatialAreaClass:GetSpotWithinArea(Object)
+--[=[
+	@prop OverlapParams OverlapParams
+	@within SpatialAreaClass
+]=]
+--[=[
+	@prop Area Instance?
+	@within SpatialAreaClass
+]=]
+--[=[
+	@prop CFrame CFrame
+	@within SpatialAreaClass
+]=]
+--[=[
+	@prop Size Vector3
+	@within SpatialAreaClass
+]=]
+--[=[
+	@prop Enabled boolean
+	@within SpatialAreaClass
+]=]
+
+--[=[]=]
+function SpatialAreaClass:GetSpotWithinArea(Object:any):CFrame
 	local halfSize = self.Size/2
 	local RandomX,RandomZ = math.random(-halfSize.X,halfSize.X),math.random(-halfSize.Z,halfSize.Z);
 
@@ -36,11 +64,29 @@ function SpatialAreaClass:_Render()
 	LiveDemo.Parent = workspace;
 	
 	local InActiveRegion = {};
-	
+	--[=[
+		@prop ObjectAdded PHeSignal<Pseudo|Instance|any>
+		@within SpatialAreaClass
+		@tag Event
+	]=]
 	local ObjectAdded = self:AddEventListener("ObjectAdded",true);
+	--[=[
+		@prop ObjectRemoved PHeSignal<Pseudo|Instance|any>
+		@within SpatialAreaClass
+		@tag Event
+	]=]
 	local ObjectRemoved = self:AddEventListener("ObjectRemoved",true)
-	
+	--[=[
+		@prop PlayerAdded PHeSignal<Player>
+		@within SpatialAreaClass
+		@tag Event
+	]=]
 	local PlayerAdded = self:AddEventListener("PlayerAdded",true);
+	--[=[
+		@prop PlayerRemoved PHeSignal<Player>
+		@within SpatialAreaClass
+		@tag Event
+	]=]
 	local PlayerRemoved = self:AddEventListener("PlayerRemoved",true)
 	
 	local PlayersInActiveRegion = {};
@@ -161,10 +207,12 @@ function SpatialAreaClass:_Render()
 	};
 end
 
-
-function module.new()
+--[=[
+	@return SpatialAreaClass
+]=]
+function SpatialArea.new()
 	local Class = CustomClassService:Create(SpatialAreaClass);
 	return Class;
 end;
 
-return module
+return SpatialArea

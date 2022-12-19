@@ -9,7 +9,6 @@ local Format = require(script.Parent.Parent.Globals.Format);
 	@class PingService
 
 ]=]
-
 local PingServiceServer = {};
 local PingService = {};
 
@@ -93,12 +92,9 @@ function PingService:RequestUserPingAsync()
 			
 			};
 		end
-		
 		local newClass = CustomClassService:CreateClassAsync(c);
-	
-		PingReader = newClass;		
-		
-	end
+		PingReader = newClass;
+	end;
 	return PingReader;
 end
 

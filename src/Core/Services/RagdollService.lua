@@ -1,6 +1,6 @@
-local module = {}
+local RagdollService = {}
 
-function module:RigCharacter(Character)
+function RagdollService:RigCharacter(Character:Model)
 	local pr = Character.PrimaryPart or Character:GetChildren()[1];
 	if(pr:FindFirstChild("CharacterRig%Ragdoll%identifier"))then print("Character already rigged") return;end;
 
@@ -47,4 +47,4 @@ function module:RigCharacter(Character)
 
 end
 
-return module
+return RagdollService

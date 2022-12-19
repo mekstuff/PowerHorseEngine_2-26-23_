@@ -1,10 +1,9 @@
-local module = {}
+local Client = {}
 local CustomClassService = require(script.Parent.Parent.Services.CustomClassService);
 
 local PlayerMouse;
 
-
-function module:GetMouse()
+function Client:GetMouse()
 	if(PlayerMouse)then
 		return PlayerMouse;
 	else
@@ -13,4 +12,4 @@ function module:GetMouse()
 	end
 end;
 
-return module
+return Client

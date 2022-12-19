@@ -361,20 +361,7 @@ function Button:_Render(App)
 	Text.AnchorPoint = Vector2.new(0,.5);
 	Text.Position = UDim2.fromScale(0,.5);
 	Text.BackgroundTransparency = 1;
-	
-	--Text.Size = UDim2.new(0,5,0,0);
---[[
-	local IconWrapper = App.new("Frame", TextAndIconWrapper);
-	IconWrapper.Name = "$l_icon_wrapper";
-	IconWrapper.SupportsRBXUIBase = true;
-	IconWrapper.Position = UDim2.new(0,1,0,0);
-	IconWrapper.BackgroundTransparency = .6;
-	IconWrapper.BackgroundColor3 = Color3.fromRGB(0,255,0)
-	IconWrapper.Size = UDim2.fromScale(1,1);
-	local IconWrapperAspectRatioConstraint = Instance.new("UIAspectRatioConstraint",IconWrapper:GetGUIRef());
-	IconWrapperAspectRatioConstraint.DominantAxis = Enum.DominantAxis.Height
-	]]
-	
+
 	local IconImage = App.new("Image", TextAndIconWrapper);
 	local IconImageRef = IconImage:GetGUIRef();
 	-- IconImageRef.Name = "a_l$"

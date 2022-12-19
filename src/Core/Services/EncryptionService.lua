@@ -1,4 +1,7 @@
-local module = {};
+--[=[
+	@class EncryptionService
+]=]
+local EncryptionService = {};
 
 local ASCIICharsSupported = require(script.Parent.Parent.Parent.Pseudo.Core).ASCIICharsSupported;
 
@@ -13,26 +16,27 @@ local function genkeyatlen(len)
 	return table.concat(t,"");
 end
 
-function module:g256enc()
+--[=[]=]
+function EncryptionService:g256enc():string
 	return genkeyatlen(128);
 end;
 
---local 
-
-function module:Encrypt(str,enckey)
-	enckey = enckey or module:g256enc();
+--[=[]=]
+function EncryptionService:Encrypt(str:any,enckey:any)
+	enckey = enckey or EncryptionService:g256enc();
 	print(enckey)
 
 	--[[
-	enckey = enckey or module:g256enc();
+	enckey = enckey or EncryptionService:g256enc();
 	for i,char in ipairs(str:split("")) do
 		
 	end;
 	]]
 end;
 
-function module:Decrypt(enc,key)
+--[=[]=]
+function EncryptionService:Decrypt(enc:any,key:any)
 	
 end;
 
-return module;
+return EncryptionService;

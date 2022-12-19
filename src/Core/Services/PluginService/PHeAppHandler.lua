@@ -3,6 +3,8 @@
 ]=]
 local PHePluginAppHandler = {};
 
+local PluginApps = {};
+
 --[=[]=]
 function PHePluginAppHandler.IsProperLibrary(libFile:Folder):table
 	local isFolder = typeof(libFile) == "Instance" and libFile:IsA("Folder");
@@ -31,7 +33,6 @@ function PHePluginAppHandler.IsProperLibrary(libFile:Folder):table
 	
 	if(not manifestReq.Name)then
 		return {
-			
 			error="Name is required to be stated in your $Manifest."
 		}
 	end
@@ -77,8 +78,7 @@ end;
 
 	@return PHePluginStudioTool
 ]=]
-function PHePluginAppHandler.addTool(App:table,ToolData:table,ManifestName:string,toolbar:PluginToolbar,AppStorage:Folder)
-	local PHeModules = PHePluginAppHandler.getModulesfolder();
+function PHePluginAppHandler.addTool(App:table,ToolData:table,ManifestName:string,toolbar:PluginToolbar,AppStorage:Folder,PluginLibraryObject:PHePluginLibraryObject)
 
 	local ImageProvider = App:GetProvider("ImageProvider");
 	local ErrorService = App:GetService("ErrorService");
@@ -93,15 +93,15 @@ function PHePluginAppHandler.addTool(App:table,ToolData:table,ManifestName:strin
 	ErrorService.assert(ToolData.close, "missing close method from tool data, the closed method is triggered whenever the button is pressed and self._enabled = true. you should set self._enabled to false so our system knows that it was closed");
 	ErrorService.assert(ToolData.initiated, "missing initiated method from tool data, this is triggered whenever the tool was initiated from tool.init");
 	
-	
 	if(not ToolData.launch)then
 		ToolData.launch = ToolData.open;
-	end
+	end;
 
 	local data = ToolData.init();
 	
 	ErrorService.assert(data and data.id, "id missing from init function return, you are required to pass a unique identifier e.g return{ id = example-id-for-my-special-app}");
-	data.id = ManifestName.."-"..data.id;
+	-- data.id = ManifestName.."-"..data.id;
+	-- data.id = data
 	data.name = data.name or data.id;
 	if(data.toolboxbutton == nil)then data.toolboxbutton = true;end;
 
@@ -139,7 +139,24 @@ function PHePluginAppHandler.addTool(App:table,ToolData:table,ManifestName:strin
 		@method close
 		@within PHePluginStudioTool
 	]=]
+
+	--[=[
+		@method ProvideAPI
+		@within PHePluginStudioTool
+		@param APIKEY string?
+	]=]
+	function ToolData:ProvideAPI(APIKEY:string?)
+		if(PluginLibraryObject._StudioTools[ToolData.id])then
+			ErrorService.tossError(ToolData.id.." is already occupied an API Space, "..ToolData.name.." -> "..PluginLibraryObject.Name);
+		end;
+		PluginLibraryObject._StudioTools[data.id] = self;
+	end;
+
 	local PHePluginStudioTool = CustomClassService:Create(ToolData);
+	if(data.api)then
+		PHePluginStudioTool:ProvideAPI(typeof(data.api) == "string" and data.api or "$lanzo-open-api");
+	end;
+
 	PHePluginStudioTool.Parent = PHePluginAppHandler._container;
 
 	local ToolClassButton;
@@ -175,7 +192,8 @@ end;
 	@return PHePluginLibraryObject
 ]=]
 function PHePluginAppHandler.CreatePHeLibraryObject(LibraryFolder:Folder,toolbar:PluginToolbar,plugin:Plugin)
-    local App = require(script.Parent.Parent.Parent.Parent);
+    local App:PHeApp = require(script.Parent.Parent.Parent.Parent)::any;
+	local Theme = App:GetGlobal("Theme");
 	local ErrorService = App:GetService("ErrorService");
 	local CustomClassService = App:GetService("CustomClassService");
 
@@ -202,6 +220,22 @@ function PHePluginAppHandler.CreatePHeLibraryObject(LibraryFolder:Folder,toolbar
 			@within PHePluginLibraryObject
 		]=]
 		PHePluginLibraryObject.onReady = "**function";
+		--[=[
+			@prop onInstall function
+			@within PHePluginLibraryObject
+		]=]
+		PHePluginLibraryObject.onInstall = "**function";
+		--[=[
+			@prop onUninstall function
+			@within PHePluginLibraryObject
+		]=]
+		PHePluginLibraryObject.onUninstall = "**function";
+		--[=[
+			@prop onUpdate function
+			@within PHePluginLibraryObject
+		]=]
+		PHePluginLibraryObject.onUpdate = "**function";
+		
 
 		function PHePluginLibraryObject:_Render()
 			return function(Hooks)
@@ -211,21 +245,154 @@ function PHePluginAppHandler.CreatePHeLibraryObject(LibraryFolder:Folder,toolbar
 
 		--//Shipped with all tools
 
+		--> We should make PluginApps have a shared property.
+		if(PluginApps[Manifest.Name])then
+			App:GetService("ErrorService").tossWarn(("PluginApp Manifest Name used twice. \"%s\""):format(Manifest.Name))
+		end
+		PluginApps[Manifest.Name] = PHePluginLibraryObject;
+
+		--[=[
+			Gets the current version of the plugin install on the client
+			Your plugin must be published for this to take effect, until then, it will always return version 0.1.0
+		]=]
+		function PHePluginLibraryObject:GetLocalPluginVersion()
+			return "0.1.0";
+		end;
+		--[=[
+			Gets the current version of the plugin on the ROBLOX server
+			Your plugin must be published for this to take effect, until then, it will always return version 0.1.0
+		]=]
+		function PHePluginLibraryObject:GetCloudPluginVersion()
+			return "0.1.0";
+		end;
+		--[=[]=]
+		function PHePluginLibraryObject:RequestVersionUpdateAsync(Append:any?,UpdateRequired:boolean?,HeadsupText:string?)
+			HeadsupText = HeadsupText or "A new update "..self:GetCloudPluginVersion().." is available, "..self:GetLocalPluginVersion().." is no longer the latest, "..(UpdateRequired and "this update is required." or "Please update.");
+			local Prompt = App.new("Prompt");
+			if(not Append)then
+				Append = Instance.new("ScreenGui");
+				Append.Name = "%Temp-Lanzo%~=RequestVersionUpdateAsync@"..self.Name;
+				Append.Parent = game:GetService("CoreGui");
+				table.insert(Prompt._dev, Append); --> So it will be cleaned up
+			end;
+			Prompt.Header = "Update "..self.Name;
+			Prompt.Size = UDim2.fromOffset(250);
+			Prompt.Highlighted = true;
+			Prompt.HeaderIconSize = UDim2.fromOffset(30,30);
+			Prompt.HeaderIcon = UpdateRequired and "ico-mdi@alert/error" or "ico-mdi@alert/warning";
+			Prompt.HeaderIconAdaptsHeaderTextColor = false;
+			Prompt.HeaderIconColor3 = UpdateRequired and Theme.useTheme("Danger") or Theme.useTheme("Warning");
+			Prompt.HeaderAdjustment = App.Enumeration.Adjustment.Left;
+			Prompt.ZIndex = 10;
+			Prompt.Body = HeadsupText;
+			Prompt.BackgroundColor3 = Theme.useTheme("Background");
+			Prompt.HeaderTextColor3 = Theme.useTheme("Text");
+			Prompt:GET("Modal"):GET("Body").TextColor3 = Theme.useTheme("Text");
+			Prompt:GET("Modal"):GET("Body").ZIndex = Prompt.ZIndex+1;
+			local CancelButton = Prompt:AddButton("Cancel", {
+				TextColor3 = Theme.useTheme("Text");
+				BackgroundColor3 = Theme.useTheme("Secondary");
+				ButtonFlexSizing = true;
+				Disabled = UpdateRequired;
+			},"close");
+			local UpdateButton = Prompt:AddButton("Update", {
+				TextColor3 = Theme.useTheme("Text");
+				BackgroundColor3 = Theme.useTheme("Primary");
+				ButtonFlexSizing = true;
+			},"update");
+			Prompt.Parent = Append;
+			local _,btnid = Prompt.ButtonClicked:Wait();
+			if(btnid == "update")then
+				CancelButton.Disabled = true;
+				UpdateButton.Disabled = true;
+				Prompt.Header = "Updating...";
+				return true;
+			else
+				Prompt:Destroy();
+				return false;
+			end
+		end;
+		--[=[
+			@return PHePluginLibraryObject
+		]=]
+		function PHePluginLibraryObject:HasPluginApp(PluginAppName:string):boolean
+			ErrorService.assert(typeof(PluginAppName) == "string", ("string expected for PluginAppName on :HasPluginApp, got %s. %s"):format(tostring(PluginAppName),self.Name));
+			if(PluginApps[PluginAppName])then
+				return true;
+			else
+				return false;
+			end
+		end
+		--[=[
+			@return PHePluginLibraryObject
+		]=]
+		function PHePluginLibraryObject:WaitForPluginApp(PluginAppName:string, TRIES:number?)
+			ErrorService.assert(typeof(PluginAppName) == "string", ("string expected for PluginAppName on :WaitForPluginApp, got %s. %s"):format(tostring(PluginAppName),self.Name));
+			local HasApp = self:HasPluginApp(PluginAppName);
+			if(not HasApp)then
+				TRIES = TRIES or 1;
+				task.wait(TRIES/7);
+				if(TRIES == 10)then
+					ErrorService.tossWarn((":WaitForPluginApp is taking longer than usual for \"%s\""):format(PluginAppName));
+				end;
+				return self:WaitForPluginApp(PluginAppName,TRIES);
+			else
+				return PluginApps[PluginAppName];
+			end
+		end;
+		--[=[
+			@return PHePluginLibraryObject
+		]=]
+		function PHePluginLibraryObject:GetPluginApp(PluginAppName:string)
+			ErrorService.assert(typeof(PluginAppName) == "string", ("string expected for PluginAppName on :GetPluginApp, got %s. %s"):format(tostring(PluginAppName),self.Name));
+		end;
+		--[=[]=]
+		function PHePluginLibraryObject:HasStudioTool(StudioToolId:string):boolean
+			ErrorService.assert(typeof(StudioToolId) == "string", ("string expected for StudioToolId on :HasStudioTool, got %s. %s"):format(tostring(StudioToolId),self.Name));
+			if(self._StudioTools[StudioToolId])then
+				return true;
+			else
+				return false;
+			end
+		end;
+		--[=[
+			@return PHePluginStudioTool
+		]=]
+		function PHePluginLibraryObject:WaitForStudioTool(StudioToolId:string, TRIES:number?)
+			ErrorService.assert(typeof(StudioToolId) == "string", ("string expected for StudioToolId on :WaitForStudioTool, got %s. %s"):format(tostring(StudioToolId),self.Name));
+			local HasApp = self:HasStudioTool(StudioToolId);
+			if(not HasApp)then
+				TRIES = TRIES and TRIES+1 or 1;
+				task.wait(TRIES/7);
+				if(TRIES == 10)then
+					ErrorService.tossWarn((":WaitForStudioTool is taking longer than usual for \"%s\". Make sure that you are calling :ProvideAPI() on the given studio tool, you can also pass a .api='key or boolean' in the init() return to automatically ProvideAPI."):format(StudioToolId));
+				end;
+				return self:WaitForStudioTool(StudioToolId,TRIES);
+			else
+				return self._StudioTools[StudioToolId];
+			end
+		end;
+		--[=[
+			@return PHePluginStudioTool
+		]=]
+		function PHePluginLibraryObject:GetStudioTool(StudioToolId:string)
+			return self:WaitForStudioTool(StudioToolId);
+		end;
 		--[=[
 			@return PHePluginStudioTool
 		]=]
 		function PHePluginLibraryObject:CreateStudioTool(ClassInfo:table)
 			ErrorService.assert(ClassInfo and typeof(ClassInfo) == "table", ("Table expected when calling :CreatetoolbarButton, got %s"):format(typeof(ClassInfo)));
-			
-			local classObject,toolbarButton = PHePluginAppHandler.addTool(App,ClassInfo, Manifest.Name, toolbar, AppStorage);
+			local classObject,toolbarButton = PHePluginAppHandler.addTool(App,ClassInfo, Manifest.Name, toolbar, AppStorage, self);
 			classObject._App = self;
-			classObject:initiated(self._PHeAppPseudoHooks);
-			self._PHeAppPseudoHooks = nil;
-			if(classObject._mainWidget and classObject._mainWidget.Enabled)then
-				classObject:launch();
-				classObject.___phestudiotoollaunched=true;
-			end
-			
+			task.spawn(function() --> initiated is executed on a different thread, this helps with :WaitForStudioTool
+				classObject:initiated(self._PHeAppPseudoHooks);
+				self._PHeAppPseudoHooks = nil;
+				if(classObject._mainWidget and classObject._mainWidget.Enabled)then
+					classObject:launch();
+					classObject.___phestudiotoollaunched=true;
+				end;
+			end)
 			return classObject;
 		end;
 		--[=[]=]
@@ -255,14 +422,18 @@ function PHePluginAppHandler.CreatePHeLibraryObject(LibraryFolder:Folder,toolbar
 		end;
 		--//Shipped with all tools
 		
-		local GeneratedClass = CustomClassService:Create(PHePluginLibraryObject);	
+		local GeneratedClass = CustomClassService:Create(PHePluginLibraryObject);
+		GeneratedClass.Name = Manifest.Name;
+		GeneratedClass:_lockProperty("Name");
+		GeneratedClass._StudioTools = {};
 		
 		local s,r = pcall(function()
 			return require(isProperyLibrary.AppFile)(GeneratedClass);
 		end);
 		if(not s)then
 			ErrorService.tossError("Failed to connect to $App module, make sure that the module is returning a function. RBX?: "..r)
-		end
+		end;
+
 		if(GeneratedClass.onReady)then
 			GeneratedClass.onReady();
 		end;

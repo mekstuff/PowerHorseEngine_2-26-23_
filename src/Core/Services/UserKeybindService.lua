@@ -1,4 +1,4 @@
-local module = {}
+local UserKeybindService = {}
 local UIS = game:GetService("UserInputService");
 
 local UISConnection;
@@ -33,7 +33,7 @@ local function handleKeys()
 	end
 end
 
-function module:BindKeybind(...)
+function UserKeybindService:BindKeybind(...:any):(RBXScriptSignal,any,...any)
 	local e,id = addKeys(...)
 	if(not UISConnection)then
 		UISConnection = UIS.InputBegan:Connect(handleKeys);
@@ -43,7 +43,7 @@ end;
 
 
 --//
-function module:UnbindKey(id)
+function UserKeybindService:UnbindKey(id:any)
 	for index,v in pairs(UserKeybindDataList) do
 		if(v.id == id)then
 			v.event:Destroy();v.event=nil;
@@ -56,7 +56,7 @@ function module:UnbindKey(id)
 end;
 
 --//
-function module:ConvertBindsToString(...)
+function UserKeybindService:ConvertBindsToString(...:any):string
 	local Binds = {...};
 	local String = "";
 	
@@ -73,4 +73,4 @@ function module:ConvertBindsToString(...)
 	--if(#Binds < 0)then return String;end;
 end
 
-return module
+return UserKeybindService

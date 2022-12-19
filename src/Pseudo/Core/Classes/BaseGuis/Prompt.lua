@@ -25,7 +25,7 @@ local Prompt = {
 	DestroyOnOverride = false;
 	
 	--StandAlone = false;
-	PromptClass = "Main";
+	PromptClass = "$main";
 	
 	--Showing = false;
 	--HeaderAdjustment = Enumeration.Adjustment.Left;
@@ -236,12 +236,12 @@ end
 
 --//
 function Prompt:_Render(App)
-	
+	local PluginService = App:GetService("PluginService");
 	if(not IsClient)then return {};end;
 	
 	self._tweenSpeed = .65;
 
-	if(App:GetService("PluginService"):IsPluginMode())then
+	if(PluginService:IsPluginMode())then
 		self.ButtonsAdjustment = Enumeration.Adjustment.Right;
 	end
 	--local s = tick();
@@ -374,6 +374,12 @@ end)
 			end
 		end,
 		["*Parent"] = function(Value)
+			if(Value and PluginService:IsPluginMode())then
+				local pluginGui = Value:IsA("PluginGui") and Value or Value:FindFirstAncestorOfClass("PluginGui");
+				if(pluginGUi and self.PromptClass == "$main")then
+					self.PromptClass = "$main@"..pluginGui.Title;
+				end;
+			end
 			-- if(Value:FindFirstAncestorOfClass("DataModel") and self.Visible)then
 				-- self:Show();
 			-- end
@@ -409,7 +415,7 @@ end)
 				--"Position",
 				--"AnchorPoint",
 				"Roundness",
-				"Header",
+				"Header","HeaderIconColor3","HeaderIconAdaptsHeaderTextColor","HeaderIconSize",
 				"HeaderIcon","HeaderTextColor3",
 				"HeaderTextSize","BodyTextSize",
 				"ButtonsAdjustment","HeaderAdjustment",

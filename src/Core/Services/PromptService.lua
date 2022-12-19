@@ -25,7 +25,7 @@ end;
 --[=[
 	@return PromptResponse
 ]=]
-function PromptService:PromptUser(User:Player,Header:string|table,Body:string|nil?,Buttons:table?)
+function PromptService:PromptUser(User:Player,Header:string|{[any]:any},Body:string|nil?,Buttons:{[any]:any}?)
 	if(not IsServer)then ErrorService.tossWarn("PromptUserAsync() can only be called by the server.");return end;
 	if(not User)then ErrorService.tossWarn(tostring(User).." is not a valid user");return;end;
 	
@@ -36,9 +36,8 @@ function PromptService:PromptUser(User:Player,Header:string|table,Body:string|ni
 			Header = Header;
 			Body = Body;
 		}
-	end
+	end;
 
-	
 	local id = tostring(math.random(1,500));
 	if(not  Buttons)then
 		Buttons = {{
@@ -55,8 +54,7 @@ function PromptService:PromptUser(User:Player,Header:string|table,Body:string|ni
 	--newPromptResponse._User = User;
 	PromptsStorage[id]=newPromptResponse;
 	
-	
-	delay(20*1000,function()
+	task.delay(20*1000,function()
 		print("Removing prompt from storage because of time");
 		if(PromptsStorage[id])then
 			if(PromptsStorage._dev)then

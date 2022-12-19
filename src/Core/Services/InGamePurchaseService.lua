@@ -35,10 +35,9 @@ end
 	@client
 	@server
 ]=]
-function InGamePurchaseService:PromptPurchase(Plr:Player,ProductId:number,Props:table)
-	
+function InGamePurchaseService:PromptPurchase(Plr:Player,ProductId:number,Props:{[string]:any}?)
+
 	assert(Plr and game:GetService("Players"):FindFirstChild(Plr.Name), "PromptPurchase() First Argument Must Be A Player Instance");
-	
 	
 	Props = Props or {};
 	Props.Name = Props.Name or "Unknown Product";

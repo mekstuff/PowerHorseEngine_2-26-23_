@@ -198,7 +198,7 @@ function Pseudo:GetChildren(onlyPseudo:boolean):table
 	local onlyPseudoTable;
 
 	for _,x in pairs(Children) do
-		local isApartOfComponent = x.Name:match("^%$l_") or x.name:match("$_%$l");
+		local isApartOfComponent = x.Name:match("^%$l_") or x.Name:match("$_%$l");
 		if(not isApartOfComponent)then
 			local isPseudo = (x:FindFirstChild("_pseudoid"));
 			if(isPseudo)then

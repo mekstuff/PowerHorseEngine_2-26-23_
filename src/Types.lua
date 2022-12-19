@@ -38,7 +38,15 @@ export type App = {
 	-- Enumeration: Enumeration.Enumeration,
 	-- Enum: Enumeration.Enumeration,
 	Create: CreateCustomClass,
-	GetGlobal: (self:any,GlobalName:string)->any,
+    GetGlobal: (
+        ((self:any, "Client")->ClientGlobal)
+        &((self:any, "Engine")->Engine)
+        &((self:any, "Enum")->Enumeration)
+        &((self:any, "Format")->FormatGlobal)
+        &((self:any, "Pseudo")->PseudoGlobal)
+        &((self:any, "Theme")->Theme)   
+    ),
+	-- GetGlobal: (self:any,GlobalName:string)->any,
     GetService: (
         ((self:any,"AudioService")->AudioService)
         &((self:any,"BanService")->BanService)
@@ -57,7 +65,7 @@ export type App = {
         &((self:any,"GridPlacementService")->GridPlacementService)
         &((self:any,"InGamePurchaseService")->InGamePurchaseService)
         &((self:any,"KEYSERVICE")->KEYSERVICE)
-        &((self:any,"MessagingService")->MessagingService)
+        &((self:any,"MessagingService")->MessagingService) --> native
         &((self:any,"ModalService")->ModalService)
         &((self:any,"NotificationBannerService")->NotificationBannerService)
         &((self:any,"NotificationService")->NotificationService)
@@ -73,7 +81,7 @@ export type App = {
         &((self:any,"TextService")->TextService)
         &((self:any,"TopBarService")->TopBarService)
         &((self:any,"TradeService")->TradeService)
-        &((self:any,"TweenService")->TweenService)
+        &((self:any,"TweenService")->TweenService) --> Native for now
         &((self:any,"UserIdService")->UserIdService)
         &((self:any,"UserKeybindService")->UserKeybindService)
         &((self:any,"UserThumbnailService")->UserThumbnailService)
@@ -81,7 +89,16 @@ export type App = {
         &((self:any,"WaypointService")->WaypointService)
     ),
     -- GetService: (self:any,ServiceName:string)->any,
-	GetProvider: (self:any,ProviderName:string)->any,
+	-- GetProvider: (self:any,ProviderName:string)->any,
+    GetProvider: (
+        ((self:any,"LibraryProvider")->LibraryProvider)
+        &((self:any,"ContentProvider")->ContentProvider)
+        &((self:any,"ModuleFetcherProvider")->ModuleFetcherProvider)
+        &((self:any,"PropProvider")->PropProvider)
+        &((self:any,"ServiceProvider")->ServiceProvider)
+        &((self:any,"SignalProvider")->SignalProvider)
+        &((self:any,"UtilProvider")->UtilProvider)
+    ),
     Import: (
         ((self:any,"DirectionalArrow3D")->DirectionalArrow3DLibrary)
         &((self:any,"Framework")->FrameworkLibrary)
@@ -106,9 +123,9 @@ export type PHeApp = App;
 
 type PseudoRender = (App:App) -> nil
 
-type PHeSignal<T> = {
-    Connect: (self:any,(...T)->nil)-> nil,
-}
+type PHeSignal<T...> = {
+    Connect: (self:any, callback:(T...)->())->nil, --> For now we use this because I have no idea how to setup dynamic arguments with types :)
+};
 
 export type Pseudo = {
 	Name: string,
@@ -140,9 +157,9 @@ export type Pseudo = {
     RemoveEventListeners: (self:Pseudo)->nil,
     GetEventListener: (self:Pseudo)->PHeSignal<nil>,
     _lockProperty: (self:Pseudo,propertyName:string,propertyCallback:any)->nil,
-    _lockProperties: (self:Pseudo,properties:string|any)->nil,
-    _unlockProperty: (self:Pseudo,propertyNames:string|any)->nil,
-    [string]: any?
+    _lockProperties: (self:Pseudo,...string|any)->nil,
+    _unlockProperty: (self:Pseudo,...string|any)->nil,
+    [any]: any?
     -- _Render: PseudoRender
 }
 
@@ -370,6 +387,9 @@ export type PHeDropdownButton = DropdownButton;
 export type Modal = Pseudo&BaseGui&GUI&{
     Header: string,
     HeaderIcon: string,
+    HeaderIconColor3: Color3,
+    HeaderIconAdaptsHeaderTextColor: boolean,
+    HeaderIconSize: UDim2,
     HeaderTextSize: number,
     HeaderTextFont: Enum.Font,
     HeaderTextColor3: Color3,
@@ -402,23 +422,34 @@ export type Prompt = Modal&{
 };
 export type PHeModalPrompt = Prompt;
 
+--> Providers
+export type LibraryProvider = {
+    LoadLibrary: (...string) -> ...any
+};
+export type ContentProvider = {
+    Uri: (self:any, string:string,promise:boolean?) -> Promise|string
+};
+
+export type ModuleFetcherProvider = ModuleFetcherConstantProvider;
+
+export type PropProvider = {
+    GetProps: (self:any,propSheet:{},ignoreHiddenProps:boolean?,ignoreFunctions:boolean?,onlykeys:boolean?)->{[any]:any},
+    FromPseudoClass: (self:any,Class:string,ignoreHiddenProps:boolean?,ignoreFunctions:boolean?,onlyKeys:boolean?)->{[any]:any}
+};
+
+export type ServiceProvider = {
+    LoadServiceAsync: (self:any,ServiceName:string)->any
+};
+
+export type SignalProvider = {
+    new: (Name:string?) -> PHeSignal
+};
+
+export type UtilProvider = {
+    LoadUtil: (UtilName:string) -> any
+}
 
 --> Services
-
-export type QuickWeldService = {
-    AnchorAll: (self:any,Object:Instance,Ignore:{string}?)->nil,
-    UnAnchorAll: (self:any,Object:Instance,Ignore:{string}?)->nil,
-    SetCanCollideAll: (self:any,Object:Instance,State:boolean?,Ignore:{string}?)->nil,
-    WeldAll: (self:any,Object:Instance,WeldTo:Instance?,DontWeldDescendants:boolean?)->nil,
-}
-export type PHeQuickWeldService = QuickWeldService;
-
-export type ReplicationService = {
-    destroyReplicationToken: (id:string) -> nil,
-    newReplicationToken: (pseudo:Pseudo) -> nil,
-    ReplicatePseudo: (pseudo:Pseudo) -> nil,
-};
-export type PHeReplicationService = ReplicationService;
 
 type PHePluginStudioTool_dev = {}
 type PHePluginStudioTool_initreturn = {
@@ -426,29 +457,44 @@ type PHePluginStudioTool_initreturn = {
     id: string,
     icon: string?,
     toolboxbutton:boolean?,
+    api: boolean|string?,
 }
 
 type launch = (self:any)->nil;
 export type PHePluginStudioTool = {
     init: ()->PHePluginStudioTool_initreturn,
     launch: launch?,
-    initiated: (self:any,Hooks:PseudoHooks)->nil,
-    open: (self:any)->nil,
-    close: (self:any)->nil,
+    initiated: (self:any,Hooks:PseudoHooks)->any,
+    open: (self:any)->any,
+    close: (self:any)->any,
+    ProvideAPI: (self:any, APIKEY:string?) -> any,
+    _App: PHePluginLibraryObject,
+
     [string]: any
 };
 
 export type PHePluginLibraryObject = Pseudo&{
     onReady: ()->nil,
-    CreateStudioTool: (self:any,ClassInfo:PHePluginStudioTool)->nil,
+    onInstall: ()->nil,
+    onUninstall: ()->nil,
+    onUpdate: ()->nil,
+    onReady: ()->nil,
+    GetLocalPluginVersion: (self:any) -> string,
+    GetCloudPluginVersion: (self:any) -> string,
+    RequestVersionUpdateAsync: (self:any,Append:any?,UpdateRequired:boolean?,HeadsupText:string?) -> boolean,
+    CreateStudioTool: (self:any,ClassInfo:PHePluginStudioTool)->PHePluginStudioTool,
     CreateDockWidgetPluginGui: (self:any,WidgetName:string,WidgetInfo:DockWidgetPluginGuiInfo)->DockWidgetPluginGui,
     CreatePluginMenu: (self:any,id:any,name:string?)->PluginMenu,
     SavePluginData: (self:any,key:any,value:any)->nil,
     GetPluginData: (self:any,key:any,value:any)->nil,
     SendNotification: (self:any,t:any)->nil,
-}
-
-
+    GetPluginApp: (self:any,PluginAppName:string) -> PHePluginLibraryObject?,
+    WaitForPluginApp: (self:any,PluginAppName:string,TRIES:number?) -> PHePluginLibraryObject?,
+    HasPluginApp: (self:any,PluginAppName:string) -> boolean,
+    GetStudioTool: (self:any,StudioToolId:string) -> PHePluginStudioTool,
+    WaitForStudioTool: (self:any,StudioToolId:string) -> PHePluginStudioTool,
+    HasStudioTool: (self:any,StudioToolId:string) -> boolean,
+};
 
 export type PHePluginAppHandler = {
     IsProperLibraryFile: (libfile:Folder)->boolean,
@@ -502,6 +548,43 @@ export type AudioService = {
     UnmuteChannel:(self:any,ChannelName:string)->nil,  
 };
 export type PHeAudioService = AudioService;
+
+export type ChatTagService = {
+    AddChatTag: (self:any,Player:Player, TagInformation:{[any]:any}?) -> nil,
+    GetChatTags: (self:any,Player:Player, TagInformation:{[any]:any}?) -> nil,
+};
+
+export type ClientTradeService = {
+    TradeStarted: PHeSignal<nil>,
+    TradeEnded: PHeSignal<nil>,
+};
+
+export type CodeService = Pseudo&{
+
+};
+
+export type CommandService = {
+    GetCommands: (self:any) -> {[any]:any},
+    ExecuteCommand: (self:any, x:string, y:{[any]:any}, focusOnCommand:boolean?) -> string?,
+    GetCommand: (self:any, name:string) -> any,
+    FromStringToCommand: (self:any,String:string) -> (string,{}),
+    ExecuteCmdFromStr: (self:any, Str:string) -> string?
+};
+
+export type CoordinateService = {
+    AddCoordinate: (self:any, CFrameCoor:CFrame,Name:string,Category:string?,CoordinateId:string?,Reserved:{[number]:string|number}?) -> nil,
+    GetCoordinatesAsync: (self:any,forTeleportService:boolean?) -> {[any]:any}?,
+    TeleportAsync: (self:any,Player:Player,CoordinateName:string,CoordinateCategory:string?,Transition:boolean?,Notify:table?,IgnoreReserved:boolean?) -> nil,
+};
+
+export type CoreGuiService = {
+
+};
+
+export type CoreProviderService = {
+    CalculateUIAbsolutePosition: (self:any,Position:UDim2?,AnchorPoint:Vector2?,Relative:Vector2?) -> nil,
+};
+
 export type PseudoClassFunctionalRender = (PseudoHooks:PseudoHooks) -> nil
 export type PseudoClass = {
     Name: string?,
@@ -513,16 +596,224 @@ export type CustomClassService = {
 	CreateClassAsync: (self:any,ClassData:PseudoClass,DirectParent:any?,PropArguments:any?)->(Pseudo),
 	Create: (self:any,ClassData:PseudoClass,DirectParent:any?,PropArguments:any?)->(Pseudo),
 };
-export type PHeCustomClassService = CustomClassService;
+
+export type DataStore = Pseudo&{
+    Autosave: boolean,
+    RemoveCache: (self:any, Key:any) -> nil,
+    GetCache: (self:any) -> any,
+    SetCache: (self:any, To:any) -> nil,
+    RemoveAsync: (self:any, Key:any) -> nil,
+    RemoveAsync: (self:any, Key:any) -> nil,
+    GetAsync: (self:any, Key:any) -> any,
+    SetAsync: (self:any,Key:any,Value:any,ShouldServe:boolean?) -> nil,
+    SaveAsync: (self:any) -> nil,
+    Serve: (self:any,Key:any) -> nil,
+    UpdateAsync: (self:any,DatastoreKey:any,Key:any,Value:any) -> nil,
+};
+
+export type DataStoreService = {
+    GetDataStore: (self:any,dstore:string,version_:string?) -> DataStore
+};
+
+export type EncryptionService = {
+    g256enc: (self:any) -> string,
+    Encrypt: (self:any,str:any,enckey:string) -> nil,
+    Decrypt: (self:any,str:any,enckey:string) -> nil,
+};
+
+export type ErrorService = {
+    tossError: (errorshort:string, ...any) -> nil,
+    tossWarn: (errorshort:string, ...any) -> nil,
+    tossMessage: (errorshort:string, ...any) -> nil,
+    assert: (condition:boolean,errorshort:string, ...any) -> nil,
+};
+
+export type FormatService = {
+    toNumberAbbreviation: (self:any,n:number,...any) -> string,
+    toNumberCommas: (self:any,n:number,...any) -> string,
+    toTimeFormat: (self:any,timeStamp:number,is12Hour:boolean?) -> string,
+    toDateFormat: (self:any,timeStamp:number,useString:boolean?,shortenString:boolean?,indicateDayAsNumber:boolean?) -> string,
+    toTimeDifference: (self:any,t1:number,t2:number,...any) -> string,
+};
+
+export type GridPlacement = Pseudo&{
+    RaycastParams: RaycastParams,
+    UnitLength: number,
+    Results: {}?,
+    AutomaticPlacement: boolean,
+    AutomaticRotation: boolean,
+    -- RotationKeyCode: Enumeration.KeyCode
+    ShowBoundingBox: boolean,
+    GridCellSize: number,
+    Angle: number,
+};
+export type GridPlacementService = {
+    Create: (self:any, Instance:Instance) -> GridPlacement
+};
+
+export type InGamePurchaseService = {
+    PurchaseCompleted: PHeSignal<nil>,
+    PromptPurchase: (self:any,ProductId:number,Props:{[string]:any}) -> nil
+};
+
+export type KEYSERVICE = {
+    Give: (self:any,KeyName:string,Shared:boolean?,dedicatedUserId:number?) -> nil,
+    Get: (self:any,Keyname:string,fromShared:boolean?) -> nil,
+};
 
 export type ModalService = {
     ConvertToModal: (self:any,Frame:any,TargetModal:Modal?,ModalCloseButton:Button|CloseButton?,ModalAppender:any?,ModalHeader:Text|TextLabel|any?)->Modal
 };
-export type PHeModalService = ModalService;
+
+-- export type MessagingService 
+
+-- export type NotificationBannerService 
+
+export type NotificationResponse = Pseudo&{
+    Dismiss: (self:any) -> nil
+}
+export type NotificationService = {
+    SetNotificationsEnabled: (self:any, State:boolean) -> nil,
+    BroadcastNotification: (self:any, Data:{[any]:any}) -> nil,
+    SendNotificationToAllPlayers: (self:any, Data:{[any]:any},...any) -> nil,
+    SendNotification: (self:any, ...any) -> NotificationResponse,
+    SendNotificationAsync: (self:any, Plr:Player,Data:{[any]:any},...any) -> NotificationResponse,
+    AddNotificationStyle: (self:any, StyleName:string, StyleHandler:()->nil) -> nil,
+    HandleNotificationRequest: (self:any, ...any) -> any
+};
+
+export type PingReader = Pseudo&{
+    Enabled: boolean,
+    ms: string,
+    Ping: number,
+    UpdateInterval: number,
+    -- ConnectionStatus: Enumeration.ConnectionStatus,
+
+};
+export type PingService = {
+    Invoke: () -> boolean,
+    RequestUserPingAsync: () -> PingReader,
+};
+
+export type PromptResponse = Pseudo&{
+
+};
+export type PromptService = {
+    PromptUser: (self:any,User:Player,Header:string|{[any]:any},Body:string|nil?,Buttons:{[any]:any}?) -> PromptResponse,
+};
+
+export type PseudoService = {
+    FromROBLOXObject: (self:any, Instance:Instance,dontdeleteInstance:boolean?,p:Instance?) -> (Instance,{[any]:any}),
+    GetPseudoFromId: (self:any, id:Instance|StringValue|string) -> any,
+    GetPseudoObjects: (self:any, Specific:{[number]:string}?) -> {[any]:any}
+};
+
+export type QuickWeldService = {
+    AnchorAll: (self:any,Object:Instance,Ignore:{string}?)->nil,
+    UnAnchorAll: (self:any,Object:Instance,Ignore:{string}?)->nil,
+    SetCanCollideAll: (self:any,Object:Instance,State:boolean?,Ignore:{string}?)->nil,
+    WeldAll: (self:any,Object:Instance,WeldTo:Instance?,DontWeldDescendants:boolean?)->nil,
+};
+
+export type RagdollService = {
+    RigCharacter: (self:any, Character:Model) -> nil,
+};
+
+export type ReplicationService = {
+    destroyReplicationToken: (id:string) -> nil,
+    newReplicationToken: (pseudo:Pseudo) -> nil,
+    ReplicatePseudo: (pseudo:Pseudo) -> nil,
+};
+
+type SerializationService_SerializeAsync = (self:any,ToSerialize:any,...any) -> string;
+type SerializationService_DeserializeAsync = (self:any,ToDeserialize:any,...any) -> {[any]:any};
+export type SerializationService = {
+    SerializeAsync: SerializationService_SerializeAsync,
+    DeserializeAsync: SerializationService_DeserializeAsync,
+    Serialize: SerializationService_SerializeAsync,
+    Deserialize: SerializationService_DeserializeAsync,
+    SerializeTable: (self:any, Table:{[any]:any},...any) -> string,
+    DeserializeTable: (self:any, ...any) -> {[any]:any},
+    SerializeString: (self:any, String:string, SerializationVersion:string?) -> string,
+    DeserializeString: (self:any, String:string) -> string,
+    toBinary: (self:any, str:string) -> string,
+    fromBinary: (self:any, str:string) -> string,
+};
+
+export type SmartTextService = {
+    GetSmartText: (self:any, txt:string?, textComponent:any, ParentTo:any, txtSize:any, txtFont:any) -> any,
+};
+
+export type SplashScreenSequence = {
+    new: (Sequences:{[any]:any},defaultColor:Color3?,defaultLifeTime:number?) -> nil,  
+};
+
+export type TextService = {
+    GetWordsFromString: (self:any, String:string, StartCapture:string?, EndCapture:string?) -> {[any]:any},
+    GetWordAtPosition: (self:any, String:string, i:number) -> (string,number,number),
+    GetWordAtPosition: (self:any, txt:string, returnWithNoTags:boolean?) -> ({[any]:any},any?),
+};
+
+export type ActiveTrade = Pseudo&{
+    Sender: Player?,
+    Reciever: Player?,
+    TradeId: string,
+    MaximumContent: number,
+    AddContent: (self:any, ToUser:Player,Content:any,ContentId:string,IgnoreMaximumLimit:boolean?) -> nil,
+    RemoveContent: (self:any, fromUser:Player,ContentId:string) -> nil,
+    GetContents: (self:any, fromUser:Player) -> {[any]:any},
+    End: (self:any, Reasons:any) -> nil,
+    GetTradeActive: (self:any, Player1:Player,Player2:Player?) -> Player|boolean,
+    TradeRequestOutBound: (Sender:Player,Reciever:Player,Header:string?,Body:string?,Blurred:boolean?,Button1:string?,Button2:string?) -> nil,
+    ContentAdded: PHeSignal<Player,any,string>,
+    ContentRemoved: PHeSignal<Player,string>,
+    Ended: PHeSignal<...any>,
+};
+
+export type TradeService = {
+    TradeRequest: PHeSignal<nil>,
+    TradeStarted: PHeSignal<ActiveTrade>,
+    TradeEnded: PHeSignal<ActiveTrade>,
+    new: (Sender:Player,Reciever:Player,Header:string?,Body:string?,Blurred:boolean?,Button1:string?,Button2:string?) -> ActiveTrade,
+};
+
+-- export type TweenService
+
+export type UserIdService = {
+    GetUsername: (self:any, obj:Player|string|number) -> Promise,
+    GetUserId: (self:any, obj:Player|string|number) -> Promise,
+    getUserId: (obj:Player|string|number) -> number?,
+    getUsername: (obj:Player|string|number) -> string?,
+};
+
+export type UserKeybindService = {
+    BindKeybind: (self:any,...any) -> (RBXScriptSignal,any,...any),
+    UnbindKey: (self:any,id:any) -> nil,
+    ConvertBindsToString: (self:any,...any) -> string,
+};
+
+export type UserThumbnailService = {
+
+};
+
+export type VoteKickService = {
+    SpawnToken: (self:any, TargetUser:Player, TargetSender:Player?, TotalTime:number?, TotalVotes:number?) -> nil,
+};
+
+export type Waypoint = Pseudo&{
+    ShowOnMap: boolean,
+    ShowScreenIndicator: boolean,
+    ShowDirectionalArrow: boolean,
+    WaypointInfo: string,
+    WaypointReached: PHeSignal<nil>
+};
+
+export type WaypointService = {
+    CreateWaypoint: (self:any,Direction:Vector3,WaypointInfo:string?) -> Waypoint
+}
 
 --> Globals
 
-export type PHeimport = (...string) -> any?
 type themeDefaults = {
     Alert: Color3,
 	Warning: Color3,
@@ -601,15 +892,56 @@ export type Engine = {
 export type PHeEngine = Engine;
 --> Built in libraries
 
-export type SillitoLibrary = {
-    Screen: (self:any,ScreenProps:{[string]:any},...any) -> TabGroup
+export type MathLibrary = {
+    oscillate: (min:number,max:number?,Time:number?)->number,
+    perc: (x:number,y:number,max:number?)->number
 }
-export type PHeSillitoLibrary = SillitoLibrary;
+export type ReClasserLibrary = {
+    ToClass: (self:any,Original:Instance,TargetClass:string,DontDestroy:boolean?,runOnBuild:any?)->(Pseudo|Instance)
+};
+export type ServerBeeLibrary = Pseudo&{
+    ValidateDepedency: (self:any,Player:Player,objectHost:table,TargetHOST_KEY:string)->boolean,
+    OnServerEvent: (self:any,HOST_KEY:string,Handler:any)->nil,
+    REMOVEHOST: (self:any,HOST_KEY:string)->nil,
+    HOST: (self:any,HOST_KEY:string,State:any,ClientDepedencies:table?)->nil
+};
+
+export type SpatialAreaClass = Pseudo&{
+    OverlapParams: OverlapParams,
+    Area: Instance?,
+    CFrame: CFrame,
+    Size: Vector3,
+    Enabled: boolean,
+    GetSpotWithinArea:(self:any, Object:Instance)->CFrame,
+    ObjectAdded: PHeSignal<Pseudo|Instance>,
+    ObjectRemoved: PHeSignal<Pseudo|Instance>,
+    PlayerAdded: PHeSignal<Player>,
+    PlayerRemoved: PHeSignal<Player>,
+};
+export type SpatialAreaLibrary = {
+    new: () -> SpatialAreaClass,
+}
 
 export type StateSetterFunc = (value:any) -> nil;
 export type PHeStateSetterFunc = StateSetterFunc;
 export type StateLibrary = (defaultValue:any?) -> (State,StateSetterFunc);
 export type PHeStateLibrary = StateLibrary;
+
+export type StateManagerClass = {
+    new: (self:any,...any)->(State,StateSetterFunc)
+};
+export type StateManagerLibrary = {
+    new: () -> StateManagerClass
+}
+
+export type WhiplashLibrary = {
+    New: (class:string,...any)->(()->(Instance,Pseudo)),
+    ForEach: (loop:{})->(()->(any,any)),
+    OnChange: (Event:string)->(()->(any,any)),
+    OnEvent: (Event:string)->(()->(any,any)),
+    Children: (Parent:Instance,Value:any)->(()->(any,any)),
+    this: (followOrder:boolean?)->string,
+}
 
 export type PointerLibrary = (Instance:Instance,Parent:any?) -> Pseudo;
 
@@ -636,6 +968,18 @@ export type FrameworkLibraryService = {
     Shared: any?
 };
 export type PHeFrameworkLibraryService = FrameworkLibraryService;
+
+export type DirectionalArrowClass = Pseudo&{
+    Origin: any,
+    Target: any,
+    OriginOffset: Vector3,
+    Magnitude: number,
+    BrickColor: BrickColor,
+    Enabled: boolean,
+};
+export type DirectionalArrow3DLibrary = {
+    new: (Origin:any, Target:any) -> DirectionalArrowClass
+}
 
 export type FrameworkLibrary = {
     Start: (self:any)->Promise,
@@ -677,7 +1021,7 @@ export type CollectorLibrary = Pseudo&{
     Unbind: (self:any,Binded:Servant) -> nil,
     Tag: (self:any,Instances:table|Instance|Pseudo,TagName:string) -> nil,
     AddTag: (self:any,Instances:table|Instance|Pseudo,TagName:string) -> nil,
-    RemoveTag: (self:any,Instances:table|Instance|Pseudo) -> nil,
+    RemoveTag: (self:any,Instances:table|Instance|Pseudo,TagName:string) -> nil,
     Has: (self:any,Instance:Pseudo|Instance,TagName:string) -> boolean,
     GetTagged: (self:any,TagName:string) -> table,
 };

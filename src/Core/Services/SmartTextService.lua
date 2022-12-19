@@ -1,4 +1,7 @@
-local module = {}
+--[=[
+	@class SmartTextService
+]=]
+local SmartTextService = {}
 local PowerHorseEngine = require(game:GetService("ReplicatedStorage"):WaitForChild("PowerHorseEngine"));
 local TextService = require(script.Parent.TextService);
 local ErrorService = require(script.Parent.ErrorService);
@@ -6,21 +9,6 @@ local ROBLOXTextService = game:GetService("TextService");
 local Core = require(script.Parent.Parent.Parent.Pseudo.Core);
 local lowerCaseAZ = Core:fromStringToTable("abcdefghijklmnopqrstuvwxyz");
 
---<(%w+)%s-(.-)>(.-)</(%w+)
-
---//
-local function getIndexAsChar(i)
-	if(lowerCaseAZ[i])then
-		return lowerCaseAZ[i];
-	end;
-	local rep = 1;
-	local v = i%#lowerCaseAZ;
-	local timesR = math.floor(i/#lowerCaseAZ);
-	local l = lowerCaseAZ[#lowerCaseAZ]
-	v = v~=0 and v or 1;
-	return l..lowerCaseAZ[v];
-	--return string.rep("z"..lowerCaseAZ[v],timesR);
-end;
 
 local function createSmartTextObject(text,size,color,font,p)
 	local textObj = Instance.new("TextLabel");
@@ -218,7 +206,8 @@ function disectString(String,txtSize,txtFont,txtColor3,parent,startingpoint,text
 	end;
 end;
 
-function module:GetSmartText(txt,textComponent,ParentTo,txtSize,txtFont)
+--[=[]=]
+function SmartTextService:GetSmartText(txt:string?,textComponent:any,ParentTo:any,txtSize:any,txtFont:any):any
 	txtSize = txtSize or (textComponent and textComponent.TextSize);
 	txtFont = txtFont or (textComponent and textComponent.Font);
 	local TextTags,TextWithNoTags = TextService:GetTags(txt,true);
@@ -240,4 +229,4 @@ function module:GetSmartText(txt,textComponent,ParentTo,txtSize,txtFont)
 	return true;
 end;
 
-return module
+return SmartTextService

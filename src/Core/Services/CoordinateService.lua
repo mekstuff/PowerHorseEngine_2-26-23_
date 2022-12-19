@@ -138,7 +138,7 @@ end;
 	
 	@param Reserved table --If you want only specific players, you can add their UserId (recommended) or Username in this table.
 ]=]
-function CoordinateService:AddCoordinate(CFrameCoor:CFrame,Name:string,Category:string?,CoordinateId:string?,Reserved:table?):nil
+function CoordinateService:AddCoordinate(CFrameCoor:CFrame,Name:string,Category:string?,CoordinateId:string?,Reserved:{[number]:string|number}?):nil
 	assert(not IsClient, "AddCoordinate() can only be called by the server");
 	Name = Name or "Coordinate "..tostring(CFrameCoor);
 	Category = Category or "Unknown";
@@ -159,7 +159,7 @@ function CoordinateService:AddCoordinate(CFrameCoor:CFrame,Name:string,Category:
 end;
 
 --[=[]=]
-function CoordinateService:GetCoordinatesAsync(forTeleportService:boolean):table
+function CoordinateService:GetCoordinatesAsync(forTeleportService:boolean?):{[any]:any}?
 	local Player = game.Players.LocalPlayer;
 	if(Player)then
 		local fetch = CoordinateCommunicator:InvokeServer();

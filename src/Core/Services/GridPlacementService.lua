@@ -1,4 +1,7 @@
-local module = {}
+--[=[
+	@class GridPlacementService
+]=]
+local GridPlacementService = {}
 
 local UIS = game:GetService("UserInputService");
 local CustomClassService = require(script.Parent.CustomClassService);
@@ -10,8 +13,10 @@ if(game:GetService("RunService"):IsRunning())then
 	incY = 0;
 end
 
-
-local Class = {
+--[=[
+	@class GridPlacement
+]=]
+local GridPlacement = {
 	Name = "GridPlacement";
 	ClassName = "GridPlacement";
 	RaycastParams = RaycastParams.new();
@@ -25,6 +30,34 @@ local Class = {
 	Angle = 0;
 };
 
+--[=[
+	@prop RaycastParams RaycastParams
+	@within GridPlacement
+]=]
+--[=[
+	@prop UnitLength number
+	@within GridPlacement
+]=]
+--[=[
+	@prop AutomaticPlacement boolean
+	@within GridPlacement
+]=]
+--[=[
+	@prop AutomaticRotation boolean
+	@within GridPlacement
+]=]
+--[=[
+	@prop ShowBoundingBox boolean
+	@within GridPlacement
+]=]
+--[=[
+	@prop GridCellSize number
+	@within GridPlacement
+]=]
+--[=[
+	@prop Angle number
+	@within GridPlacement
+]=]
 
 local function getMouseInput(Position,self)
 	local Cam = workspace.CurrentCamera;
@@ -55,7 +88,7 @@ local function getMouseInput(Position,self)
 end;
 
 
-function Class:_Render()
+function GridPlacement:_Render()
 	
 	local function update(_position)
 		local results,Position = getMouseInput(_position,self);
@@ -161,7 +194,10 @@ function Class:_Render()
 	};
 end
 
-function module:Create(Instance_)
+--[=[
+	@return GridPlacement
+]=]
+function GridPlacementService:Create(Instance_:Instance)
 	--if(UISInputChangedListener)then return 
 	local Player = game:GetService("Players").LocalPlayer;
 	local Char;
@@ -169,7 +205,7 @@ function module:Create(Instance_)
 		Char = Player.Character or Player.CharacterAdded;
 	end
 	
-	local CC = CustomClassService:CreateClassAsync(Class);
+	local CC = CustomClassService:CreateClassAsync(GridPlacement);
 	local SelectionBox = Instance.new("SelectionBox");
 	SelectionBox.LineThickness = 0.05;
 	SelectionBox.SurfaceTransparency = .6;
@@ -177,7 +213,6 @@ function module:Create(Instance_)
 	SelectionBox.SurfaceColor3 = SelectionBox.Color3;
 	SelectionBox.Adornee = Instance_;
 	SelectionBox.Parent = Instance_;
-	--SelectionBox.
 	CC._dev.sBox = SelectionBox;
 	CC.RaycastParams.FilterType = Enum.RaycastFilterType.Blacklist;
 	CC.RaycastParams.FilterDescendantsInstances = {Instance_,Char};
@@ -187,4 +222,4 @@ function module:Create(Instance_)
 	return CC;
 end;
 
-return module
+return GridPlacementService

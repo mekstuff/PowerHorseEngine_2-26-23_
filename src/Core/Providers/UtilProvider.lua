@@ -1,19 +1,15 @@
 --[=[
-Provides Utilities
-@tag Provider
-@class UtilProvider
+	@class UtilProvider
+	@tag Provider
+	Provides Utilities
 ]=]
 
 local UtilProvider = {}
 
-local ErrorService = require(script.Parent.Parent.Services.ErrorService);
-local Engine = require(script.Parent.Parent.Parent.Engine);
-local isSever = game:GetService("RunService"):IsServer();
-
 --[=[
-Loads the util
-@private
-@return UtilProvider
+	Loads the util
+	@private
+	@return UtilProvider
 ]=]
 function UtilProvider.LoadUtil(UtilName:string)
 	

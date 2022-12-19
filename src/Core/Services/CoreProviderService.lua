@@ -1,6 +1,10 @@
+--[=[
+    @class CoreProviderService
+]=]
 local CoreProviderService = {};
 
-function CoreProviderService:CalculateUIAbsolutePosition(Position:UDim2,AnchorPoint:Vector2,Relative:Vector2)
+--[=[]=]
+function CoreProviderService:CalculateUIAbsolutePosition(Position:UDim2?,AnchorPoint:Vector2?,Relative:Vector2?)
     if(typeof(Position) ~= "UDim2")then 
         local i = Position;
         Relative = AnchorPoint;

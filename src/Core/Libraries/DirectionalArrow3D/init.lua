@@ -83,10 +83,15 @@ end;
 
 local Model = script:FindFirstChild("DirectionArrow") or CreateModel();
 
+--[=[
+	@class DirectionalArrow3D
+]=]
+local DirectionalArrow3D = {}
 
-local module = {}
-
-local DirectionArrowClass = {
+--[=[
+	@class DirectionalArrowClass
+]=]
+local DirectionalArrowClass = {
 	Name = "DirectionalArrow3D";
 	ClassName = "DirectionalArrow3D";
 	Origin = "**any";
@@ -97,7 +102,33 @@ local DirectionArrowClass = {
 	Enabled = true;
 };
 
-function DirectionArrowClass:_GetCFrame(Object:any)
+--[=[
+	@prop Origin any
+	@within DirectionalArrowClass
+]=]
+--[=[
+	@prop Target any
+	@within DirectionalArrowClass
+]=]
+--[=[
+	@prop OriginOffset Vector3
+	@within DirectionalArrowClass
+]=]
+--[=[
+	@prop Magnitude number
+	@within DirectionalArrowClass
+]=]
+--[=[
+	@prop BrickColor BrickColor
+	@within DirectionalArrowClass
+]=]
+--[=[
+	@prop Enabled boolean
+	@within DirectionalArrowClass
+]=]
+
+--[=[]=]
+function DirectionalArrowClass:_GetCFrame(Object:any)
 	if(typeof(Object) == "CFrame")then
 		return Object;
 	elseif(typeof(Object) == "Instance")then
@@ -105,7 +136,7 @@ function DirectionArrowClass:_GetCFrame(Object:any)
 	end
 end;
 
-function DirectionArrowClass:_Render()
+function DirectionalArrowClass:_Render()
 	
 	if(not WeldedOriginalModel)then
 		QuickWeldService:AnchorAll(Model);
@@ -200,11 +231,14 @@ function DirectionArrowClass:_Render()
 	};
 end;
 
-function module.new(Origin,Target)
-	local c = CustomClassService:Create(DirectionArrowClass);
+--[=[
+	@return DirectionalArrowClass
+]=]
+function DirectionalArrow3D.new(Origin:any,Target:any)
+	local c = CustomClassService:Create(DirectionalArrowClass);
 	c.Origin = Origin;
 	c.Target = Target;
 	return c;
 end;
 
-return module
+return DirectionalArrow3D

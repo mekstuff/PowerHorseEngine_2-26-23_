@@ -1,5 +1,8 @@
 
-local module = {}
+--[=[
+	@class SerializationService
+]=]
+local SerializationService = {}
 local ErrorService = require(script.Parent.ErrorService);
 local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
 
@@ -74,7 +77,7 @@ local function getPropsString(Props)
 	if(not Props)then return;end;
 	local propsx = {};
 	for key,value in pairs(Props) do
-		local s = module:_ConvertToString(key).."=="..module:_ConvertToString(value);
+		local s = SerializationService:_ConvertToString(key).."=="..SerializationService:_ConvertToString(value);
 	
 		table.insert(propsx,s);
 		
@@ -99,47 +102,25 @@ local function stringToTable(string_,isProps,capture)
 			local propvalsplit = v:split("=="); 
 			
 			
-			--local prop,value = stringToTable(propvalsplit[1]),stringToTable(propvalsplit[2],nil);
 			local prop = stringToTable(propvalsplit[1]);
-			--print(propvalsplit)
 			local value = stringToTable(propvalsplit[2]);
-			
-			
 			table.insert(t,{
 				key = prop,
 				value = value;
 			})
-		
 		end;
 		return t;
-		
 	else
-		-- capture = capture or "(%a+)\=([%w%s%.%-|]%,%+)"; -->Detected as invalid lua escape sequence in vs code
 		capture = capture or "(%a+)\\=([%w%s%.%-|]%,%+)";
-		
-		
-		--capture = capture or "(%a+)\=({[%w%s]+})";
-		--capture = capture or "(%a+)\=([%w%s%p/]+)";
-		
-		--capture = capture or "(%a+)\=(.)";
-		
-		--print(string_)
-	
-		
 		local t = {};
-		--if(not string_)then return t;end;
 		for prop,value in string.gmatch(string_,capture)do
-			--print("\nprop:",prop,"\nval:",value)
 			t[prop]=value;
-
 		end;
 		return t;
 	end
-	
 end;
 
-local function GetTableForm(String)
-	
+local function GetTableForm(String:string)
 
 	local ObjectData,ObjectProps;
 
@@ -149,10 +130,6 @@ local function GetTableForm(String)
 	if(ObjectProps)then
 		ObjectProps = ObjectProps:split("props={","")[2]
 	end;
-	
-	--ObjectProps = ObjectProps:gsub("|",",");
-	
-	
 	
 	ObjectData = stringToTable(ObjectData);
 	ObjectProps = ObjectProps and stringToTable(ObjectProps,true);
@@ -165,35 +142,35 @@ local function GetTableForm(String)
 		end
 	end;
 
-
-	
 	return {
 		Data = ObjectData;
 		Props = ObjectProps;
 	}
 	
 end
---//
-function module:_FromConvertedString(s)
+
+--[=[
+	@private
+]=]
+function SerializationService:_FromConvertedString(s:string)
 	return GetTableForm(s)
 end;
 
---//
-function module:_ConvertToString(Object,Type,Properties,initiated)
+--[=[
+	@private
+]=]
+function SerializationService:_ConvertToString(Object:any,Type:any,Properties:any,initiated:any):string
 
 	Type = Type or typeof(Object);
 	local ObjectType = typeof(Object);
 	Properties = getPropsString(Properties);
 	
-	
 	local vAsString = tostring(Object):gsub(",","|");
-	
-	
 	
 	if(Type == "table")then
 		if not(vAsString:match("Enumeration"))then
 			if(not initiated)then
-				--local serialized = (module:SerializeTable(Object))
+				--local serialized = (SerializationService:SerializeTable(Object))
 				
 				--vAsString = "awesome capture!@#$%^&*()?.>,<;:"
 				--print("got it")
@@ -201,71 +178,54 @@ function module:_ConvertToString(Object,Type,Properties,initiated)
 				--vAsString = serialized;
 				--print(Object)
 			end
-			
 		end
 	end
 	
 	local s = "value={"..vAsString.."},type={"..Type.."},typeof={"..ObjectType.."}";
-	--print(s)
 
-
-	if(ObjectType == "Instance")then
-		
-		--s = s..",fullname={"..Object:GetFullName():gsub("%.","/").."}";
+	if(ObjectType == "Instance")then		
 		s = s..",fullname={"..Object:GetFullName().."}";
-		
-		--//SupportSerializingScripts (Only for plugins)
-
-
 	end;
 	
 	if(Properties)then
 		s = s.."\\props={"..Properties.."}";
 	end;
 
-	
 	return s;
 end
---//
-function module:SerializeInstance(Instance_,...)
-	--print(module:_ConvertToString(Instance_))
-	--local ObjectSerialize 
-end
---//
-function module:SerializeModel(Model,...)
-	
-end;
---//
-function module:SerializeAsync(ToSerialize,...)
+
+
+--[=[]=]
+function SerializationService:SerializeAsync(ToSerialize:any,...:any):string
 	--local t="unknownSRC"
 	local src = "s-with:"
 	if(typeof(ToSerialize) == "table")then
-		local s = module:SerializeTable(ToSerialize);
+		local s = SerializationService:SerializeTable(ToSerialize);
 		--print(s);
 		s = src.."table-"..s;
 		return s;
 	end
 end;
---//
-function module:DeserializeAsync(ToDeserialize,...)
+
+--[=[]=]
+function SerializationService:DeserializeAsync(ToDeserialize:any,...:any):{[any]:any}
 	local t,end_ = ToDeserialize:match("s-with:(%w+)()");
 	local str = (ToDeserialize:sub(end_+1,#ToDeserialize));
 	if(t == "table")then
 		--print(str);
-		return module:DeserializeTable(str);
+		return SerializationService:DeserializeTable(str);
 		
 	end
 end;
---//
-function module:Serialize(...) return module:SerializeAsync(...);end;
-function module:Deserialize(...) return module:DeserializeAsync(...);end;
---//
-function module:SerializeTable(Table,...)
-	
-	return module:SerializeTableNew(Table,...);
-	
-	--return module:_ConvertToString(Table,"table",Table,true)
-	--return module:SerializeString(module:_ConvertToString(Table,"table",Table,true),...);
+
+--[=[]=]
+function SerializationService:Serialize(...:any) return SerializationService:SerializeAsync(...);end;
+--[=[]=]
+function SerializationService:Deserialize(...:any) return SerializationService:DeserializeAsync(...);end;
+
+--[=[]=]
+function SerializationService:SerializeTable(Table:{[any]:any},...:any)	
+	return SerializationService:SerializeTableNew(Table,...);
 end;
 --//
 local floatMatch = "(%-*%d.*)";
@@ -363,7 +323,7 @@ local function determineObject(data)
 			--local enumType,
 		else
 			-->Decrypt
-			transformedValue = module:DeserializeTable(data.value)
+			transformedValue = SerializationService:DeserializeTable(data.value)
 		end
 	end;
 	return transformedValue;
@@ -382,34 +342,26 @@ function createAllObjectsFromProps(props)
 	end;
 	return t;
 end
---//
-function module:DeserializeTable(...)
-	return module:DeserializeTableNew(...);
-	--local FromString = module:DeserializeString(SerializedKey);
-	--local FromString = module:_FromConvertedString(module:DeserializeString(SerializedKey));
-	--local Props = FromString.Props;
-	--return createAllObjectsFromProps(module:_FromConvertedString(SerializedKey).Props)
-	--return createAllObjectsFromProps(Props);
+
+--[=[]=]
+function SerializationService:DeserializeTable(...:any)
+	return SerializationService:DeserializeTableNew(...);
 end
 --//
---function module:SerializeS
+--function SerializationService:SerializeS
 --//
-function module:SerializeString(String,SerializationVersion)
+function SerializationService:SerializeString(String:string,SerializationVersion:string?):string
 	SerializationVersion = SerializationVersion or "v1";	
 	local iterationSteps = string.sub(iterations[SerializationVersion],#iterations[SerializationVersion]);
 	local iterationtable = converIterationToTable(SerializationVersion);
 	
 	local x = (serializeString(String,iterationSteps,iterationtable));
 	local f = "PHE"..SerializationVersion.."PHE"..x;
-	--f = module:ShrinkString(f);
+	--f = SerializationService:ShrinkString(f);
 	return f;
 end;
 
-function module:DeserializeString(String)
-
-	
-	--String = module:GetShrinkedString(String)
-	
+function SerializationService:DeserializeString(String:string):string
 	
 	local versionType,versionNumber = string.match(String, "^PHE(%l+)(%d+)PHE");
 	local version_ = versionType and versionNumber and versionType..tostring(versionNumber);
@@ -442,9 +394,9 @@ local function toSerialTable(t)
 				v = tostring(t)
 			else
 				--return serialized version;
-				local serialized = module:SerializeTableNew(t);
+				local serialized = SerializationService:SerializeTableNew(t);
 				v=serialized;
-				--v = module:SerializeTableNew(t);
+				--v = SerializationService:SerializeTableNew(t);
 			end
 		elseif(typeof(t) == "Instance")then
 			v = t:GetFullName();
@@ -532,17 +484,17 @@ local function fromStringToTable(str)
 	return finalTable;
 end;
 
-function module:SerializeTableNew(Table)
-	return module:toBinary(fromTableToString(Table));
+function SerializationService:SerializeTableNew(Table)
+	return SerializationService:toBinary(fromTableToString(Table));
 end;
 
-function module:DeserializeTableNew(String)
-	return fromStringToTable(module:fromBinary(String))
-	--return module:fromBinary(fromStringToTable(String));
+function SerializationService:DeserializeTableNew(String)
+	return fromStringToTable(SerializationService:fromBinary(String))
+	--return SerializationService:fromBinary(fromStringToTable(String));
 end;
 
---//
-function module:toBinary(str)
+--[=[]=]
+function SerializationService:toBinary(str:string):string
 	local binstr = {};
 	for i,char in ipairs(str:split("")) do
 		local asBinary = "";
@@ -556,7 +508,7 @@ function module:toBinary(str)
 	return table.concat(binstr," ")
 end
 --
-function module:fromBinary(str)
+function SerializationService:fromBinary(str:string):string
 	local fstr = "";
 	for i, Binary in ipairs(str:split(" ")) do
 		local Byte = tonumber(Binary, 2)
@@ -565,4 +517,4 @@ function module:fromBinary(str)
 	return fstr
 end
 
-return module
+return SerializationService

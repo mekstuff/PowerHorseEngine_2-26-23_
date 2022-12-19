@@ -19,6 +19,9 @@ local Modal = {
 	Roundness = UDim.new(0,5);
 	Header = "Header";
 	HeaderIcon = "";
+	HeaderIconColor3 = Theme.getCurrentTheme().ForegroundText;
+	HeaderIconAdaptsHeaderTextColor = true;
+	HeaderIconSize = UDim2.fromOffset(20,20);
 	HeaderTextSize = 20;
 	HeaderTextFont = Theme.getCurrentTheme().Font;
 	HeaderTextColor3 = Theme.getCurrentTheme().ForegroundText;
@@ -278,7 +281,7 @@ function Modal:_Render(App)
 	self._Header.Font = Theme.getCurrentTheme().Font;
 	self._Header.RippleStyle = App.Enumeration.RippleStyle.None;
 	-- Header.ActiveBehaviour = App.Enumeration.ActiveBehaviour.None;
-	self._Header.IconAdaptsTextColor = false;
+	-- self._Header.IconAdaptsTextColor = false;
 	self._Header.HoverEffect = Enumeration.HoverEffect.None; --< HoverEffect.None 
 	self._Header.Parent = Top;
 	
@@ -416,7 +419,14 @@ function Modal:_Render(App)
 			self._Header.Text = Value;
 		end,["HeaderIcon"] = function(Value)
 			self._Header.Icon = Value;
-		end,["HeaderTextSize"] = function(Value)
+		end,["HeaderIconAdaptsHeaderTextColor"] = function(Value)
+			self._Header.IconAdaptsTextColor = Value;
+		end,["HeaderIconColor3"] = function(Value)
+			self._Header.IconColor3 = Value;
+		end,["HeaderIconSize"] = function(Value)
+			self._Header.IconSize = Value;
+		end,
+		["HeaderTextSize"] = function(Value)
 			self._Header.TextSize = Value;
 		end,
 		["HeaderTextColor3"] = function(Value)

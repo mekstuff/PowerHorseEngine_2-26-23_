@@ -45,7 +45,10 @@ function Waypoint:_Render()
 	local CoreGuiService = App:GetService("CoreGuiService");
 
 	local DirectionalArrow;
-	
+	--[=[
+		@prop WaypointReached PHeSignal
+		@within Waypoint
+	]=]
 	local WaypointReached = self:AddEventListener("WaypointReached",true);
 	local FiringWaypointReached = false;
 	
@@ -90,9 +93,9 @@ end;
 	@return Waypoint
 ]=]
 function WaypointService:CreateWaypoint(Direction:Vector3,WaypointInfo:string?):Instance
-	local Waypoint = CustomClassService:CreateClassAsync(Waypoint,nil,{Direction = Direction});
-	Waypoint.WaypointInfo = WaypointInfo;
-	return Waypoint;
+	local TargetWaypoint = CustomClassService:CreateClassAsync(Waypoint,nil,{Direction = Direction});
+	TargetWaypoint.WaypointInfo = WaypointInfo;
+	return TargetWaypoint;
 end;
 
 return WaypointService

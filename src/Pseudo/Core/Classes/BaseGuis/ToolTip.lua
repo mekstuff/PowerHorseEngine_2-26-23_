@@ -22,6 +22,7 @@ local ToolTip = {
 	BackgroundColor3 = Theme.getCurrentTheme().Disabled;
 	StaticXAdjustment = Enumeration.Adjustment.Center;
 	StaticYAdjustment = Enumeration.Adjustment.Bottom;
+	BackgroundTransparency = 0;
 	RespectViewport = false;
 	Showing = false;
 	Adornee = "**any";
@@ -47,18 +48,40 @@ local function DisconnectPrevAdorneeConnection(self)
 	StopTrack(self);
 end;
 --//
+
+local function OnMouseEnter(Object:any)
+	local hasMouseEnter,mouseEnter = pcall(function()
+		return Object.MouseEnter;
+	end);
+	if(hasMouseEnter)then
+		return mouseEnter;
+	else
+		return Object.InputBegan;
+	end
+end;
+local function OnMouseLeave(Object:any)
+	local hasMouseLeave,mouseleave = pcall(function()
+		return Object.MouseLeave;
+	end);
+	if(hasMouseLeave)then
+		return mouseleave;
+	else
+		return Object.InputEnded;
+	end
+end;
+
 local function Listen(self)
 	local AdorneeObject = self.Adornee;
 	--local AdorneeObject = Core.getElementObject(self.Adornee);
 	DisconnectPrevAdorneeConnection(self);
 	
 
-	self._dev.__prevAdorneeConnectionA = AdorneeObject.MouseEnter:Connect(function()
+	self._dev.__prevAdorneeConnectionA = OnMouseEnter(AdorneeObject):Connect(function()
 		if(self.RevealOnMouseEnter)then
 			self:_Show();
 		end;
 	end);
-	self._dev.__prevAdorneeConnectionB = AdorneeObject.MouseLeave:Connect(function()
+	self._dev.__prevAdorneeConnectionB = OnMouseLeave(AdorneeObject):Connect(function()
 		if(self.RevealOnMouseEnter)then
 			self:_Hide();
 		end;
@@ -92,6 +115,8 @@ function ToolTip:AddTipText(Text:string|{[string]:any}?,TextProps:{[string]:any}
 			TextObject[a] = b;
 		end;
 	end;
+	self._AddTipTextTextObject = TextObject;
+	TextObject.ZIndex = self.ZIndex;
 	TextObject.Parent = self;
 	return TextObject;
 end;
@@ -218,8 +243,6 @@ function ToolTip:_Render(App)
 	Frame.AutomaticSize = Enum.AutomaticSize.XY;
 	Frame.StrokeTransparency = 1;
 	Frame.Parent = Portal and Portal:GetGUIRef() or self:GetRef();
-	
-
 
 	local ContentsContainer = Instance.new("Frame", Frame:GetGUIRef());
 	ContentsContainer.Name = "Contents Container";
@@ -237,6 +260,11 @@ function ToolTip:_Render(App)
 		["Adornee"] = function()
 			self:_UpdateAdornee();
 		end,
+		["ZIndex"] = function(v)
+			if(self._AddTipTextTextObject)then
+				self._AddTipTextTextObject.ZIndex = v;
+			end
+		end,
 	--[[
 		["*Parent"] = function(Value)
 			if(Value ~= self.Adornee)then
@@ -253,8 +281,9 @@ function ToolTip:_Render(App)
 		};
 		_Mapping = {
 			[Frame] = {
-				"BackgroundColor3","BackgroundTransparency","Roundness","StrokeTransparency","StrokeColor3","StrokeThickness";
-			}	
+				"BackgroundColor3","BackgroundTransparency","Roundness","StrokeTransparency","StrokeColor3","StrokeThickness","ZIndex";
+			};
+			[ContentsContainer] = {"ZIndex"},
 		};
 	};
 end;

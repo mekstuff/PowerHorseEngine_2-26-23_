@@ -17,7 +17,6 @@ local AudioChannel = AudioService:CreateSoundEffectsChannel();
 ]=]
 local NotificationService = {};
 
-
 if(game:GetService("RunService"):IsClient())then
 	NotificationService.OnNotification = SignalProvider.new("NotificationInbound");
 end;
@@ -42,7 +41,7 @@ local BroadcastSubscriber;
 	Limited to [MessagingService] limits
 	:::
 ]=]
-function NotificationService:BroadcastNotification(Data:table)
+function NotificationService:BroadcastNotification(Data:{[any]:any})
 	if(not BroadcastSubscriber)then
 		BroadcastSubscriber = MessagingService:SubscribeAsync("NotificationBroadcast",function(serial)
 			NotificationService:SendNotificationToAllPlayers(SerializationService:DeserializeTable(serial));
@@ -55,7 +54,7 @@ end;
 --[=[
 	Sends A notification to everyone in the current server
 ]=]
-function NotificationService:SendNotificationToAllPlayers(Data:table,...:any)
+function NotificationService:SendNotificationToAllPlayers(Data:{[any]:any},...:any)
 	Engine:FetchStorageEvent("NotificationService_SendNotificationAsync"):FireAllClients(Data,...);
 end;
 
@@ -93,6 +92,18 @@ end;
 
 function NotificationResponse:_Render()
 	
+	--[=[
+		@prop AttachButtonDown PHeSignal
+		@within NotificationResponse
+	]=]
+	--[=[
+		@prop AttachButton2Down PHeSignal
+		@within NotificationResponse
+	]=]
+	--[=[
+		@prop Dismissed PHeSignal
+		@within NotificationResponse
+	]=]
 	local AttachButtonDown,AttachButton2Down,Dismissed = self:AddEventListener("AttachButtonDown",true),self:AddEventListener("AttachButton2Down",true),self:AddEventListener("Dismissed",true)
 	
 	local Channel = self._dev.args.Channel
@@ -121,7 +132,7 @@ end
 --[=[
 	@return NotificationResponse
 ]=]
-function NotificationService:SendNotificationAsync(Plr:Player,Data:table,...:any)
+function NotificationService:SendNotificationAsync(Plr:Player,Data:{[any]:any},...:any)
 	local passed = (...);
 	local Player = Plr;
 	

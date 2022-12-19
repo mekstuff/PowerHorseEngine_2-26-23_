@@ -1,8 +1,12 @@
 local ServiceProvider = require(script.Parent.ServiceProvider);
 local PseudoService = ServiceProvider:LoadServiceAsync("PseudoService");
 local SerializationService = ServiceProvider:LoadServiceAsync("SerializationService");
+--[=[
+    @class PropProvider
+]=]
 local PropProvider = {};
 
+--[=[]=]
 function PropProvider:GetProps(propSheet:{},ignoreHiddenProps:boolean?,ignoreFunctions:boolean?,onlykeys:boolean?):{[any]:any}
     local x = {};
     for a,b in pairs(propSheet)do
@@ -17,7 +21,8 @@ function PropProvider:GetProps(propSheet:{},ignoreHiddenProps:boolean?,ignoreFun
     return x;
 end
 
-function PropProvider:FromPseudoClass(Class:string,ignoreHiddenProps:boolean?,ignoreFunctions:boolean?,onlyKeys:boolean?)
+--[=[]=]
+function PropProvider:FromPseudoClass(Class:string,ignoreHiddenProps:boolean?,ignoreFunctions:boolean?,onlyKeys:boolean?):{[any]:any}
     ignoreHiddenProps = ignoreHiddenProps == nil and true or false;
     ignoreFunctions = ignoreFunctions == nil and true or false;
     onlyKeys = onlyKeys == nil and true or false;

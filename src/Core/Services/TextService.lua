@@ -4,7 +4,7 @@
 local TextService = {}
 
 --[=[]=]
-function TextService:GetWordsFromString(String:string,StartCapture:string,EndCapture:string):table
+function TextService:GetWordsFromString(String:string,StartCapture:string,EndCapture:string):{[any]:any}
 	if(not StartCapture)then return String:split(" ");end;
 	local Words = {};
 	local toFormatBack = {};
@@ -28,7 +28,8 @@ function TextService:GetWordsFromString(String:string,StartCapture:string,EndCap
 	--return Unpack and unpack(Words) or Words;
 end
 
-function TextService:GetWordAtPosition(String:string,i:number):string|number|number
+--[=[]=]
+function TextService:GetWordAtPosition(String:string,i:number):(string,number,number)
 	local ns = String:find("%s",i) or #String+1;
 	local fnsb = String:sub(1,ns-1);
 	local fnsbr = fnsb:reverse();
@@ -64,29 +65,25 @@ end
 	```
 
 ]=]
-function TextService:GetTags(txt:string,returnWithNoTags:boolean):table
+function TextService:GetTags(txt:string,returnWithNoTags:boolean?):({[any]:any},any?)
 	local res = {};
 
 	local pattern = "()<([%a]+)%s*(.-)>(.-)</(%a+)>()";
 	
 	for tagStart,tagType,tagProps,tagValue,tagClose,tagEnd in txt:gmatch(pattern) do
 		local t = {};
-
 		for a,b in tagProps:gmatch("(%w+)=*([%w%p]*)")do t[a]=b ~= "" and b or true;end;
-
-		tagProps=t;
-		--print(tagProps);
-		tagEnd-=1
-		table.insert(res, {
-			type = tagType,
-			props = tagProps,
-			value = tagValue,
-			close = tagClose,
-			starts = tagStart,
-			ends = tagEnd,
-			capture = txt:sub(tagStart,tagEnd);
-		})
-		
+			tagProps=t;
+			tagEnd-=1
+			table.insert(res, {
+				type = tagType,
+				props = tagProps,
+				value = tagValue,
+				close = tagClose,
+				starts = tagStart,
+				ends = tagEnd,
+				capture = txt:sub(tagStart,tagEnd);
+			});
 	end;
 	local notags;
 	if(returnWithNoTags)then

@@ -2,6 +2,7 @@
 --local Enumeration = PowerHorseEngine.Enumeration;
 --local DatastoreService = PowerHorseEngine:GetService("DataStoreService");
 
+--[[
 local DataStoreService = require(script.Parent.DataStoreService);
 local BanServiceDataStore = DataStoreService:GetDataStore("PHe_BanService_DataStore");
 local UserIdService = require(script.Parent.UserIdService);
@@ -61,3 +62,7 @@ function module:BanUserAsync(Player,Days,Reason,Moderator,ModerationNote,Announc
 end;
 
 return module
+
+]]
+
+return {};

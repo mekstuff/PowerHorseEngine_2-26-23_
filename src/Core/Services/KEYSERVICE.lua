@@ -1,10 +1,12 @@
-local module = {}
+--[=[
+	@class KEYSERVICE
+]=]
+local KEYSERVICE = {}
 local HTTPService = game:GetService("HttpService");
 local ErrorService = require(script.Parent.ErrorService);
 local Engine = require(script.Parent.Parent.Globals.Engine);
 local isServer = game:GetService("RunService"):IsServer();
 local Keys = {};
-
 
 if not (game:GetService("RunService"):IsRunning())then
 	ErrorService.tossError("KEYSERVICE can only be used while the game is running");
@@ -38,7 +40,8 @@ if(isServer)then
 	--fetchKeyRemote.o
 end
 
-function module:Give(KeyName,Shared,dedicatedUserId)
+--[=[]=]
+function KEYSERVICE:Give(KeyName:string,Shared:boolean?,dedicatedUserId:number?)
 	if(Keys[KeyName])then
 		ErrorService.tossWarn("Key "..KeyName.." is already an existing key name");
 		return;
@@ -65,7 +68,8 @@ function module:Give(KeyName,Shared,dedicatedUserId)
 	return key;
 end;
 
-function module:Get(Keyname,fromShared)
+--[=[]=]
+function KEYSERVICE:Get(Keyname:string,fromShared:boolean?)
 	if not fromShared then
 		return Keys[Keyname];
 	end;
@@ -81,4 +85,4 @@ function module:Get(Keyname,fromShared)
 	
 end
 
-return module
+return KEYSERVICE

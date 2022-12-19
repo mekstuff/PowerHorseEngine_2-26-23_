@@ -1,21 +1,15 @@
-local module = {}
+--[=[
+	@class ChatTagService
+]=]
+local ChatTagService = {}
 local IsClient = game.Players.LocalPlayer;
 local ErrorService = require(script.Parent.ErrorService);
-
-
-
-local Connection;
-
-local UserTags = {};
 
 local ServerScriptService = game:GetService("ServerScriptService");
 local ChatService = require(ServerScriptService:WaitForChild("ChatServiceRunner"):WaitForChild("ChatService"));
 
---local SpeakerWaitConnection;
---local SpeakerWaitIndex = 0;
-
-
-function module:AddChatTag(Player, TagInformation)
+--[=[]=]
+function ChatTagService:AddChatTag(Player:Player, TagInformation:{[any]:any}?)
 	
 	if(IsClient)then ErrorService.tossWarn("Add Chat Tag Can Only Be Called By The Server") return end;
 	
@@ -70,8 +64,9 @@ function module:AddChatTag(Player, TagInformation)
 	
 end;
 
-function module:GetChatTags(Player)
+--[=[]=]
+function ChatTagService:GetChatTags(Player:Player)
 	
 end;
 
-return module
+return ChatTagService

@@ -12,7 +12,7 @@ local Conversions = {
 }
 
 --[=[]=]
-function PseudoService:FromROBLOXObject(Instance:Instance,dontdeleteInstance:boolean,p:Instance?):Instance|table
+function PseudoService:FromROBLOXObject(Instance:Instance,dontdeleteInstance:boolean?,p:Instance?):(Instance,{[any]:any})
 	local InstanceClass = Instance.ClassName;
 	local x={};
 	if(Conversions[InstanceClass])then
@@ -60,7 +60,7 @@ function PseudoService:FromROBLOXObject(Instance:Instance,dontdeleteInstance:boo
 	return parent, x;
 end;
 --[=[]=]
-function PseudoService:GetPseudoFromId(id:Instance|StringValue|string)
+function PseudoService:GetPseudoFromId(id:Instance|StringValue|string):any
 	if(typeof(id) == "Instance")then
 		if(id.ClassName == "StringValue")then
 			id = id.Value;
@@ -74,7 +74,7 @@ end;
 
 local PseudoCache;
 --[=[]=]
-function PseudoService:GetPseudoObjects(Specific:table?):table
+function PseudoService:GetPseudoObjects(Specific:{[number]:string}?):{[any]:any}
 	local Classes = Pseudo.Core.Classes:GetChildren();
 	if(not PseudoCache )then
 		PseudoCache = {};

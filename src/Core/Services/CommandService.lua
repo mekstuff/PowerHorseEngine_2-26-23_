@@ -22,7 +22,7 @@ function CommandService:GetCommands():table
 end
 
 --[=[]=]
-function CommandService:ExecuteCommand(x:string,y:table,focusOnCommand:boolean):string?
+function CommandService:ExecuteCommand(x:string,y:{[any]:any},focusOnCommand:boolean?):string?
 	--consoleOutput("> Executing command...");
 	
 	local cmd = CommandService:GetCommand(x);
@@ -67,7 +67,7 @@ function CommandService:GetCommand(name:string)
 end
 
 --[=[]=]
-function CommandService:FromStringToCommand(String:string):string|table
+function CommandService:FromStringToCommand(String:string):(string,{})
 	local asWords = TextService:GetWordsFromString(String, ">","<");
 	local Commands = CommandService:GetCommands();
 	local commandName = asWords[1]
@@ -81,7 +81,7 @@ function CommandService:FromStringToCommand(String:string):string|table
 end;
 
 --[=[]=]
-function CommandService:ExecuteCmdFromStr(Str:string)
+function CommandService:ExecuteCmdFromStr(Str:string):string?
 	return CommandService:ExecuteCommand(CommandService:FromStringToCommand(Str));
 end;
 

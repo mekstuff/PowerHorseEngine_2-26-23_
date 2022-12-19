@@ -1,8 +1,8 @@
-local module = {}
+local SplashScreenSequence = {}
 local Player = game.Players.LocalPlayer;
 local TweenService = game:GetService("TweenService");
 
-function module.new(Sequences,defaultColor,defaultLifeTime)
+function SplashScreenSequence.new(Sequences:{[any]:any},defaultColor:Color3?,defaultLifeTime:number?)
 	defaultColor = defaultColor or Color3.fromRGB(255,255,255);
 	defaultLifeTime = defaultLifeTime or 2;
 	local PlayerGui = Player and Player:WaitForChild("PlayerGui");
@@ -70,4 +70,4 @@ function module.new(Sequences,defaultColor,defaultLifeTime)
 	end)
 end;
 
-return module
+return SplashScreenSequence

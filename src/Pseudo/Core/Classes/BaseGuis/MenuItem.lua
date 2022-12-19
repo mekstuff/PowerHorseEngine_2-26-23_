@@ -45,7 +45,7 @@ function MenuItem:_Render()
         ,"TextColor3","TextTransparency","TextAdjustment","IconAdjustment","Font","ZIndex","RippleStyle","Disabled",
     "IconSize","IconAdaptsTextColor","IconColor3"}, {MenuButton});
         useMapping({"BackgroundTransparency","Size","Position"
-        ,"AnchorPoint","StrokeTransparency","StrokeThickness","StrokeColor3","ZIndex","Roundness"}, {Container});
+        ,"AnchorPoint","StrokeTransparency","StrokeThickness","StrokeColor3","ZIndex","Roundness","Visible"}, {Container});
         useEffect(function()
            Container.Size = self.Size;
         end, {"Size"});

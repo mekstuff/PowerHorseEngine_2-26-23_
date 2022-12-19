@@ -2,7 +2,10 @@ local Engine = require(script.Parent.Parent.Parent.Engine);
 
 local VoteKickEvent = Engine:FetchStorageEvent("VoteKickService_VoteKickUser");
 
-local module = {}
+--[=[
+	@class VoteKickService
+]=]
+local VoteKickService = {}
 local Tokens = {};
 
 local function EndVote(id)
@@ -40,11 +43,9 @@ local function EndVote(id)
 	end	
 end
 
-function module:SpawnToken(TargetUser, TargetSender, TotalTime, TotalVotes)
-	
+--[=[]=]
+function VoteKickService:SpawnToken(TargetUser:Player, TargetSender:Player?, TotalTime:number?, TotalVotes:number?)
 
-
-	
 	if(not game.Players:FindFirstChild(TargetUser.Name))then
 		Engine.ErrorService.tossWarn(tostring(TargetUser and TargetUser.Name or "[?Unknown Argument?]").." is not a valid player instance. VoteKickService:SpawnToken(instance Player)");
 		return;	
@@ -111,4 +112,4 @@ VoteKickEvent.OnServerEvent:Connect(function(Plr,vote,id)
 end)
 
 
-return module
+return VoteKickService

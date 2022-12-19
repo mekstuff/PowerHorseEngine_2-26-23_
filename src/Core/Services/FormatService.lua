@@ -18,11 +18,11 @@ function FormatService:toNumberCommas(n:number,...:any):string
 	return Format(n):toNumberCommas(...);
 end
 --[=[]=]
-function FormatService:toTimeFormat(timeStamp:number,is12Hour:boolean):string
+function FormatService:toTimeFormat(timeStamp:number,is12Hour:boolean?):string
 	return Format(timeStamp):fromUnixStamp(is12Hour):toTimeFormat();
 end;
 --[=[]=]
-function FormatService:toDateFormat(timeStamp:number,useString:boolean,shortenString:boolean,indicateDayAsNumber:boolean):string
+function FormatService:toDateFormat(timeStamp:number,useString:boolean?,shortenString:boolean?,indicateDayAsNumber:boolean?):string
 	return Format(timeStamp):fromUnixStamp(true):toDateFormat(useString,shortenString,indicateDayAsNumber);
 end;
 --[=[]=]

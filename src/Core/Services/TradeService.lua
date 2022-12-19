@@ -25,21 +25,17 @@ local TradeService = {}
 ]=]
 TradeService.TradeRequest = SignalProvider.new("TradeRequest");
 --[=[
-	@prop TradeStarted PHeSignal
+	@prop TradeStarted PHeSignal<ActiveTrade>
 	@server
 	@within TradeService
 	On the server, every trade started will be caught but on the client, only trades pertaining that client will be caught.
-
-	Argument 1: [ActiveTrade]
 ]=]
 TradeService.TradeStarted = SignalProvider.new("TradeStarted");
 --[=[
-	@prop TradeEnded PHeSignal
+	@prop TradeEnded PHeSignal<ActiveTrade>
 	@server
 	@within TradeService
 	On the server, every trade ended will be caught but on the client, only trades pertaining that client will be caught.
-
-	Argument 1: [ActiveTrade]
 ]=]
 TradeService.TradeEnded = SignalProvider.new("TradeEnded");
 
@@ -102,9 +98,7 @@ function ActiveTrade:AddContent(ToUser:Player,Content:any,ContentId:string,Ignor
 	end
 	self._Content[Target][ContentId]=Content;
 	self:GetEventListener("ContentAdded"):Fire(ToUser,Content,ContentId);
-	self._sendInformationToClients("add-content",ToUser,Content,ContentId);
-	
-	return ContentId;
+	self._sendInformationToClients("add-content",ToUser,Content,ContentId);	
 end;
 --[=[
 	@server
@@ -118,7 +112,7 @@ end;
 --[=[
 	@server
 ]=]
-function ActiveTrade:GetContents(fromUser:Player)
+function ActiveTrade:GetContents(fromUser:Player):{[any]:any}
 	if(fromUser)then
 		local Target = fromUser == self.Sender and "Sender" or "Reciever";
 		return self._Content[Target];
@@ -184,7 +178,7 @@ end
 	@return TradeConstructorResults
 	@server
 ]=]
-function TradeService.new(Sender:Player,Reciever:Player,Header:string?,Body:string?,Blurred:boolean?,Button1:string?,Button2:string?):table
+function TradeService.new(Sender:Player,Reciever:Player,Header:string?,Body:string?,Blurred:boolean?,Button1:string?,Button2:string?):{[any]:any}
 	local inActiveTradeSearch_Initial = TradeService:GetTradeActive(Sender,Reciever)
 	if(inActiveTradeSearch_Initial)then
 		local x = {
@@ -230,19 +224,19 @@ function TradeService.new(Sender:Player,Reciever:Player,Header:string?,Body:stri
 		]=]
 		newTrade:AddEventListener("ContentAdded",true);
 		--[=[
-			@prop ContentRemoved PHeSignal
+			@prop ContentRemoved PHeSignal<Player,any,string>
 			@within ActiveTrade
 			@server
 		]=]
 		newTrade:AddEventListener("ContentRemoved",true);
 		--[=[
-			@prop Ended PHeSignal
+			@prop Ended PHeSignal<Player,string>
 			@within ActiveTrade
 			@server
 		]=]
 		newTrade:AddEventListener("Ended",true);
 		--[=[
-			@prop ChannelMessage PHeSignal
+			@prop ChannelMessage PHeSignal<...any>
 			@within ActiveTrade
 			@server
 		]=]
