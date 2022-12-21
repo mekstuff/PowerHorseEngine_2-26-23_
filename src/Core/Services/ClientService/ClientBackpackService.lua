@@ -21,7 +21,7 @@ function ClientBackpackService:SetCoreBackpackEnabled(state:boolean)
 end;
 
 --[=[]=]
-function ClientBackpackService:GetTools(Player:Player,existingTable:table?)
+function ClientBackpackService:GetTools(Player:Player,existingTable:{[any]:any}?)
     local Backpack = Player:WaitForChild("Backpack");
     local Character = Player.Character or Player.CharacterAdded:Wait();
 
@@ -112,7 +112,7 @@ function ClientBackpackProxy:ToolBind(BindHandler:any)
     return Collector:Bind(self._toolbindtag,BindHandler)
 end;
 --[=[]=]
-function ClientBackpackProxy:GetTools():table
+function ClientBackpackProxy:GetTools():{[number]:Tool}
     local Collector = self:_GetAppModule():Import("Collector");
     return Collector:GetTagged(self._toolbindtag);
 end

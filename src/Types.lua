@@ -48,7 +48,8 @@ export type App = {
     ),
 	-- GetGlobal: (self:any,GlobalName:string)->any,
     GetService: (
-        ((self:any,"AudioService")->AudioService)
+        ((self:any,"ClientService")->ClientService)
+        &((self:any,"AudioService")->AudioService)
         &((self:any,"BanService")->BanService)
         &((self:any,"ChatTagService")->ChatTagService)
         &((self:any,"ClientTradeService")->ClientTradeService)
@@ -450,6 +451,24 @@ export type UtilProvider = {
 }
 
 --> Services
+type ClientService_Backpack_ClientBackpackProxy = Pseudo&{
+    ToolBind: (self:any, BindHandler:()->any) -> Servant,
+    GetTools: (self:any) -> {[number]:Tool}
+};
+
+type ClientService_Backpack = Pseudo&{
+    Tracked: {[any]:any},
+    ToolTagName: string,
+    ProxyBackpacks: {[any]:any},
+    SetCoreBackpackEnabled: (self:any, state:boolean) -> any,
+    GetTools: (self:any, Player:Player, existingTable:{[any]:any}?) -> {[any]:any},
+    ProxyBackpack: (self:any, Player:Player?) -> ClientService_Backpack_ClientBackpackProxy,
+    GetToolOwner: (self:any, Tool:Tool) -> Player?
+};
+
+export type ClientService = {
+    Backpack: ClientService_Backpack
+}
 
 type PHePluginStudioTool_dev = {}
 type PHePluginStudioTool_initreturn = {
