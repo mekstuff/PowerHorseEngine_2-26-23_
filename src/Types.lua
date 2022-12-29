@@ -246,7 +246,6 @@ export type State = Pseudo&StateFunctionalCall&{
     State: any,
     useEffect: (self:any,Handler:any,Depedencies:any?) -> Servant,
 };
-export type PHeState = State;
 
 export type PseudoHooks = {
     useEffect: useEffect,
@@ -694,8 +693,11 @@ type ClientService_Backpack = Pseudo&{
 export type ClientService = {
     Ping: PingReader,
     Backpack: ClientService_Backpack,
-    GetClientDeviceType: (self:any) -> "pc"|"mobile"|"xbox",
-    Device: "pc"|"mobile"|"xbox"
+    SetDeviceClientType: (self:any,DeviceType:"pc"|"mobile"|"xbox") -> nil,
+    GetClientDeviceType: (self:any) -> State,
+    Device: State,
+    GetIsGamePadConnected: (self:any) -> State,
+    GamepadConnected: State,
 }
 
 type PHePluginStudioTool_dev = {}
