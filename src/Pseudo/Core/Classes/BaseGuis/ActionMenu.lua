@@ -438,7 +438,7 @@ function ActionMenu:AddAction(ActionName:string,id:string,ActionIcon:string,...:
 end;
 --[=[
 ]=]
-function ActionMenu:UpdateAllIcons(Icon:string, IgnoreList:table?, Inverse:boolean?)
+function ActionMenu:UpdateAllIcons(Icon:string, IgnoreList:{[number]:any}?, Inverse:boolean?)
 	for _,v in pairs(self._dev.__TreeContents)do
 		if(IgnoreList)then
 

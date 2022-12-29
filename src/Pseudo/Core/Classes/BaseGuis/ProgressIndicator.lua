@@ -3,6 +3,9 @@ local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
 local Core = require(script.Parent.Parent.Parent);
 local IsClient = game:GetService("RunService"):IsClient();
 
+--[=[
+	@class ProgressIndicator
+]=]
 local ProgressIndicator = {
 	Name = "Spinner";
 	ClassName = "Spinner";
@@ -15,6 +18,22 @@ local ProgressIndicator = {
 	Position = UDim2.fromScale(.5,.5);
 	Enabled = true;
 };
+--[=[
+	@prop Color Color3
+	@within ProgressIndicator
+]=]
+--[=[
+	@prop CycleSpeed number
+	@within ProgressIndicator
+]=]
+--[=[
+	@prop Size number
+	@within ProgressIndicator
+]=]
+--[=[
+	@prop Enabled boolean
+	@within ProgressIndicator
+]=]
 ProgressIndicator.__inherits = {"BaseGui"}
 
 local function createIndicator(app,amt)

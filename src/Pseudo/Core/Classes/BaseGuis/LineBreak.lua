@@ -3,6 +3,9 @@ local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
 local Core = require(script.Parent.Parent.Parent);
 local IsClient = game:GetService("RunService"):IsClient();
 
+--[=[
+	@class LineBreak
+]=]
 local LineBreak = {
 	Name = "LineBreak";
 	ClassName = "LineBreak";

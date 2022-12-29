@@ -48,22 +48,23 @@ else
 end
 
 --//Consts
-local Providers = (script.Core.Providers);
-local ServiceProvider = require(Providers.ServiceProvider);
-local LibraryProvider = require(Providers.LibraryProvider);
+local CoreEngine = script:WaitForChild("Core");
+
+local Providers = CoreEngine:WaitForChild("Providers");
+local ServiceProvider = require(Providers:WaitForChild("ServiceProvider"));
+local LibraryProvider = require(Providers:WaitForChild("LibraryProvider"));
 
 --//Consts
-local CoreEngine = script.Core;
-local CoreGlobals = CoreEngine.Globals;
-local CoreProviders = CoreEngine.Providers;
+local CoreGlobals = CoreEngine:WaitForChild("Globals");
+local CoreProviders = CoreEngine:WaitForChild("Providers");
 
-local ModuleFetcher = require(CoreProviders.Constants.ModuleFetcher);
+local ModuleFetcher = require(CoreProviders:WaitForChild("Constants"):WaitForChild("ModuleFetcher"));
 --local CoreLibs = CoreEngine.Librarys;
 
 --//Consts
-local Pseudo = require(script.Pseudo);
-local Enumeration = require(script.Enumeration);
-local Manifest = require(script["Manifest"]);
+local Pseudo = require(script:WaitForChild("Pseudo"));
+local Enumeration = require(script:WaitForChild("Enumeration"));
+local Manifest = require(script:WaitForChild("Manifest"));
 
 --[=[
 	Main Module

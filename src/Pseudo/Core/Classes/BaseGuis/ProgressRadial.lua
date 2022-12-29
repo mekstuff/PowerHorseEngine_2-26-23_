@@ -25,7 +25,7 @@ local TweenService = game:GetService("TweenService");
 --end
 
 --//
-function ProgressRadial:SetYielding(Yield)
+function ProgressRadial:SetYielding(Yield:boolean)
 	local Component = self:GET("Radial");
 	local G1Image = self:GET("G1Image");
 	if(Yield == true)then
@@ -60,7 +60,7 @@ function ProgressRadial:SetYielding(Yield)
 end;
 
 --//
-function ProgressRadial:FillValue(Value,Speed)
+function ProgressRadial:FillValue(Value:number?,Speed:number?)
 	if(not self._dev.___yielding)then
 		if(not Value)then
 			Value = self.Value;

@@ -11,7 +11,26 @@ local MenuItem = {
     HoverColor3 = Theme.getCurrentTheme().Secondary;
     HoverColorTweenInfo = TweenInfo.new(.2);
 };
-MenuItem.__inherits = {"BaseGui", "Button", "Text", "Frame","GUI"}
+
+--[=[
+    @prop RightSlotIcon string
+    @within MenuItem
+]=]
+--[=[
+    @prop HoverColorEffect boolean
+    @within MenuItem
+]=]
+--[=[
+    @prop HoverColor3 Color3
+    @within MenuItem
+]=]
+--[=[
+    @prop HoverColorTweenInfo TweenInfo
+    @within MenuItem
+]=]
+
+
+MenuItem.__inherits = {"BaseGui", "Button", "Text", "Frame","GUI"};
 
 function MenuItem:_Render()
     local App = self:_GetAppModule();

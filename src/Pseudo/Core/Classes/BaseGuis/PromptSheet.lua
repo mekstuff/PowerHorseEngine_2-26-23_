@@ -14,6 +14,8 @@ local PromptSheet = {
 };
 PromptSheet.__inherits = {"BaseGui","Prompt","Modal","GUI","Frame"}
 
+
+--[=[]=]
 function PromptSheet:AddButton(...:any)
     return self:GET("Prompt"):AddButton(...);
 end;

@@ -1,9 +1,4 @@
-local Theme = require(script.Parent.Parent.Parent.Theme);
-local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
-local Core = require(script.Parent.Parent.Parent);
-local IsClient = game:GetService("RunService"):IsClient();
-
-local module = {
+local AI = {
 	__PseudoBlocked = true;
 	Name = "AI";
 	ClassName = "AI";
@@ -14,14 +9,14 @@ local module = {
 	--AIType = Enumeration.AI.Human;
 };
 
-module.__inherits = {"AI"}
+AI.__inherits = {}
 
-function module:GetTargetPosition()
+function AI:GetTargetPosition()
 	if(not self.Target)then return Vector3.new(0,0,0);end;
 	return self.RelativeOffset and self.Target.CFrame:PointToWorldSpace(self.TargetOffset) or self.Target.Position + self.TargetOffset;
 end
 
-function module:_Render(App)
+function AI:_Render(App)
 	
 	return {
 		["Property"] = function(Value)
@@ -33,4 +28,4 @@ function module:_Render(App)
 end;
 
 
-return module
+return AI

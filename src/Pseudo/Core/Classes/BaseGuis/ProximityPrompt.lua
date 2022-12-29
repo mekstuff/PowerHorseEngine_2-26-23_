@@ -6,10 +6,11 @@ local Mouse = Vanilla_Core.Mouse;
 local IsClient = game.Players.LocalPlayer;
 local ProximityPromptsIdentifier = "ProximityPrompts[PHe]";
 
---local ClassStructure_Module = require(script.Parent.Parent.Parent.UserScripts.ClassStructure);
 local globalClassStructureName = "ProximitivePrompts";
 
-
+--[=[
+	@class ProximityPrompt
+]=]
 local ProximityPrompt = {
 	Name = "ProximityPrompt";
 	ClassName = "ProximityPrompt";
@@ -37,6 +38,72 @@ local ProximityPrompt = {
 	Disabled = false;
 	--_ReplicatedToClients = false;
 };
+
+--[=[
+	@prop Icon string
+	@within ProximityPrompt
+]=]
+--[=[
+	@prop ActionText string
+	@within ProximityPrompt
+]=]
+--[=[
+	@prop ActionTextColor3 Color3
+	@within ProximityPrompt
+]=]
+--[=[
+	@prop ActionTextSize number
+	@within ProximityPrompt
+]=]
+--[=[
+	@prop KeyTextColor3 Color3
+	@within ProximityPrompt
+]=]
+--[=[
+	@prop ActionTextAdjustment Enumeration.Adjustment
+	@within ProximityPrompt
+]=]
+--[=[
+	@prop PromptOffset Vector2
+	@within ProximityPrompt
+]=]
+--[=[
+	@prop KeyCode Enumeration.KeyCode
+	@within ProximityPrompt
+]=]
+--[=[
+	@prop MaxActivationDistance number
+	@within ProximityPrompt
+]=]
+--[=[
+	@prop RequiresLineOfSight boolean
+	@within ProximityPrompt
+]=]
+--[=[
+	@prop RequiresDirectInteraction boolean
+	@within ProximityPrompt
+]=]
+--[=[
+	@prop HoldDuration number
+	@within ProximityPrompt
+]=]
+--[=[
+	@prop RetractionSpeed number
+	@within ProximityPrompt
+]=]
+--[=[
+	@prop Exclusivity Enumeration.Exclusivity
+	@within ProximityPrompt
+]=]
+--[=[
+	@prop Hidden boolean
+	@within ProximityPrompt
+]=]
+--[=[
+	@prop Disabled boolean
+	@within ProximityPrompt
+]=]
+
 ProximityPrompt.__inherits = {"BaseGui"}
 
 
@@ -202,7 +269,16 @@ function ProximityPrompt:_Render(App)
 			TriggerEndedEvent = Instance.new("RemoteEvent");
 			TriggeredEvent.Name = "Triggered-"..self._REPLICATED;TriggerEndedEvent.Name = "TriggerEnded-"..self._REPLICATED;
 			TriggeredEvent.Parent = EnginelocalEventsFolder;TriggerEndedEvent.Parent = EnginelocalEventsFolder;
+			
+			--[=[
+				@prop Triggered PHeSignal<Player>
+				@within ProximityPrompt
+			]=]
 			self:AddEventListener("Triggered",true,TriggeredEvent.OnServerEvent);
+			--[=[
+				@prop TriggerEnded PHeSignal<Player>
+				@within ProximityPrompt
+			]=]
 			self:AddEventListener("TriggerEnded",true,TriggerEndedEvent.OnServerEvent);
 		else
 			TriggeredEvent = EnginelocalEventsFolder:WaitForChild("Triggered-"..self._REPLICATED);
@@ -279,11 +355,26 @@ function ProximityPrompt:_Render(App)
 		PromptButtonFill.BackgroundTransparency = .35;
 		
 		local Adornee = getAdornee(self.Parent);
-		
-
+	
+		--[=[
+			@prop HoldBegan PHeSignal<nil>
+			@within ProximityPrompt
+		]=]
 		local HoldBeganEvent = self:AddEventListener("HoldBegan", true);
+		--[=[
+			@prop HoldEnded PHeSignal<nil>
+			@within ProximityPrompt
+		]=]
 		local HoldEndedEvent =  self:AddEventListener("HoldEnded",true);
+		--[=[
+			@prop ProximityGained PHeSignal<nil>
+			@within ProximityPrompt
+		]=]
 		ProximityGained = self:AddEventListener("ProximityGained", true);
+		--[=[
+			@prop ProximityLost PHeSignal<nil>
+			@within ProximityPrompt
+		]=]
 		ProximityLost =  self:AddEventListener("ProximityLost",true);
 	
 		

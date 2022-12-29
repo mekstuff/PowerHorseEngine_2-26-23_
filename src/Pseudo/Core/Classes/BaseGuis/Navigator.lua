@@ -99,7 +99,7 @@ function Navigator:Next(initial:boolean?)
 	return true;
 end;
 --[=[]=]
-function Navigator:NavigateTo(index:number|string,initial:boolean)
+function Navigator:NavigateTo(index:number|string,initial:boolean?)
 	if(typeof(index) ~= "number")then
 		for _i,x in pairs(self._dev.__nav.pages) do
 			if(x.id == index)then
@@ -123,7 +123,9 @@ function Navigator:NavigateTo(index:number|string,initial:boolean)
 		end;
 	end;
 end;
-function Navigator:RemoveNavigation(id)
+
+--[=[]=]
+function Navigator:RemoveNavigation(id:number|string)
 	for index,v in pairs(self._dev.__nav.pages)do
 		if(v.id == id)then
 		
@@ -149,7 +151,7 @@ end
 --[=[
 	@param Page Instance | Pseudo
 ]=]
-function Navigator:AddNavigation(Page:Instance, id:string|number, Number:number)
+function Navigator:AddNavigation(Page:Instance, id:string|number, Number:number?)
 	Page = Core.getElementObject(Page);
 	if(not Number)then Number = #self._dev.__nav.pages+1;end;
 
@@ -177,7 +179,7 @@ function Navigator:_Render(App)
 	self._dev.__nav.currentIndex = safeNumber;
 	
 --[=[
-	@prop Navigated PHeSignal
+	@prop Navigated PHeSignal<string|number,Instance|Pseudo,string,number>
 	@within Navigator
 ]=]
 	self:AddEventListener("Navigated",true);

@@ -8,12 +8,12 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 ]=]
 
 local Engine = {}
-local ServiceProvider = require(script.Parent.Core.Providers.ServiceProvider);
+local ServiceProvider = require(script.Parent:WaitForChild("Core"):WaitForChild("Providers"):WaitForChild("ServiceProvider"));
 
 ServiceProvider:LoadServiceAsync("ReplicationService") --< Creates replication event.
 
 Engine.ErrorService = ServiceProvider:LoadServiceAsync("ErrorService");
-Engine.Manifest = require(script.Parent["Manifest"]);
+Engine.Manifest = require(script.Parent:WaitForChild("Manifest"));
 
 local ServerInitiated=false;
 --> Optimize so we only use events that are used.

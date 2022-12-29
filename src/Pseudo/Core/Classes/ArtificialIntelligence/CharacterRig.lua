@@ -1,11 +1,11 @@
-local Theme = require(script.Parent.Parent.Parent.Theme);
-local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
-local Core = require(script.Parent.Parent.Parent);
 local IsClient = game:GetService("RunService"):IsClient();
 local Camera = workspace.CurrentCamera;
 local TweenService = game:GetService("TweenService");
 
-local module = {
+--[=[
+	@class CharacterRig
+]=]
+local CharacterRig = {
 	Name = "CharacterRig";
 	ClassName = "CharacterRig";
 
@@ -29,9 +29,47 @@ local module = {
 	Focus = "**Instance";
 
 };
-module.__inherits = {}
+--[=[
+	@prop WalkAnimation string
+	@within CharacterRig
+]=]
+--[=[
+	@prop RunAnimation string
+	@within CharacterRig
+]=]
+--[=[
+	@prop JumpAnimation string
+	@within CharacterRig
+]=]
+--[=[
+	@prop Shirt string
+	@within CharacterRig
+]=]
+--[=[
+	@prop Pants string
+	@within CharacterRig
+]=]
+--[=[
+	@prop WalkSpeed number
+	@within CharacterRig
+]=]
+--[=[
+	@prop JumpPower number
+	@within CharacterRig
+]=]
+--[=[
+	@prop WalkTo Vector3
+	@within CharacterRig
+]=]
+--[=[
+	@prop Focus any
+	@within CharacterRig
+]=]
 
-function module:Sprint()
+CharacterRig.__inherits = {}
+
+--[=[]=]
+function CharacterRig:Sprint()
 	if(IsClient)then
 		if(not self._dev.orgfovcam)then
 			self._dev.orgfovcam = Camera.FieldOfView;
@@ -43,7 +81,8 @@ function module:Sprint()
 	end;
 end;
 
-function module:StopSprint()
+--[=[]=]
+function CharacterRig:StopSprint()
 	if(not self._Human)then return end;
 	local tinfo = TweenInfo.new(1);
 	local t1 = TweenService:Create(Camera, tinfo, {FieldOfView = self._dev.orgfovcam or 70});
@@ -51,14 +90,16 @@ function module:StopSprint()
 	t1:Play();t2:Play();
 end
 
-function module:GetIsCharacter()
+--[=[]=]
+function CharacterRig:GetIsCharacter()
 	local Humanoid = self:GetBodyParts();
 	if(Humanoid)then
 		return Humanoid.Parent;
 	end
 end
 
-function module:GetBodyParts()
+--[=[]=]
+function CharacterRig:GetBodyParts()
 	local Model = self.Parent:IsA("Model") and self.Parent or self.Parent.Parent;
 	
 	local Human = Model:FindFirstChildWhichIsA("Humanoid");
@@ -71,8 +112,9 @@ function module:GetBodyParts()
 	return self._Human;
 end
 
-function module:AddAccessory(Accessory,SpecialId)
-	local ErrorService = self:_GetAppModule():GetService("ErrorService");
+--[=[]=]
+function CharacterRig:AddAccessory(Accessory:Accessory,SpecialId:any?)
+	local ErrorService = self:_GetAppCharacterRig():GetService("ErrorService");
 	local Model;
 	
 	if(typeof(Accessory) == "number")then
@@ -100,7 +142,8 @@ function module:AddAccessory(Accessory,SpecialId)
 	
 end;
 
-function module:WalkToCoordinate(Coordinates,Force)
+--[=[]=]
+function CharacterRig:WalkToCoordinate(Coordinates:CFrame|Vector3,Force:boolean?)
 	self._Human:MoveTo(Coordinates)
 	if(Force)then
 		local WalkToReached=false;
@@ -111,7 +154,7 @@ function module:WalkToCoordinate(Coordinates,Force)
 				WalkToReached=true;
 			end
 		end);
-		spawn(function()
+		task.spawn(function()
 			while not WalkToReached do
 				if(not self or not self._dev or not self._Human)then break;end;
 				if(self._Human.WalkToPoint ~= Coordinates)then
@@ -123,11 +166,12 @@ function module:WalkToCoordinate(Coordinates,Force)
 	end
 end
 
-function module:RemoveAccessory()
+--[=[]=]
+function CharacterRig:RemoveAccessory()
 	
 end;
 
-function module:_Render(App)
+function CharacterRig:_Render(App)
 	
 	--if(not IsClient)then
 	local init;
@@ -215,4 +259,4 @@ function module:_Render(App)
 end;
 
 
-return module
+return CharacterRig

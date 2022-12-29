@@ -15,28 +15,98 @@ type x = (("a") -> true);
 
 export type App = {
     new:
+    --> AI
+        (("AICharacterRig") -> AICharacterRig)
+        &(("AI") -> AI)
+        &(("AIPet") -> AIPet)
+        &(("AIHuman") -> AIHuman)
+        &(("BaseCharacterRig") -> BaseCharacterRig)
+        &(("CharacterRig") -> CharacterRig)
 --> BaseGui's 
-        (("Accordion") -> Accordion)
+        &(("Accordion") -> Accordion)
+        &(("AccordionGroup") -> AccordionGroup)
         &(("ActionMenu") -> ActionMenu)
         &(("AppBar") -> AppBar)
+        &(("Backpack") -> Backpack)
+        &(("Badge") -> Badge)
+        &(("BaseGui") -> BaseGui)
+        &(("BaseText") -> BaseText)
         &(("Button") -> Button)
         &(("Checkbox") -> Checkbox)
+        &(("CloseButton") -> CloseButton)
+        &(("DatePicker") -> DatePicker)
+        &(("Dialog") -> Dialog)
+        &(("DialogueGUI") -> DialogueGUI)
+        &(("DropdownButton") -> DropdownButton)
+        &(("FormControl") -> FormControl)
         &(("Frame") -> Frame)
+        &(("GUI") -> GUI)
+        &(("Image") -> Image)
+        &(("LineBreak") -> LineBreak)
+        &(("ListItem") -> ListItem)
+        &(("MenuItem") -> MenuItem)
         &(("Modal") -> Modal)
+        &(("Navigator") -> Navigator)
+        &(("NewToast") -> NewToast)
+        &(("NotificationBanner") -> AccordionGroup)
+        &(("NotificationGroup") -> NotificationGroup)
+        &(("ObjectiveGroupOLD") -> ObjectiveGroupOLD)
+        &(("ObjectiveOLD") -> ObjectiveOLD)
+        &(("Portal") -> Portal)
+        &(("ProgressBar") -> ProgressBar)
+        &(("ProgressIndicator") -> ProgressIndicator)
+        &(("ProgressiveProgress") -> ProgressiveProgress)
+        &(("ProgressRadial") -> ProgressRadial)
         &(("Prompt") -> Prompt)
-        &(("Promise") -> Promise)
-        &(("BaseCharacterRig") -> BaseCharacterRig)
+        &(("PromptSheet") -> PromptSheet)
+        &(("ProximityPrompt") -> ProximityPrompt)
+        &(("Radio") -> Radio)
+        &(("RadioGroup") -> RadioGroup)
+        &(("ScrollingFrame") -> ScrollingFrame)
+        &(("SettingButton") -> SettingButton)
+        &(("Slider") -> Slider)
+        &(("Snackbar") -> Snackbar)
+        &(("Subtitle") -> Subtitle)
+        &(("SubtitleText") -> SubtitleText)
+        &(("SuggestiveTextInput") -> SuggestiveTextInput)
         &(("TabGroup") -> TabGroup)
         &(("Text") -> Text)
+        &(("TextComponent") -> TextComponent)
+        &(("TextInput") -> TextInput)
+        &(("TextSlider") -> TextSlider)
+        &(("TimePicker") -> TimePicker)
+        &(("Toast") -> Toast)
+        &(("Toggle") -> Toggle)
+        &(("ToolTip") -> ToolTip)
+        &(("ViewportRespectiveFrame") -> ViewportRespectiveFrame)
+        &(("Widget") -> Widget)
+
+--> Instances
+        &(("Folder") -> Folder)
+        &(("RInstance") -> RInstance)
+--> Joint
+        &(("Ligament") -> Ligament)
+--> PHe
+        &(("PHePrompt") -> PHePrompt)
+--> Promises
+        &(("Promise") -> Promise)
+--> Rig
+        &(("DoorRig") -> DoorRig)
+        &(("HingedDoorRig") -> HingedDoorRig)
+        &(("Rig") -> Rig)
+--> Servants
+        &(("Servant") -> Servant)
+--> SignalBlockers
+        &(("GUISignalBlocker") -> GUISignalBlocker)
+--> Signals
+        &(("PHeSignal") -> PHeSignal)
 --> States
         &(("State") -> State)
---> AI
-        &(("AIPet") -> AIPet)
-        &(("AICharacterRig") -> AICharacterRig)
---> Servants
-        &(("Servant") -> Servant),
-	-- Enumeration: Enumeration.Enumeration,
-	-- Enum: Enumeration.Enumeration,
+--> Transitions
+        &(("FadeTransition") -> State)
+        &(("Transition") -> Transition)
+        &(("WipeTransition") -> WipeTransition),
+
 	Create: CreateCustomClass,
     GetGlobal: (
         ((self:any, "Client")->ClientGlobal)
@@ -210,12 +280,6 @@ export type Promise = Pseudo&{
 export type PHePromise = Promise;
 
 --> AI
-export type AI = {
-
-};
-
-export type PHeBaseCharacterRig = BaseCharacterRig;
-
 export type AICharacterRig = Pseudo&AI&BaseCharacterRig&{
     ShirtTemplate: string,
     PantsTemplate: string,
@@ -223,6 +287,18 @@ export type AICharacterRig = Pseudo&AI&BaseCharacterRig&{
     WalkToPart: BasePart,
 };
 export type PHeAICharacterRig = AICharacterRig;
+
+export type AI = {
+    Target: Instance?,
+    TargetOffset: Vector3,
+    RelativeOffset: boolean,
+    GetTargetPosition: (self:any) -> Vector3
+};
+
+
+export type PHeBaseCharacterRig = BaseCharacterRig;
+
+
 export type AIPet = Pseudo&{
     IdleAnimation: string,
     WalkAnimation: string,
@@ -234,9 +310,115 @@ export type AIPet = Pseudo&{
     TargetRotation: number,
     -- FaceDirection: Enumeration,
 }
-export type PHeAIPet = AIPet;
+
+export type AIHuman = AI&{
+    IdleAnimation: string,
+    WalkAnimation: string,
+    RunAnumation: string,
+    JumpAnimation: string,
+    Health: number,
+    _DetermineIsValidHumanModel: (self:any, Parent:any?) -> any,
+};
+
+export type BaseCharacterRig = Pseudo&{
+    GetClothing: (self:any) -> {[any]:any},
+    GetCharacterInRadius: (self:any, Radius:number) -> {[any]:any},
+    GetBaseHumanoid: (self:any,Target:Instance|Pseudo) -> {[any]:any},
+};
+
+export type CharacterRig = Pseudo&{
+    WalkAnimation: string,
+    RunAnimation: string,
+    JumpAnimation: string,
+    Shirt: string,
+    Pants: string,
+    WalkSpeed: number,
+    JumpPower: number,
+    WalkTo: Vector3,
+    Focus: any,
+    Sprint: (self:any) -> nil,
+    StopSprint: (self:any) -> nil,
+    GetIsCharacter: (self:any) -> any,
+    GetBodyParts: (self:any) -> any,
+    AddAccessory: (self:any,Accessory:Accessory,SpecialId:any?) -> nil,
+    RemoveAccessory: (self:any) -> nil,
+    WalkToCoordinate: (self:any,Coordinates:CFrame|Vector3,Force:boolean?) -> nil,
+}
 
 --> Base Gui's
+
+export type Accordion = Pseudo&BaseGui&{
+    Text: string,
+    Icon: string,
+    Font: Font,
+    TextSie: number,
+    TextColor3: Color3,
+    Expanded: boolean,
+    -- AccordionButtonPosition: Enumeration.AccordionButtonPosition,
+    ButtonSize: UDim2,
+    AutoExpand: boolean,
+    GetButton: (self:any) -> Button,
+    ButtonMouseEnter: PHeSignal<nil>,
+    ButtonMouseLeave: PHeSignal<nil>,
+    ButtonPressed: PHeSignal<nil>,
+};
+
+export type AccordionGroup = {
+    CellSize: UDim2,
+    CellPadding: UDim2,
+    HorizontalAlignment: Enum.HorizontalAlignment,
+    VerticalAlignment: Enum.VerticalAlignment,
+    FillDirection: Enum.FillDirection,
+    SortOrder: Enum.SortOrder,
+    AddAccordion: (self:any, Text:string?, Icon:string?) -> Accordion,
+    Add: (self:any,...any) -> Accordion,  
+};
+
+export type ActionMenuAction = Pseudo&{
+    ID: string,
+    Text: string,
+    Icon: string,
+    UpdateText: (self:any, Text:string) -> nil,
+    UpdateIcon: (self:any, Icon:string) -> nil,
+    AddActionMenu: (self:any) -> ActionMenu,
+};
+export type ActionMenu = {
+    -- AutomaticHide: Enumeration.ActionMenuAutomaticHide,
+    Showing: boolean,
+    TextSize: number,
+    ShowAsync: (self:any, ...any) -> ActionMenuAction,
+    Show: (self:any, ignoreFocusLost:boolean?,CustomAdornee:any?) -> nil,
+    Hide: (self:any) -> nil,
+    AddSplit: (self:any) -> nil,
+    AddPadding: (self:any, y:number?) -> nil,
+    AddHeader: (self:any, Header:string?) -> nil,
+    AddAction: (self:any, ActionName:string,id:string,ActionIcon:string?,...any) -> ActionMenuAction,
+    UpdateAllIcons: (self:any, Icon:string, IgnoreList:{[number]:any}?, Inverse:boolean?) -> nil,
+    GetActions: (self:any) -> {[any]:ActionMenuAction},
+    GetAction: (Action:string) -> ActionMenuAction,
+    AddToTree: (self:any,...any) -> nil,
+    ActionTrigger: PHeSignal<ActionMenuAction>
+};
+
+export type AppBar = Pseudo&BaseGui&{
+    Text: string,
+    TextColor3: Color3,
+    Icon: string,
+    Size: UDim2,
+    ActionButtonPressed: PHeSignal<nil>
+};
+
+export type Badge = {
+    Text: string,
+    TextColor3: Color3,
+    TextScaled: boolean,
+    StrokeTransarepcny: number,
+    StrokeThickness: number,
+    StrokeColor3: number,
+    -- xAdjustment: Enumeration,
+    Roundness: UDim,
+};
+
 export type BaseGui = {
 	Disabled: boolean,
 	Position: UDim2,
@@ -249,105 +431,10 @@ export type BaseGui = {
     GetAbsolutePosition: (self:any) -> Vector2,
     GetGUIRef: (self:any) -> any,
 };
-export type PHeBaseGui = BaseGui;
-export type GUI = {
 
-};
-export type PHeGUI = GUI;
-
-export type TabGroup = Pseudo&BaseGui&{
-    HighlighterColor3: Color3,
-    HighlighterThickness: number,
-    HighlighterPadding: number,
-    AddTab: (self:any,TabContent:(Pseudo|Instance|any),TabName:string|{},TabIcon:string?,TabId:any?,TabButtonProps:{}?)->Button,
-    OpenTab: (self:any,TabId:any)->nil,
-    TabSwitched: PHeSignal<any>
-};
-
-export type PHeTabGroup = TabGroup;
-
-export type Text = {
-
-};
-export type PHeText = Text;
-
-export type Frame = {
-    MouseButton1Down: PHeSignal<nil>,
-    MouseButton2Down: PHeSignal<nil>,
-    MouseButton1Up: PHeSignal<nil>,
-    MouseButton2Up: PHeSignal<nil>,
-    MouseClick: PHeSignal<nil>,
-    MouseLeave: PHeSignal<nil>,
-};
-export type PHeFrame = Frame;
 export type BaseText = Pseudo&GUI&{
     GetUserTextAsync: (self:any,ShowText:string?) -> (string|nil,boolean),
 };
-export type PHeBaseText = BaseText;
-export type Accordion = Pseudo&BaseGui&{
-    Icon: string,
-    Font: Enum.Font,
-    TextSize: number,
-    TextColor3: Color3,
-    Expanded: boolean,
-    -- AccordionButtonPosition: Enumeration
-    AutomaticSize: Enum.AutomaticSize,
-    ButtonSize: UDim2,
-    AutoExpand: boolean,
-    ButtonMouseEnter: PHeSignal<nil>,
-    ButtonMouseLeave: PHeSignal<nil>,
-};
-export type PHeAccordion = Accordion;
-
-export type ActionMenuAction = Pseudo&{
-    ID: string,
-    Text: string,
-    Icon: string,
-    OnAction: PHeSignal<nil>,
-    UpdateText: (self:any,Text:string)->nil,
-    UpdateIcon: (self:any,Icon:string)->nil
-};
-export type PHeActionMenuAction = ActionMenuAction;
-
-export type ActionMenu = Pseudo&{
-    -- AutomaticHide: 
-    Showing: boolean,
-    TextSize: number,
-    ShowAsync: (self:any,...any)->ActionMenuAction|nil,
-    Show: (self:any,ignoreFocusLost:boolean?,CustomAdornee:any?)->nil,
-    Hide: (self:any)->nil,
-    AddSplit: (self:any)->nil,
-    AddPadding: (self:any,y:number?)->nil,
-    AddHeader: (self:any,Header:string?)->nil,
-    AddAction: (self:any,ActionName:string,id:string,ActionIcon:string?,...any?)->ActionMenuAction,
-    UpdateAllIcons: (self:any,Icon:string, IgnoreList:table?, Inverse:boolean?)->nil,
-    GetActions: (self:any,Icon:string)->{},
-    GetAction: (self:any,ActionName:string)->ActionMenuAction,
-    AddToTree: (self:any,...any)->nil,
-    ActionTriggered: PHeSignal<ActionMenuAction>
-};
-export type PHeActionMenu = ActionMenu;
-
-export type AppBar = Pseudo&BaseGui&{
-    Text: string,
-    TextColor3: Color3,
-    Icon: string,
-    Size: UDim2,
-    ActionButtonPressed: PHeSignal<nil>
-};
-export type PHeAppBar = AppBar;
-
-export type Badge = {
-    Text: string,
-    TextColor3: Color3,
-    TextScaled: boolean,
-    StrokeTransarepcny: number,
-    StrokeThickness: number,
-    StrokeColor3: number,
-    -- xAdjustment: Enumeration,
-    Roundness: UDim,
-};
-export type PHeBadge = Badge;
 
 export type Button = Pseudo&Frame&Text&BaseGui&{
     Icon: string,
@@ -364,7 +451,6 @@ export type Button = Pseudo&Frame&Text&BaseGui&{
     ClickEffect: boolean?,
     Padding: Vector2,
 };
-export type PHeButton = Button;
 
 export type Checkbox = BaseGui&Frame&{
     Icon: string,
@@ -372,18 +458,54 @@ export type Checkbox = BaseGui&Frame&{
     AutoToggle: boolean,
     Toggled: PHeSignal<boolean>
 };
-export type PHeCheckbox = Checkbox;
 
 export type CloseButton = Pseudo&BaseGui&{
     Actvated: PHeSignal<true>
 };
-export type PHeCloseButton = CloseButton;
 
-export type DropdownButton = {
-    ContentSize: Vector2,
-    Expanded: boolean,
+-- export type DatePicker = 
+-- export type Dialog
+-- export type DialogueGUI
+-- export type FormControl
+
+export type Frame = {
+    MouseButton1Down: PHeSignal<nil>,
+    MouseButton2Down: PHeSignal<nil>,
+    MouseButton1Up: PHeSignal<nil>,
+    MouseButton2Up: PHeSignal<nil>,
+    MouseClick: PHeSignal<nil>,
+    MouseLeave: PHeSignal<nil>,
 };
-export type PHeDropdownButton = DropdownButton;
+
+export type GUI = {
+
+};
+
+export type Image = Pseudo&BaseGui&Frame&GUI&{
+    Model: Instance?,
+    ModelAngle: Vector3,
+    Image: string,
+    ImageColor3: Color3,
+    ImageRectOffset: Vector2,
+    ImageRectSize: Vector2,
+    ImageTransparency: number,
+    ResampleMode: Enum.ResamplerMode,
+    ScaleType: Enum.ScaleType,
+    SliceScale: number
+};
+
+export type LineBreak = BaseGui&{
+    Color: Color3,
+};
+
+-- export type ListItem --> MenuItem instead
+
+export type MenuItem = BaseGui&Button&Text&Frame&GUI&{
+    RightSlotIcon: string,
+    HoverColorEffect: boolean,
+    HoverColor3: Color3,
+    HoverColorTweenInfo: TweenInfo,
+};
 
 export type Modal = Pseudo&BaseGui&GUI&{
     Header: string,
@@ -408,7 +530,54 @@ export type Modal = Pseudo&BaseGui&GUI&{
     OnHighlightClicked: (self:any, handler:()->nil) -> nil
     -- CloseButtonBehaviour: Enumeration.CloseButtonBehaviour,
 };
-export type PHeModal = Modal;
+
+export type Navigator = BaseGui&{
+    NavigationSpeed: number,
+    Back: (self:any) -> nil,
+    Next: (self:any, initial:boolean?) -> nil,
+    NavigateTo: (self:any, index:number|string,initial:boolean?) -> nil,
+    RemoveNavigation: (self:any, id:string) -> nil,
+    AddNavigation: (Page:Instance|Pseudo, id:string|number, Number:number?) -> nil,
+    Navigated: PHeSignal<string|number,Instance|Pseudo,string,number>
+};
+
+-- export type NewToast = 
+-- export type NotificationBanner
+-- export type ObjectiveGroupOLD
+-- export type ObjectiveOLD
+
+export type Portal = BaseGui&{
+    IgnoreGuiInset: boolean,
+    ResetOnSpawn: boolean
+};
+
+export type ProgressBar = BaseGui&{
+    ForegroundColor3: Color3,
+    TweenSpeed: number,
+    ValueChanged: PHeSignal<nil>
+};
+
+export type ProgressIndicator = {
+    Color: Color3,
+    CycleSpeed: number,
+    Size: number,
+    Enabled: boolean
+};
+
+export type ProgressProgress = ProgressBar&{
+    CurrentIndex: string,
+    NextIndex: string,
+    ProgressBarPadding: number
+};
+
+export type ProgressRadial = GUI&BaseGui&{
+    Value: number,
+    Color: Color3,
+    Yielding: boolean,
+    SetYielding: (self:any, Yield:boolean) -> nil,
+    FillValue: (self:any, Value:number?, Speed:number?) -> nil,
+};
+
 export type Prompt = Modal&{
     Level: number,
     StartPosition: UDim2,
@@ -418,10 +587,60 @@ export type Prompt = Modal&{
     Show: (self:any) -> nil,
     Hide: (self:any,DontLookForOther:boolean?,Destroy:boolean?) -> nil,
     SetTweenSpeed: (self:any,Speed:number)->nil,
-    Yield: (self:any,DestroyOnEnded:boolean?)->(Button,any),
-    
+    Yield: (self:any,DestroyOnEnded:boolean?)->(Button,any),    
 };
-export type PHeModalPrompt = Prompt;
+
+export type PromptSheet = BaseGui&Prompt&Modal&GUI&Frame;
+
+export type ProximityPrompt = BaseGui&{
+    Icon: string,
+    ActionText: string,
+    ActionTextColor3: Color3,
+    ActionTextSize: number,
+    KeyTextColor3: Color3,
+    -- ActionTextAdjustment: Enumeration.Adjustment,
+    PromptOffset: Vector2,
+    -- KeyCode: Enumeration.KeyCode,
+    MaxActivationDistance: number,
+    RequiresLineOfSight: boolean,
+    HoldDuration: number,
+    RetractionSpeed: number,
+    -- Exclusivity: Enumeration.Exclusivity,
+    Hidden: boolean,
+    Disabled: boolean,
+	Triggered: PHeSignal<Player>,
+	TriggerEnded: PHeSignal<nil>,
+	HoldBegan: PHeSignal<nil>,
+	HoldEnded: PHeSignal<nil>,
+	ProximityGained: PHeSignal<nil>,
+	ProximituLost: PHeSignal<nil>,
+};
+
+export type TabGroup = Pseudo&BaseGui&{
+    HighlighterColor3: Color3,
+    HighlighterThickness: number,
+    HighlighterPadding: number,
+    AddTab: (self:any,TabContent:(Pseudo|Instance|any),TabName:string|{},TabIcon:string?,TabId:any?,TabButtonProps:{}?)->Button,
+    OpenTab: (self:any,TabId:any)->nil,
+    TabSwitched: PHeSignal<any>
+};
+
+export type PHeTabGroup = TabGroup;
+
+export type Text = {
+
+};
+export type PHeText = Text;
+
+
+
+export type PHeCloseButton = CloseButton;
+
+export type DropdownButton = {
+    ContentSize: Vector2,
+    Expanded: boolean,
+};
+export type PHeDropdownButton = DropdownButton;
 
 --> Providers
 export type LibraryProvider = {
@@ -452,8 +671,14 @@ export type UtilProvider = {
 
 --> Services
 type ClientService_Backpack_ClientBackpackProxy = Pseudo&{
-    ToolBind: (self:any, BindHandler:()->any) -> Servant,
-    GetTools: (self:any) -> {[number]:Tool}
+    GUID: string,
+    Backpack: {[any]:any},
+    Characters: {[any]:any},
+    ToolBind: (self:any, BindHandler:(Tool:Tool,CollectorBinder:Servant)->any) -> Servant,
+    GetTools: (self:any) -> {[number]:Tool},
+    BindKeysToList: (self:any,KeybindMapping:{[number]:{[number]:Enum.KeyCode}},RequestsHandler:(TargetTool:Tool,InputObject:InputObject?)->any??)->Servant,
+    HasToolEquipped: (self:any, Tool:Tool) -> boolean,
+    SetToolEquipped: (self:any, Tool:Tool, State:boolean) -> any
 };
 
 type ClientService_Backpack = Pseudo&{
@@ -467,7 +692,10 @@ type ClientService_Backpack = Pseudo&{
 };
 
 export type ClientService = {
-    Backpack: ClientService_Backpack
+    Ping: PingReader,
+    Backpack: ClientService_Backpack,
+    GetClientDeviceType: (self:any) -> "pc"|"mobile"|"xbox",
+    Device: "pc"|"mobile"|"xbox"
 }
 
 type PHePluginStudioTool_dev = {}
@@ -707,6 +935,7 @@ export type PingReader = Pseudo&{
     Ping: number,
     UpdateInterval: number,
     -- ConnectionStatus: Enumeration.ConnectionStatus,
+    PingChanged: PHeSignal<nil>
 
 };
 export type PingService = {

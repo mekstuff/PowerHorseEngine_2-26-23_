@@ -1,8 +1,6 @@
-local Theme = require(script.Parent.Parent.Parent.Theme);
-local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
-local Core = require(script.Parent.Parent.Parent);
-local IsClient = game:GetService("RunService"):IsClient();
-
+--[=[
+	@class AccordionGroup
+]=]
 local AccordionGroup = {
 	Name = "AccordionGroup";
 	ClassName = "AccordionGroup";
@@ -17,8 +15,10 @@ local AccordionGroup = {
 };
 AccordionGroup.__inherits = {"BaseGui"}
 
---//
-function AccordionGroup:AddAccordion(Text,Icon)
+--[=[
+	@return Accordion
+]=]
+function AccordionGroup:AddAccordion(Text:string?,Icon:string?)
 	local App = self:_GetAppModule();
 	local RespectGrid = Instance.new("Frame",self:GetGUIRef());
 	--RespectGrid.AutomaticSize = Enum.AutomaticSize.XY;
@@ -29,9 +29,10 @@ function AccordionGroup:AddAccordion(Text,Icon)
 	local RandomFrame = App.new("Frame",Accordion);
 	RandomFrame.Size = UDim2.new(1,0,0,70);
 	RandomFrame.BackgroundColor3 = Color3.fromRGB(217, 255, 78);
+	return Accordion
 end;
---
-function AccordionGroup:Add(...)
+--[=[]=]
+function AccordionGroup:Add(...:any)
 	return self:AddAccordion(...)
 end
 --//

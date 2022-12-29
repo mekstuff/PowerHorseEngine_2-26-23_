@@ -1,9 +1,7 @@
-local Theme = require(script.Parent.Parent.Parent.Theme);
-local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
-local Core = require(script.Parent.Parent.Parent);
-local IsClient = game:GetService("RunService"):IsClient();
-
-local module = {
+--[=[
+	@class AIHuman
+]=]
+local AIHuman = {
 	Name = "AIHuman";
 	ClassName = "AIHuman";
 	IdleAnimation = "";
@@ -12,14 +10,15 @@ local module = {
 	JumpAnimation = "";
 	Health = 100;
 };
-module.__inherits = {"AI"}
+AIHuman.__inherits = {"AI"}
 
 local function tossWarnParentMessage(Parent,self,ErrorService)
 	ErrorService.tossWarn(Parent.Name.." is not a valid AIHuman 'Adornee'. Try pareting "..self.Name.." to a model which contains a humanoid and a humanoidRootPart.");
 end
 
-function module:_DetermineIsValidAIHumanModel(Parent)
-	local App = self:_GetAppModule();
+--[=[]=]
+function AIHuman:_DetermineIsValidAIHumanModel(Parent:any?)
+	local App = self:_GetAppAIHuman();
 	local ErrorService = App:GetService("ErrorService");
 	if(Parent:IsA("Model"))then
 		local RootPart = Parent:FindFirstChild("HumanoidRootPart");
@@ -33,7 +32,7 @@ function module:_DetermineIsValidAIHumanModel(Parent)
 end;
 
 
-function module:_Render(App)
+function AIHuman:_Render(App)
 	
 	
 	return {
@@ -52,4 +51,4 @@ function module:_Render(App)
 end;
 
 
-return module
+return AIHuman
