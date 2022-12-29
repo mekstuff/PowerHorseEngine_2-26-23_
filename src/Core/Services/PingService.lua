@@ -55,6 +55,10 @@ function PingService:RequestUserPingAsync()
 		};
 		function c:_Render()
 			local ConnectionStatusEnums = Enumeration:GetEnums("ConnectionStatus");
+			--[=[
+				@prop PingChanged PHeSignal<nil>
+			]=]
+			self:AddEventListener("PingChanged",true,self:GetPropertyChangedSignal("Ping"))
 			return {
 				["Enabled"] = function(v)
 					if(v)then
