@@ -28,7 +28,30 @@ function FrameworkBranch:_Render()
 
     return {};
 end;
-
+--[=[
+    @client
+]=]
+function FrameworkBranch:CreateDedicatedScreenGui(ScreenGuiProps:{[string]:any}?)
+    local ErrorService = self:_GetAppModule():GetService("ErrorService");
+    if(not IsClient)then
+        ErrorService.tossError("CreateDedicatedScreenGui Can only be called by a framework client branch", self.Name);
+        return;
+    end;
+    local ScreenGui = Instance.new("ScreenGui");
+    ScreenGui.Name = self.Name;
+    ScreenGui.ResetOnSpawn = false;
+    if(ScreenGuiProps)then
+        for a,b in pairs(ScreenGuiProps) do
+            ScreenGui[a] = b;
+        end;
+    end;
+    if not (ScreenGuiProps and ScreenGuiProps.Parent)then
+        local Player = game:GetService("Players").LocalPlayer;
+        local PlayerGui = Player:WaitForChild("PlayerGui");
+        ScreenGui.Parent = PlayerGui;
+    end;
+    return ScreenGui;
+end;
 --[=[
     @client
 ]=]
@@ -122,15 +145,21 @@ function FrameworkBranch:PortModular(Modular:any):Types.FrameworkLibrary
 
     function Modular:GetModular(...)
         return ogSelf:GetModular(...)
-    end
+    end;
     
     function Modular:GetService(...)
         return ogSelf:GetService(...);
-    end
+    end;
 
     function Modular:GetComponentClass(...:any)
         return ogSelf:GetComponentClass(...);
-    end
+    end;
+
+    function Modular:CreateDedicatedScreenGui(ScreenGuiProps:{[string]:any}?)
+        ScreenGuiProps = ScreenGuiProps or {};
+        ScreenGuiProps.Name = ogSelf.Name.."-Branch@"..self.Name;
+        return ogSelf:CreateDedicatedScreenGui(ScreenGuiProps);
+    end;
 
     if(not Modular._Render)then
         function Modular:_Render()
