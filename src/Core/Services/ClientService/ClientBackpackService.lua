@@ -1,3 +1,5 @@
+local ContextActionService = game:GetService("ContextActionService")
+local HttpService = game:GetService("HttpService")
 --[=[
     @class ClientBackpackService
     @tag ClientService
@@ -49,6 +51,7 @@ end;
 local ClientBackpackProxy = {
     Name = "ClientBackpackProxy",
     ClassName = "ClientBackpackProxy",
+    GUID = HttpService:GenerateGUID(false);
     Backpacks = {};
     Charaters = {};
 }
@@ -103,7 +106,7 @@ function ClientBackpackProxy:_Render()
 end;
 
 --[=[
-    
+    @param BindHandler (Tool:Tool,CollectorBinder:Servant)->any
     @return Servant -- Collector Binded Connection.
     Useful for creating custom backpack systems
 ]=]
@@ -115,7 +118,90 @@ end;
 function ClientBackpackProxy:GetTools():{[number]:Tool}
     local Collector = self:_GetAppModule():Import("Collector");
     return Collector:GetTagged(self._toolbindtag);
+end;
+--[=[]=]
+function ClientBackpackProxy:GetIndexBasedOnBindId(BindId:string)
+    if(not self._List)then
+        self:_GetAppModule():GetService("ErrorService").tossWarn("self._List is nil, cannot fetch GetIndexBasedOnBindId")
+    end
+    for i:number,x:{[any]:any} in pairs(self._List)do
+        if(x.BindId == BindId)then
+            return i;
+        end;
+    end;
+end;
+function ClientBackpackProxy:HasToolEquipped(Tool:Tool)
+    local Character = self.Charaters[1];
+    if(Tool:IsDescendantOf(Character))then
+        return true;
+    else
+        return false;
+    end
+end;
+--[=[]=]
+function ClientBackpackProxy:SetToolEquipped(Tool:Tool,State:boolean)
+    if(State == true)then
+        local Human:Humanoid = self.Charaters[1]:WaitForChild("Humanoid");
+        Human:EquipTool(Tool);
+    else
+        Tool.Parent = self.Backpacks[1];
+    end;
 end
+--[=[
+    Connects to the ToolBind and binds keys to the tool of the given index of the KeybindMap, Basically custom backpack.
+    By Default, Request Handler will automatically equip and unequip on requests, you can override this behaviour by passing your own function handler. 
+    @return Servant
+]=]
+function ClientBackpackProxy:BindKeysToList(KeybindMapping:{[number]:{[number]:Enum.KeyCode}},RequestsHandler:(TargetTool:Tool,InputObject:InputObject)->nil??)
+    if(not self._List)then
+        self._List = {};
+    end;
+
+    RequestsHandler = RequestsHandler or function(ToolObject:Tool,InputObject:InputObject)
+        if(not self:HasToolEquipped(ToolObject))then
+            self:SetToolEquipped(ToolObject, true);
+        else
+            self:SetToolEquipped(ToolObject, false);
+        end
+    end;
+
+    return self:ToolBind(function(ToolObject:Tool)
+        local BindId = "$lanzo-"..self.GUID.."@"..tostring(#self._List);
+        table.insert(self._List, {
+            BindId = BindId;
+            LinkedTool = ToolObject;
+        });
+        ContextActionService:BindAction(BindId, function(Id:string,InputState:Enum.UserInputState,InputObject:InputObject)
+            if(InputState == Enum.UserInputState.End)then
+                RequestsHandler(ToolObject,InputObject);
+            end;
+        end, false, unpack(KeybindMapping[#self._List]))
+        return function()
+            local myCurrentIndex = self:GetIndexBasedOnBindId(BindId);
+            local newList = {};
+            ContextActionService:UnbindAction(BindId) --> Unbind self
+            for i = myCurrentIndex,#self._List do
+                local id = (self._List[i].BindId);
+                --> We unbind the old ones, for e.g if #3 was removed, we bind #4 to #3 and #5 to #4 etc.
+                ContextActionService:UnbindAction(id);
+                --> Rebind to -1 index                
+                local newID = "$lanzo-"..self.GUID.."@"..tostring(i-1);
+                local newTool = self._List[i-1].LinkedTool;
+                ContextActionService:BindAction(newID, function(NestedId:string,NestedInputState:Enum.UserInputState,NestedInputObject:InputObject)
+                    if(NestedInputState == Enum.UserInputState.End)then
+                        RequestsHandler(newTool,NestedInputObject);
+                    end;
+                end, false, unpack(KeybindMapping[i-1]));
+                table.insert(newList, {
+                    BindId = newID;
+                    LinkedTool = self._List[i-1].LinkedTool;
+                });
+            end;
+            self._List = nil;
+            self._List = newList;
+        end
+    end)
+end;
 --[=[
     @return ClientBackpackProxy
 ]=]
@@ -132,8 +218,6 @@ function ClientBackpackService:ProxyBackpack(Player:Player?)
     self.ProxyBackpacks[Player.UserId] = proxy;
     return proxy;
 end;
-
-
 
 --[=[]=]
 function ClientBackpackService:GetToolOwner(Tool:Tool)
