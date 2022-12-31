@@ -8,7 +8,7 @@ local Util = require(script.Core:WaitForChild("Util"));
 function module.new(PseudoName:string,Parent:Instance?,...:any)
 	assert(typeof(PseudoName) == "string", ("String expectd for Pseudo name, got %s. {%s}"):format(typeof(PseudoName), tostring(PseudoName)));
 	local name,type_ = unpack(PseudoName:split("@"));
-	local Pseudo, id = Util.Produce(name,Parent,type_,...);
+	local Pseudo, id = Util.Produce(name,Parent,...);
 	
 	if(name == "RInstance" and type_)then
 		Pseudo.Instance = type_;

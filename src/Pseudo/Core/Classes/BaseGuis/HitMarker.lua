@@ -73,7 +73,7 @@ end;
 
     Called whenever the hitmarker is descendant of datamodel
 ]=]
-function HitMarker:_Initate(Hooks:PseudoHooks)
+function HitMarker:_Initiate(Hooks:PseudoHooks)
     local App = self:_GetAppModule();
     self:_lockProperties("SoundProps","Lifetime","HitMarkerType")
     if(self.SoundProps.SoundId ~= "")then
@@ -130,7 +130,7 @@ function HitMarker:_Render()
         Hooks.useEffect(function()
             if(self:GetRef():FindFirstAncestorOfClass("DataModel"))then
                 if(not Initiated)then
-                    self:_Initate(Hooks);
+                    self:_Initiate(Hooks);
                     Initiated = true;
                 end
             end;

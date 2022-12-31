@@ -10,9 +10,6 @@ local Types = {};
 type CreateCustomClass = (ClassData:PseudoClass)->(Pseudo);
 -- type CreateCustomClassMethod = 
 
-type x = (("a") -> true);
-
-
 export type App = {
     new:
     --> AI
@@ -34,6 +31,9 @@ export type App = {
         &(("Button") -> Button)
         &(("Checkbox") -> Checkbox)
         &(("CloseButton") -> CloseButton)
+        &(("CurrencyDropIndicator") -> CurrencyDropIndicator)
+        &(("CurrencyIndicator") -> CurrencyIndicator)
+        &(("DamageIndicator") -> DamageIndicator)
         &(("DatePicker") -> DatePicker)
         &(("Dialog") -> Dialog)
         &(("DialogueGUI") -> DialogueGUI)
@@ -41,9 +41,11 @@ export type App = {
         &(("FormControl") -> FormControl)
         &(("Frame") -> Frame)
         &(("GUI") -> GUI)
+        &(("HitMarker") -> HitMarker)
         &(("Image") -> Image)
         &(("LineBreak") -> LineBreak)
         &(("ListItem") -> ListItem)
+        &(("LocationIndicator") -> LocationIndicator)
         &(("MenuItem") -> MenuItem)
         &(("Modal") -> Modal)
         &(("Navigator") -> Navigator)
@@ -462,6 +464,34 @@ export type CloseButton = Pseudo&BaseGui&{
     Actvated: PHeSignal<true>
 };
 
+export type CurrencyDropIndicator = Pseudo&BaseGui&{
+    Lost: string,
+    Target: Instance|Pseudo|any,
+};
+
+export type CurrencyIndicator = Pseudo&BaseGui&{
+    VisibleLifetime: number,
+    AnimateNumbers: boolean,
+    FormatToCommas: boolean,
+    FormatToNumberAbbreviation: boolean,
+    Text: string,
+    MinimumRandom: number,
+    MaximumRandom: number,
+    Icon: string,
+    EntryTween: TweenInfo,
+    TweenInfo: TweenInfo,
+    animText: (self:any,v:number,default:number?) -> IntValue
+};
+
+export type DamageIndicator = Pseudo&BaseGui&{
+    Damage: string|number,
+    Origin: UDim2|Vector3|Instance|CFrame,
+    TextColor3: Color3|{[any]:any},
+    PositionOffset: UDim2,
+    PopoutTweenInfo: TweenInfo,
+    _Initiate: (self:any) -> any,
+}
+
 -- export type DatePicker = 
 -- export type Dialog
 -- export type DialogueGUI
@@ -479,6 +509,19 @@ export type Frame = {
 export type GUI = {
 
 };
+
+export type HitMarker = Pseudo&BaseGui&{
+    SoundProps: {
+        SoundId: string,
+        SoundVolume: number,
+    },
+    Lifetime: number,
+    HitMarkerImage: string,
+    HitMarkerType: "default",
+    Target: Instance?,
+    -- _Initate: (self:any,Hooks:PseudoHooks) -> any,
+    GetTargetPositionRelativeToCamera: (self:any,Target:BasePart|Model|Instance?) -> UDim2,
+}
 
 export type Image = Pseudo&BaseGui&Frame&GUI&{
     Model: Instance?,
@@ -498,6 +541,17 @@ export type LineBreak = BaseGui&{
 };
 
 -- export type ListItem --> MenuItem instead
+
+export type LocationIndicator = Pseudo&BaseGui&{
+    StartAnchorPoint: Vector2,
+    AnchorPoint: Vector2,
+    StartPosition: UDim2,
+    Position: UDim2,
+    TweenInfo: TweenInfo,
+    Text: string,
+    Lifetime: number,
+    IndicatorClass: string,
+};
 
 export type MenuItem = BaseGui&Button&Text&Frame&GUI&{
     RightSlotIcon: string,
@@ -1243,6 +1297,7 @@ export type FrameworkLibrary = {
     GetService: (self:any,ServiceName:string)->FrameworkLibraryService,
     GetBranch: (self:any, BranchName:string)->FrameworkBranch,
     HasBranch: (self:any, BranchName:string)->(boolean,FrameworkBranch?),
+    CreateDedicatedScreenGui: (self:any, ScreenGuiProps:{[string]:any}?) -> ScreenGui,
 };
 export type PHeFrameworkLibrary = FrameworkLibrary;
 

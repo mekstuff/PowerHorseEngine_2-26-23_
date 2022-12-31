@@ -186,7 +186,7 @@ local function _getDependencyUID(dependencytable)
 	return str;
 end;
 
-local function createPseudoObject(Object:table, DirectParent:Instance?, DirectProps:table?,...:any?):any
+local function createPseudoObject(Object:{[any]:any}, DirectParent:Instance?, DirectProps:{[any]:any}?,...:any?):any
 	local Pseudo = {};	
 	local propSheet = {};	
 	local attributelocked = {};
@@ -285,8 +285,6 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 		return x;
 	end;
 
-	
-	
 	--> Replication initiaition
 	local ReplicationStatus = {ReplicateObject = false;ReplicateProperties = false;};
 	if(propSheet["_REPLICATEDTOCLIENTS"] and IsRunning and IsServer and propSheet["_CONSTRCUTED__BY___CREATE____FUNC"] ~= true)then
@@ -297,7 +295,6 @@ local function createPseudoObject(Object:table, DirectParent:Instance?, DirectPr
 		propSheet["_REPLICATED"] = id;
 	end;
 	
-
 	local _allowPassForAny = {};
 	local _renderCausedByState = false;
 
