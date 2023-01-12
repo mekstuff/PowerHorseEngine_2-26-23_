@@ -1,5 +1,3 @@
---!strict
-
 local TweenService = game:GetService("TweenService");
 local SignalProvider = require(script.Parent.Parent.Providers.SignalProvider);
 local Types = require(script.Parent.Parent.Parent.Types);
@@ -258,7 +256,7 @@ function AudioObjectMethods:Destroy()
 	self.AudioInstance:Destroy();
 end
 --[=[]=]
-function AudioChannel:AddAudio(AudioName:string,AudioID:string,AudioVolume:number,Looped:boolean,PlayAudio:boolean,Instant:boolean)
+function AudioChannel:AddAudio(AudioName:string,AudioID:string,AudioVolume:number?,Looped:boolean?,PlayAudio:boolean?,Instant:boolean?,DeleteOnComplete:boolean?)
 	if(self.Audios[AudioName])then
 		local App = require(script.Parent.Parent.Parent);
 		local ErrorService = App:GetService("ErrorService");
@@ -322,10 +320,14 @@ function AudioChannel:AddAudio(AudioName:string,AudioID:string,AudioVolume:numbe
 			end
 		end,
 	})
-	
-	
 	self.Audios[AudioName]=Audio;
 	self.AudioAdded:Fire(Audio);
+	if(DeleteOnComplete)then
+		newAudio.Ended:Connect(function()
+			print("Destroyed");
+			Audio:Destroy();
+		end)
+	end;
 	if(PlayAudio)then
 		self:PlayAudio(Audio.Name);
 	end;
@@ -366,13 +368,8 @@ function AudioService:CreateChannel(ChannelName:string, AudiosAllowedInParallel:
 	newChannel.AudioAdded = ChannelAudioAddedSignal;
 	newChannel.AudioRemoved = ChannelAudioRemovedSignal;
 	newChannel.AudioMuteChanged = ChannelAudioMuteChangedSignal;
-	
 	newChannel.DefaultAudioTriggered = ChannelAudioDefaultTriggeredSignal;
-	
-	
-	
-	--newChannel.
-	
+
 	setmetatable(newChannel, {__index=AudioChannel});
 	
 	Channels[ChannelName]=newChannel;
@@ -380,7 +377,6 @@ function AudioService:CreateChannel(ChannelName:string, AudiosAllowedInParallel:
 	AudioService.ChannelCreated:Fire(newChannel);
 	
 	return newChannel;
-	
 end;
 
 --[=[]=]

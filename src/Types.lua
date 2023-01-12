@@ -822,7 +822,7 @@ export type AudioChannelAudio = Pseudo&{
 };
 export type PHeAudioChannelAudio = AudioChannelAudio;
 export type AudioChannel = Pseudo&{
-    AddAudio:(self:Pseudo,AudioName:string,AudioID:number,AudioVolume:number?,Looped:boolean?,PlayAudio:boolean?,Instant:boolean?)->AudioChannelAudio,
+    AddAudio:(self:Pseudo,AudioName:string,AudioID:number,AudioVolume:number?,Looped:boolean?,PlayAudio:boolean?,Instant:boolean?,DeleteOnComplete:boolean?)->AudioChannelAudio,
     SetAudioMuted:(self:any,AudioName:string,State:boolean,AudioInstance:any)->nil,
     GetAudio:(self:any,AudioName:string)->AudioChannelAudio,
     GetAudios:(self:any)->nil,
