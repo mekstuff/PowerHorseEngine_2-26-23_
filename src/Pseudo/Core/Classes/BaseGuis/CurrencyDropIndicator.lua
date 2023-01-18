@@ -11,11 +11,11 @@ local CurrencyDropIndicator = {
 
 --[=[
     @prop Lost number
-    @within CurrentDropIndicator
+    @within CurrencyDropIndicator
 ]=]
 --[=[
     @prop Target Instance|Pseudo|nil
-    @within CurrentDropIndicator
+    @within CurrencyDropIndicator
 ]=]
 
 local ignore = {

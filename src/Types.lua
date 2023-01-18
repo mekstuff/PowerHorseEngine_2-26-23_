@@ -174,7 +174,7 @@ export type App = {
     ),
     Import: (
         ((self:any,"DirectionalArrow3D")->DirectionalArrow3DLibrary)
-        &((self:any,"Framework")->FrameworkLibrary)
+        &((self:any,"Sillito")->SillitoLibrary)
         &((self:any,"Collector")->CollectorLibrary)
         &((self:any,"Contextor")->ContextorLibrary)
         &((self:any,"Math")->MathLibrary)
@@ -1046,16 +1046,28 @@ export type SerializationService = {
 
 export type SmartTextService = {
     GetSmartText: (self:any, txt:string?, textComponent:any, ParentTo:any, txtSize:any, txtFont:any) -> any,
+    CreateSmartComponents: (self:any,Text:string,existingComponents:any?) -> any,
 };
 
 export type SplashScreenSequence = {
     new: (Sequences:{[any]:any},defaultColor:Color3?,defaultLifeTime:number?) -> nil,  
 };
 
+type TextService_GetTags = {
+    type: string,
+    props: {[any]:any},
+    children:any,
+    close: string,
+    starts: number,
+    ends: number,
+    capture: string
+}
+
 export type TextService = {
     GetWordsFromString: (self:any, String:string, StartCapture:string?, EndCapture:string?) -> {[any]:any},
     GetWordAtPosition: (self:any, String:string, i:number) -> (string,number,number),
     GetWordAtPosition: (self:any, txt:string, returnWithNoTags:boolean?) -> ({[any]:any},any?),
+    GetTags: (self:any,txt:string,wrapNonTagsInTextTags:boolean?,returnWithNoTags:boolean?) -> ({[number]:TextService_GetTags},any)
 };
 
 export type ActiveTrade = Pseudo&{
@@ -1249,7 +1261,7 @@ export type WhiplashLibrary = {
 
 export type PointerLibrary = (Instance:Instance,Parent:any?) -> Pseudo;
 
-export type FrameworkBranch = Pseudo&FrameworkLibrary&{
+export type SillitoBranch = Pseudo&SillitoLibrary&{
     -- GetService: (self:any, ServiceName:string)->nil,
     -- GetModular: (self:any, ServiceName:string)->nil,
     -- PortService: (self:any, Service:any)->nil,
@@ -1259,8 +1271,8 @@ export type FrameworkBranch = Pseudo&FrameworkLibrary&{
     -- GetComponentClass: (self:any, ComponentClass:string)->nil,
     -- PortComponentClass: (self:any, Component:any)->nil,
     -- PortComponentClasses: (self:any, ...any)->nil,
-    -- GetBranch: (self:any, BranchName:string)->FrameworkBranch,
-    -- HasBranch: (self:any, BranchName:string)->FrameworkBranch?,
+    -- GetBranch: (self:any, BranchName:string)->SillitoBranch,
+    -- HasBranch: (self:any, BranchName:string)->SillitoBranch?,
 }
 
 export type FrameworkLibraryService = {
@@ -1285,21 +1297,21 @@ export type DirectionalArrow3DLibrary = {
     new: (Origin:any, Target:any) -> DirectionalArrowClass
 }
 
-export type FrameworkLibrary = {
+export type SillitoLibrary = {
     Start: (self:any)->Promise,
-    PortService: (self:any, Service:any)->FrameworkLibrary,
-    PortServices: (self:any, ...any)->FrameworkLibrary?,
-    PortModular: (self:any, Modular:any)->FrameworkLibrary,
-    PortModulars: (self:any, ...any)->FrameworkLibrary,
-    PortComponentClass: (self:any,ComponentClass:ModuleScript)->FrameworkLibrary,
-    PortComponentClasses: (self:any,ComponentClasses:Folder|any)->FrameworkLibrary,
+    PortService: (self:any, Service:any)->SillitoLibrary,
+    PortServices: (self:any, ...any)->SillitoLibrary?,
+    PortModular: (self:any, Modular:any)->SillitoLibrary,
+    PortModulars: (self:any, ...any)->SillitoLibrary,
+    PortComponentClass: (self:any,ComponentClass:ModuleScript)->SillitoLibrary,
+    PortComponentClasses: (self:any,ComponentClasses:Folder|any)->SillitoLibrary,
     GetComponentClass: (self:any,ComponentClassName:string)->any,
     GetService: (self:any,ServiceName:string)->FrameworkLibraryService,
-    GetBranch: (self:any, BranchName:string)->FrameworkBranch,
-    HasBranch: (self:any, BranchName:string)->(boolean,FrameworkBranch?),
+    GetBranch: (self:any, BranchName:string)->SillitoBranch,
+    HasBranch: (self:any, BranchName:string)->(boolean,SillitoBranch?),
     CreateDedicatedScreenGui: (self:any, ScreenGuiProps:{[string]:any}?) -> ScreenGui,
 };
-export type PHeFrameworkLibrary = FrameworkLibrary;
+export type PHeFrameworkLibrary = SillitoLibrary;
 
 export type FrameworkLibraryModular = Pseudo&{
     Init: (self:any)->nil,

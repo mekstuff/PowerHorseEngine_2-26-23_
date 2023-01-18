@@ -2,9 +2,10 @@
 	@class SmartTextService
 ]=]
 local SmartTextService = {}
-local PowerHorseEngine = require(game:GetService("ReplicatedStorage"):WaitForChild("PowerHorseEngine"));
-local TextService = require(script.Parent.TextService);
-local ErrorService = require(script.Parent.ErrorService);
+local App = require(game:GetService("ReplicatedStorage"):WaitForChild("PowerHorseEngine"));
+local ServiceProvider = require(script.Parent.Parent.Providers.ServiceProvider);
+local TextService = ServiceProvider:LoadServiceAsync("TextService");
+local ErrorService = ServiceProvider:LoadServiceAsync("ErrorService");
 local ROBLOXTextService = game:GetService("TextService");
 local Core = require(script.Parent.Parent.Parent.Pseudo.Core);
 local lowerCaseAZ = Core:fromStringToTable("abcdefghijklmnopqrstuvwxyz");
@@ -95,7 +96,7 @@ local function handleSmartTag(tag,size,font,color,parent)
 			alpha = props.transparency or alpha;
 			local s_split = props.size:split("x")
 			props.size = Vector2.new(tonumber(s_split[1]),tonumber(s_split[2]));
-			local image = PowerHorseEngine.new("Image",parent);
+			local image = App.new("Image",parent);
 			image.Image = props.src;
 			image.Name = "";
 			image.BackgroundTransparency = 1;
@@ -227,6 +228,36 @@ function SmartTextService:GetSmartText(txt:string?,textComponent:any,ParentTo:an
 	end;
 	]]
 	return true;
+end;
+
+local SmartTags = {
+	["text"] = function(x)
+		local TextObject = App.new("Text");
+		TextObject.Text = x.children;
+		return TextObject;
+	end;
+}
+
+--[=[]=]
+function SmartTextService:CreateSmartComponents(Text:string,existingComponents:any?)
+	local Tags = TextService:GetTags(Text,true);
+	local Container = App.new("Frame",game.StarterGui.TestGui);
+	local Grid = Instance.new("UIGridLayout",Container:GetGUIRef());
+	Grid.CellSize = UDim2.new(0);
+	Grid.FillDirection = Enum.FillDirection.Horizontal;
+	for _,x in pairs(Tags) do
+		if(SmartTags[x.type])then
+			local res = SmartTags[x.type](x);
+			res.SupportsRBXUIBase = true;
+			local Constraint = Instance.new("UISizeConstraint");
+			if(res:IsA("Text"))then
+				local s = ROBLOXTextService:GetTextSize(res.Text,res.TextSize,res.Font,Vector2.new(math.huge,math.huge));
+				Constraint.MinSize = Vector2.new(s.X,s.Y);
+				Constraint.Parent = res:GetGUIRef();
+			end;
+			res.Parent = Container;
+		end
+	end;
 end;
 
 return SmartTextService

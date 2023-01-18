@@ -57,6 +57,7 @@ function PingService:RequestUserPingAsync()
 			local ConnectionStatusEnums = Enumeration:GetEnums("ConnectionStatus");
 			--[=[
 				@prop PingChanged PHeSignal<nil>
+				@within PingReader
 			]=]
 			self:AddEventListener("PingChanged",true,self:GetPropertyChangedSignal("Ping"))
 			return {

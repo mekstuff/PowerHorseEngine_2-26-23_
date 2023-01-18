@@ -64,10 +64,21 @@ end
 	}
 	```
 
-]=]
-function TextService:GetTags(txt:string,returnWithNoTags:boolean?):({[any]:any},any?)
-	local res = {};
+	@return {
+		{[any]: {
+			type: string,
+			props: {},
+			children: any,
+			close: string,
+			starts: number,
+			ends: number,
+			capture: string
+		}}
+	}
 
+]=]
+function TextService:GetTags(txt:string,wrapNonTagsInTextTags:boolean?,returnWithNoTags:boolean?):({[any]:any},any?)
+	local res = {};
 	local pattern = "()<([%a]+)%s*(.-)>(.-)</(%a+)>()";
 	
 	for tagStart,tagType,tagProps,tagValue,tagClose,tagEnd in txt:gmatch(pattern) do
@@ -78,7 +89,7 @@ function TextService:GetTags(txt:string,returnWithNoTags:boolean?):({[any]:any},
 			table.insert(res, {
 				type = tagType,
 				props = tagProps,
-				value = tagValue,
+				children = tagValue,
 				close = tagClose,
 				starts = tagStart,
 				ends = tagEnd,
@@ -92,7 +103,6 @@ function TextService:GetTags(txt:string,returnWithNoTags:boolean?):({[any]:any},
 			notags = notags:gsub(v.capture,"");
 		end;
 	end;
-	--print(res)
 return res,notags;
 end;
 
