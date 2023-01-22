@@ -896,8 +896,8 @@ export type PseudoClass = {
     [string]: any?
 }
 export type CustomClassService = {
-	CreateClassAsync: (self:any,ClassData:PseudoClass,DirectParent:any?,PropArguments:any?)->(Pseudo),
-	Create: (self:any,ClassData:PseudoClass,DirectParent:any?,PropArguments:any?)->(Pseudo),
+	CreateClassAsync: (self:any,ClassData:PseudoClass,DirectParent:any?,PropArguments:any?,DirectProps:{[any]:any}?)->(Pseudo),
+	Create: (self:any,ClassData:PseudoClass,DirectParent:any?,PropArguments:any?,DirectProps:{[any]:any}?)->(Pseudo),
 };
 
 export type DataStore = Pseudo&{

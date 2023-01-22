@@ -172,8 +172,8 @@ PowerHorseEngine.WhiplashExecute = PowerHorseEngine:Import("Whiplash").Execute;
 	Uses [CustomClassService:CreateClassAsync] to create a custom class
 	@return Pseudo
 ]=]
-function PowerHorseEngine.Create(ClassObject:table,DirectParent:Instance?,Arguments:any?)
-	return ServiceProvider:LoadServiceAsync("CustomClassService"):CreateClassAsync(ClassObject,DirectParent,Arguments);
+function PowerHorseEngine.Create(ClassObject:table,DirectParent:Instance?,Args:any?,DirectProps:{[any]:any}?)
+	return ServiceProvider:LoadServiceAsync("CustomClassService"):CreateClassAsync(ClassObject,DirectParent,Args,DirectProps);
 end
 
 --[=[

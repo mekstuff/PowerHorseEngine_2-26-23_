@@ -100,11 +100,15 @@ local function getClassModule(Class:string):any
 	return ModuleFetcher(Class,Classes,nil,true);
 end;
 --
-local function getModuleProps(Module:table,Sheet:any):nil
-	for property,value in pairs(Module)do		
-		if(Sheet[property] == nil and not string.match(property, "^__%a"))then
-			Sheet[property]=value;
-		end
+local function getModuleProps(Module:{},Sheet:any,force:boolean?):nil
+	for property,value in pairs(Module)do	
+		if(force)then
+			Sheet[property] = value;
+		else
+			if(Sheet[property] == nil and not string.match(property, "^__%a"))then
+				Sheet[property]=value;
+			end
+		end;
 	end;
 	
 end
@@ -207,6 +211,11 @@ local function createPseudoObject(Object:{[any]:any}, DirectParent:Instance?, Di
 	
 	local ClassNamesContainer = {};
 
+	--> force Direct props
+	if(DirectProps)then
+		getModuleProps(DirectProps,propSheet,true)
+	end;
+
 	--> Inheritance
 	for _,v in pairs(Object.__inherits)do
 		local _mod = getClassModule(v);
@@ -217,12 +226,6 @@ local function createPseudoObject(Object:{[any]:any}, DirectParent:Instance?, Di
 			getModuleProps(_mod, propSheet);
 		end;
 	end;
-
-
-	if(DirectProps)then
-		getModuleProps(DirectProps,propSheet)
-	end;
-	
 	
 	local renderMap;
 	local quickMap;
@@ -842,18 +845,24 @@ setmetatable(LanzoCoreUtil.__Pseudos, {__mode="kv"})
 --[=[
 	@ignore
 ]=]
-function LanzoCoreUtil.Create(Class:table,Parent:any?,...:any?):any
+function LanzoCoreUtil.Create(Class:table,Parent:any?,Args:any?,DirectProps:{[any]:any}?):any
 	assert(Class.ClassName, "Tried to create class without a ClassName.");
 	assert(Class._Render or Class.Render, "Tried To Create Class with no form of rendering. All Components require a :_Render method");
+	if(DirectProps)then
+		assert(typeof(DirectProps) == "table", ("DirectProps must be a table, got %s"):format(typeof(DirectProps)));
+		DirectProps["_CONSTRCUTED__BY___CREATE____FUNC"] = true
+	else
+		DirectProps = {
+			_CONSTRCUTED__BY___CREATE____FUNC = true;
+		}
+	end;
 	--[[
 	if(getClassModule(Class.ClassName))then
 		error("Cannot 'Create' Class With ClassName Of "..Class.ClassName.." Because This Class Is A CoreClass");
 		return;
 	end;
 	]]
-	local Pseudo, returnedID = createPseudoObject(Class,Parent,{
-		_CONSTRCUTED__BY___CREATE____FUNC = true;
-	},...);
+	local Pseudo, returnedID = createPseudoObject(Class,Parent,DirectProps,Args);
 	return Pseudo, returnedID;
 end;
 --//
@@ -873,11 +882,11 @@ function LanzoCoreUtil.Produce(n:string,Parent:Instance?,...:any?):any
 	
 	if(not ClassModule)then
 		handleClassDoesntExist(n);
-		return 
+		return
 	end;
 	if(ClassModule.__PseudoBlocked)then 
 		handleClassBlocked(n);
-		return ;
+		return;
 	end;
 
 	local Pseudo, returnedID = createPseudoObject(ClassModule,Parent,nil,...);
