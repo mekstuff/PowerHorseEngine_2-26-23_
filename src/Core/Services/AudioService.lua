@@ -1,6 +1,8 @@
 local TweenService = game:GetService("TweenService");
 local SignalProvider = require(script.Parent.Parent.Providers.SignalProvider);
 local Types = require(script.Parent.Parent.Parent.Types);
+local IsClient = game:GetService("RunService"):IsClient();
+local SoundService = game:GetService("SoundService");
 
 --[=[
 	@class AudioService
@@ -252,7 +254,7 @@ end;function AudioObjectMethods:Pause()
 end;
 
 function AudioObjectMethods:Destroy()
-	removeFromActiveList(Channels[self.Channel],self.Name)
+	removeFromActiveList(self.Channel,self.Name)
 	self.AudioInstance:Destroy();
 end
 --[=[]=]
@@ -275,7 +277,7 @@ function AudioChannel:AddAudio(AudioName:string,AudioID:string,AudioVolume:numbe
 	local newAudio = Instance.new("Sound");
 	newAudio.SoundId = AudioID;
 	newAudio.Volume=0;
-	newAudio.Parent = workspace;
+	-- newAudio.Parent = workspace;
 	type Audio = {
 		[string]: any
 	}
@@ -324,7 +326,6 @@ function AudioChannel:AddAudio(AudioName:string,AudioID:string,AudioVolume:numbe
 	self.AudioAdded:Fire(Audio);
 	if(DeleteOnComplete)then
 		newAudio.Ended:Connect(function()
-			print("Destroyed");
 			Audio:Destroy();
 		end)
 	end;
@@ -340,10 +341,21 @@ end
 --[=[
 	@return AudioChannel
 ]=]
+local AudioServiceChannelsFolder;
 function AudioService:CreateChannel(ChannelName:string, AudiosAllowedInParallel:number?, DefaultVolume:number?, DefaultLoop:boolean?, AudiosInstant:boolean?)
 	
+	if(not AudioServiceChannelsFolder)then
+		AudioServiceChannelsFolder = Instance.new("Folder");
+		AudioServiceChannelsFolder.Name = "AudioService-Channels"..(IsClient and "-LOCAL" or "-SERVER");
+		AudioServiceChannelsFolder.Parent = SoundService;
+	end
+
 	if(Channels[ChannelName])then  return Channels[ChannelName];end;
-	
+
+	local AudioChannelWrapper = Instance.new("Folder");
+	AudioChannelWrapper.Name = ChannelName;
+	AudioChannelWrapper.Parent = AudioServiceChannelsFolder;
+
 	local ChannelMuteChangedSignal = SignalProvider.new();
 	local ChannelAudioAddedSignal = SignalProvider.new();
 	local ChannelAudioRemovedSignal = SignalProvider.new();
@@ -376,6 +388,10 @@ function AudioService:CreateChannel(ChannelName:string, AudiosAllowedInParallel:
 	
 	AudioService.ChannelCreated:Fire(newChannel);
 	
+	newChannel.AudioAdded:Connect(function(Audio)
+		Audio.Parent = AudioChannelWrapper;
+	end)
+
 	return newChannel;
 end;
 

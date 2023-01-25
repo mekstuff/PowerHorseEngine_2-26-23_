@@ -1307,6 +1307,7 @@ export type SillitoLibrary = {
     PortComponentClasses: (self:any,ComponentClasses:Folder|any)->SillitoLibrary,
     GetComponentClass: (self:any,ComponentClassName:string)->any,
     GetService: (self:any,ServiceName:string)->FrameworkLibraryService,
+    GetModular: (self:any,ServiceName:string)->FrameworkLibraryService,
     GetBranch: (self:any, BranchName:string)->SillitoBranch,
     HasBranch: (self:any, BranchName:string)->(boolean,SillitoBranch?),
     CreateDedicatedScreenGui: (self:any, ScreenGuiProps:{[string]:any}?) -> ScreenGui,
