@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="plugin-moonwave plugin-id-moonwave">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="generator" content="Docusaurus v2.0.1">
+<title data-rh="true">CustomClassService | PowerHorseEngine</title><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://LanzoInc.github.io/PowerHorseEngine/api/CustomClassService"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docusaurus_tag" content="default"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docsearch:docusaurus_tag" content="default"><meta data-rh="true" property="og:title" content="CustomClassService | PowerHorseEngine"><meta data-rh="true" name="description" content="`CustomClassService` is a way to create custom Pseudo elements into your projects.
+
+:::warning
+CustomClasses will not replicate, They are completely bounded to their environment. After creating a custom class
+it cannot be constructed with .new
+:::
+
+:::warning
+CustomClasses require a `.ClassName` property and a `:_Render` method. more about this is included in the example below
+:::
+
+Let&#x27;s create a class that is responsible for teleporting players during rounds
+
+```lua
+	local TeleportClass = {
+		Name = &quot;TeleportClass&quot;, --&gt; Optional
+		ClassName = &quot;TeleportClass&quot;, --&gt; Required (Cannot be an existing built in ClassName)
+		OtherProperty = &quot;string&quot;,
+		TextColor3 = Color3.new()
+	};
+
+	--//Required
+	function TeleportClass:_Render()
+		--//Before we continue, let&#x27;s understand the :_Render Method
+	end;
+```
+
+## :_Render
+
+Whenever a class is in the process of being created, the `:_Render` method will be called upon. This method
+will only be called `once` in the classes lifecycle. The class expects the :_Render function to return some sort of value
+to understand how the component should be rendered.
+
+There are two types of rendering, Array Rendering and Functional Rendering
+
+### Array Rendering
+With array rendering, you return a dictionary within the :_Render function.
+
+```lua
+	function TeleportClass:_Render()
+		return {};
+	end;
+```
+Within that dictionary you can pass a string as a key which represents a property of the class and a value which is callback
+function that will be called whenever that property is changed
+
+```lua
+	function TeleportClass:_Render()
+		-- You would most likely create components here (this is called only once)
+		local TextLabel = Instance.new(&quot;TextLabel&quot;);
+		return {
+			[&quot;OtherProperty&quot;] = function(newValue)
+				-- this is called everytime &quot;OtherProperty&quot; changed, you must likely would not create components here.
+				print(&quot;OtherPropertyChanged to : &quot;, newValue);
+				TextLabel.Text = newValue; -- this will now give the TextLabel a type of &quot;Reactive&quot; feel, since the text is now dynamically linked with our &quot;OtherProperty&quot; property.
+			end;
+		};
+	end;
+```
+
+There&#x27;s also some keys that are reserved that have different functionalities
+
+#### _Components
+
+Anything listed here will be stored in the components _Components list, which you can then use :GET to retrieve
+
+```lua
+	function TeleportClass:_Render()
+		local TextLabel = Instance.new(&quot;TextLabel&quot;);
+		return {
+			[&quot;OtherProperty&quot;] = function(newValue)
+				print(&quot;OtherPropertyChanged to : &quot;, newValue);
+				TextLabel.Text = tostring(newValue);
+			end;
+			_Components = {
+				ImportantTextLabel = TextLabel
+			}
+		};
+	end;
+	--Elsewhere:
+		TeleportClassObject:GET(&quot;ImportantTextLabel&quot;);
+```
+
+#### _Mapping
+
+Mapping is used to automatically link two properties with the same key and value type together.
+
+```lua
+	function TeleportClass:_Render()
+		local TextLabel = Instance.new(&quot;TextLabel&quot;);
+		return {
+			[&quot;OtherProperty&quot;] = function(newValue)
+				print(&quot;OtherPropertyChanged to : &quot;, newValue);
+				TextLabel.Text = tostring(newValue);
+			end;
+			_Components = {
+				ImportantTextLabel = TextLabel
+			}
+			_Mapping = {
+				[TextLabel] = {
+					&quot;OtherProperty&quot;, -- this will not work because text labels do not have a property called &quot;OtherProperty&quot;
+					&quot;TextColor3&quot;, -- this will work because both the component and textlabel has a &quot;TextColor3&quot; which are Color3&#x27;s
+				}
+			}
+		};
+	end;
+```
+
+### Functional Rendering
+
+When using functional rendering, you need to return a function instead of a dictionary within the :_Render Method
+
+
+```lua
+	function TeleportClass:_Render()
+		return function ()
+			print(&quot;This is called whenever any property of the component is changed&quot;);
+		end;
+
+	end;
+```
+
+All :_Render functions pass a argument of &quot;App&quot; being the PowerHorseEngine module which it was created from.
+With functional rendering, you now have access to a second argument which is passed &quot;hooks&quot;
+
+learn more about functional rendering hooks `here`
+
+Here&#x27;s a quick example of using the `useEffect` along side the `useState` hook. We highly recommending viewing the `documentation` on it
+for a better understanding
+
+
+```lua
+	function TeleportClass:_Render(App,hooks)
+		local useState = hooks.useState;
+		local useEffect = hooks.useEffect;
+
+		local AwesomeState,setAwesomeState = useState(0);
+
+		useEffect(function()
+			print(&quot;This is only called when the state is changed&quot;)
+		end,{AwesomeState});
+
+		useEffect(function()
+			print(&quot;This is only called when \&quot;OtherProperty\&quot; and \&quot;TextColor3\&quot; are changed&quot;)
+		end,{&quot;OtherProperty&quot;,&quot;TextColor3&quot;})
+
+		useEffect(function()
+			local doCleanupOnPreviousLoop = false;
+			for i = 1,AwesomeState,1 do
+				if(doCleanupOnPreviousLoop)then break;end;
+				print(&quot;Running at index : &quot;,i);
+				wait(1);
+			end;
+			return function ()
+				--//This will cause the previous for loop if still running to end whenever this useEffect hook is called
+				doCleanupOnPreviousLoop = true; 
+			end;
+			
+		end,{AwesomeState})
+
+
+		return function ()
+			print(&quot;This is called whenever any property of the component is changed&quot;);
+		end;
+
+	end;
+```
+
+Great. Now that we understand the :_Render method, let&#x27;s actually make the teleporting class
+
+```lua
+	-- somewhere is a module script on the server
+	-- this is a very very basic example just for you to understand. we recommend looking into the `framework` library which is similar to `Knit`.
+
+local TeleportClass = {
+		Name = &quot;TeleportClass&quot;,
+		ClassName = &quot;TeleportClass&quot;, 
+		BannedFromTeleporting = {};
+	};
+	function TeleportClass:_Render()
+		return {};
+	end;
+
+	function TeleportClass:TeleportUser(Player)
+		if(self.BannedFromTeleporting[Player.UserId])then return end;
+		Player.Character.BlahBlahBlah = BlahBlahBlah;
+	end;
+
+return CustomClassService:CreateClassAsync(TeleportClass);
+```"><meta data-rh="true" property="og:description" content="`CustomClassService` is a way to create custom Pseudo elements into your projects.
+
+:::warning
+CustomClasses will not replicate, They are completely bounded to their environment. After creating a custom class
+it cannot be constructed with .new
+:::
+
+:::warning
+CustomClasses require a `.ClassName` property and a `:_Render` method. more about this is included in the example below
+:::
+
+Let&#x27;s create a class that is responsible for teleporting players during rounds
+
+```lua
+	local TeleportClass = {
+		Name = &quot;TeleportClass&quot;, --&gt; Optional
+		ClassName = &quot;TeleportClass&quot;, --&gt; Required (Cannot be an existing built in ClassName)
+		OtherProperty = &quot;string&quot;,
+		TextColor3 = Color3.new()
+	};
+
+	--//Required
+	function TeleportClass:_Render()
+		--//Before we continue, let&#x27;s understand the :_Render Method
+	end;
+```
+
+## :_Render
+
+Whenever a class is in the process of being created, the `:_Render` method will be called upon. This method
+will only be called `once` in the classes lifecycle. The class expects the :_Render function to return some sort of value
+to understand how the component should be rendered.
+
+There are two types of rendering, Array Rendering and Functional Rendering
+
+### Array Rendering
+With array rendering, you return a dictionary within the :_Render function.
+
+```lua
+	function TeleportClass:_Render()
+		return {};
+	end;
+```
+Within that dictionary you can pass a string as a key which represents a property of the class and a value which is callback
+function that will be called whenever that property is changed
+
+```lua
+	function TeleportClass:_Render()
+		-- You would most likely create components here (this is called only once)
+		local TextLabel = Instance.new(&quot;TextLabel&quot;);
+		return {
+			[&quot;OtherProperty&quot;] = function(newValue)
+				-- this is called everytime &quot;OtherProperty&quot; changed, you must likely would not create components here.
+				print(&quot;OtherPropertyChanged to : &quot;, newValue);
+				TextLabel.Text = newValue; -- this will now give the TextLabel a type of &quot;Reactive&quot; feel, since the text is now dynamically linked with our &quot;OtherProperty&quot; property.
+			end;
+		};
+	end;
+```
+
+There&#x27;s also some keys that are reserved that have different functionalities
+
+#### _Components
+
+Anything listed here will be stored in the components _Components list, which you can then use :GET to retrieve
+
+```lua
+	function TeleportClass:_Render()
+		local TextLabel = Instance.new(&quot;TextLabel&quot;);
+		return {
+			[&quot;OtherProperty&quot;] = function(newValue)
+				print(&quot;OtherPropertyChanged to : &quot;, newValue);
+				TextLabel.Text = tostring(newValue);
+			end;
+			_Components = {
+				ImportantTextLabel = TextLabel
+			}
+		};
+	end;
+	--Elsewhere:
+		TeleportClassObject:GET(&quot;ImportantTextLabel&quot;);
+```
+
+#### _Mapping
+
+Mapping is used to automatically link two properties with the same key and value type together.
+
+```lua
+	function TeleportClass:_Render()
+		local TextLabel = Instance.new(&quot;TextLabel&quot;);
+		return {
+			[&quot;OtherProperty&quot;] = function(newValue)
+				print(&quot;OtherPropertyChanged to : &quot;, newValue);
+				TextLabel.Text = tostring(newValue);
+			end;
+			_Components = {
+				ImportantTextLabel = TextLabel
+			}
+			_Mapping = {
+				[TextLabel] = {
+					&quot;OtherProperty&quot;, -- this will not work because text labels do not have a property called &quot;OtherProperty&quot;
+					&quot;TextColor3&quot;, -- this will work because both the component and textlabel has a &quot;TextColor3&quot; which are Color3&#x27;s
+				}
+			}
+		};
+	end;
+```
+
+### Functional Rendering
+
+When using functional rendering, you need to return a function instead of a dictionary within the :_Render Method
+
+
+```lua
+	function TeleportClass:_Render()
+		return function ()
+			print(&quot;This is called whenever any property of the component is changed&quot;);
+		end;
+
+	end;
+```
+
+All :_Render functions pass a argument of &quot;App&quot; being the PowerHorseEngine module which it was created from.
+With functional rendering, you now have access to a second argument which is passed &quot;hooks&quot;
+
+learn more about functional rendering hooks `here`
+
+Here&#x27;s a quick example of using the `useEffect` along side the `useState` hook. We highly recommending viewing the `documentation` on it
+for a better understanding
+
+
+```lua
+	function TeleportClass:_Render(App,hooks)
+		local useState = hooks.useState;
+		local useEffect = hooks.useEffect;
+
+		local AwesomeState,setAwesomeState = useState(0);
+
+		useEffect(function()
+			print(&quot;This is only called when the state is changed&quot;)
+		end,{AwesomeState});
+
+		useEffect(function()
+			print(&quot;This is only called when \&quot;OtherProperty\&quot; and \&quot;TextColor3\&quot; are changed&quot;)
+		end,{&quot;OtherProperty&quot;,&quot;TextColor3&quot;})
+
+		useEffect(function()
+			local doCleanupOnPreviousLoop = false;
+			for i = 1,AwesomeState,1 do
+				if(doCleanupOnPreviousLoop)then break;end;
+				print(&quot;Running at index : &quot;,i);
+				wait(1);
+			end;
+			return function ()
+				--//This will cause the previous for loop if still running to end whenever this useEffect hook is called
+				doCleanupOnPreviousLoop = true; 
+			end;
+			
+		end,{AwesomeState})
+
+
+		return function ()
+			print(&quot;This is called whenever any property of the component is changed&quot;);
+		end;
+
+	end;
+```
+
+Great. Now that we understand the :_Render method, let&#x27;s actually make the teleporting class
+
+```lua
+	-- somewhere is a module script on the server
+	-- this is a very very basic example just for you to understand. we recommend looking into the `framework` library which is similar to `Knit`.
+
+local TeleportClass = {
+		Name = &quot;TeleportClass&quot;,
+		ClassName = &quot;TeleportClass&quot;, 
+		BannedFromTeleporting = {};
+	};
+	function TeleportClass:_Render()
+		return {};
+	end;
+
+	function TeleportClass:TeleportUser(Player)
+		if(self.BannedFromTeleporting[Player.UserId])then return end;
+		Player.Character.BlahBlahBlah = BlahBlahBlah;
+	end;
+
+return CustomClassService:CreateClassAsync(TeleportClass);
+```"><link data-rh="true" rel="canonical" href="https://LanzoInc.github.io/PowerHorseEngine/api/CustomClassService"><link data-rh="true" rel="alternate" href="https://LanzoInc.github.io/PowerHorseEngine/api/CustomClassService" hreflang="en"><link data-rh="true" rel="alternate" href="https://LanzoInc.github.io/PowerHorseEngine/api/CustomClassService" hreflang="x-default"><link rel="stylesheet" href="/PowerHorseEngine/assets/css/styles.703f6049.css">
+<link rel="preload" href="/PowerHorseEngine/assets/js/runtime~main.358d0fc0.js" as="script">
+<link rel="preload" href="/PowerHorseEngine/assets/js/main.1672a453.js" as="script">
+</head>
+<body class="navigation-with-keyboard">
+<script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
+<div role="region"><a href="#" class="skipToContent_fXgn">Skip to main content</a></div><nav class="navbar navbar--fixed-top"><div class="navbar__inner"><div class="navbar__items"><button aria-label="Navigation bar toggle" class="navbar__toggle clean-btn" type="button" tabindex="0"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/PowerHorseEngine/"><b class="navbar__title text--truncate">PowerHorseEngine</b></a><a class="navbar__item navbar__link" href="/PowerHorseEngine/docs/intro">Docs</a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/PowerHorseEngine/api/">API</a></div><div class="navbar__items navbar__items--right"><a href="https://github.com/lanzoinc/PowerHorseEngine" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="Switch between dark and light mode (currently light mode)" aria-label="Switch between dark and light mode (currently light mode)"><svg viewBox="0 0 24 24" width="24" height="24" class="lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" class="darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg></button></div><div class="searchBox_ZlJk"><div class="navbar__search"><span aria-label="expand searchbar" role="button" class="search-icon" tabindex="0"></span><input type="search" id="search_input_react" placeholder="Press S to Search..." aria-label="Search" class="navbar__search-input search-bar"></div></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div class="main-wrapper mainWrapper_z2l0 docPageContainer_wNNk"><div class="docPage_Dpn1"><div class="docSidebarContainer_o_re"><div class="sidebar_njMd"><nav class="menu thin-scrollbar menu_SIkG"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" aria-expanded="false" href="/PowerHorseEngine/api/Accordion">Classes</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret menu__link--active" aria-expanded="true" href="/PowerHorseEngine/api/AudioService">Services</a></div><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/PowerHorseEngine/api/AudioService">​Audio​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/PowerHorseEngine/api/CoreGuiService">​Core​Gui​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/PowerHorseEngine/api/CustomClassService">​Custom​Class​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/PowerHorseEngine/api/ErrorService">​Error​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/PowerHorseEngine/api/FormatService">​Format​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/PowerHorseEngine/api/InGamePurchaseService">​In​Game​Purchase​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/PowerHorseEngine/api/PingService">​Ping​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/PowerHorseEngine/api/PromptService">​Prompt​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/PowerHorseEngine/api/PseudoService">​Pseudo​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/PowerHorseEngine/api/TextService">​Text​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/PowerHorseEngine/api/TradeService">​Trade​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/PowerHorseEngine/api/UserIdService">​User​Id​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/PowerHorseEngine/api/WaypointService">​Waypoint​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/PowerHorseEngine/api/NotificationService">​Notification​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/PowerHorseEngine/api/TweenService">​Tween​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/PowerHorseEngine/api/CoordinateService">​Coordinate​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/PowerHorseEngine/api/CommandService">​Command​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/PowerHorseEngine/api/ClientBackpackService">​Client​Backpack​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/PowerHorseEngine/api/ClientService">​Client​Service</a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" aria-expanded="false" href="/PowerHorseEngine/api/LibraryProvider">Providers</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" aria-expanded="false" href="/PowerHorseEngine/api/CutsceneConstructor">Globals</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" aria-expanded="false" href="/PowerHorseEngine/api/Collector">Built In Libraries</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" aria-expanded="false" href="/PowerHorseEngine/api/useEffect">Hooks</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" aria-expanded="false" href="/PowerHorseEngine/api/PHePanel">PHe Panel</a></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/AccordionGroup">​Accordion​Group</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/ActiveTrade">​Active​Trade</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/AICharacterRig">​A​I​Character​Rig</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/AIHuman">​A​I​Human</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/Badge">​Badge</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/BaseCharacterRig">​Base​Character​Rig</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/CharacterRig">​Character​Rig</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/ChatTagService">​Chat​Tag​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/ClientBackpackProxy">​Client​Backpack​Proxy</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/CloseButton">​Close​Button</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/CodeService">​Code​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/ContentProvider">​Content​Provider</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/Contextor">​Contextor</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/CoreProviderService">​Core​Provider​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/CurrencyDropIndicator">​Currency​Drop​Indicator</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/CurrencyIndicator">​Currency​Indicator</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/DamageIndicator">​Damage​Indicator</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/DataStore">​Data​Store</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/DataStoreService">​Data​Store​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/DatePicker">​Date​Picker</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/DirectionalArrow3D">​Directional​Arrow3​D</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/DirectionalArrowClass">​Directional​Arrow​Class</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/DropdownButton">​Dropdown​Button</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/EncryptionService">​Encryption​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/Flags">​Flags</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/FrameworkBranch">​Framework​Branch</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/FrameworkClient">​Framework​Client</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/FrameworkServer">​Framework​Server</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/GridPlacement">​Grid​Placement</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/GridPlacementService">​Grid​Placement​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/HitMarker">​Hit​Marker</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/KEYSERVICE">​K​E​Y​S​E​R​V​I​C​E</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/LineBreak">​Line​Break</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/ListItem">​List​Item</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/LocationIndicator">​Location​Indicator</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/MenuItem">​Menu​Item</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/ModalService">​Modal​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/ModuleFetcherProvider">​Module​Fetcher​Provider</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/PHePluginAppHandler">​P​He​Plugin​App​Handler</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/PHePluginLibraryObject">​P​He​Plugin​Library​Object</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/PHePluginStudioTool">​P​He​Plugin​Studio​Tool</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/PluginService">​Plugin​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/PowerHorseEngine">​Power​Horse​Engine</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/ProgressIndicator">​Progress​Indicator</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/PromptSheet">​Prompt​Sheet</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/PropProvider">​Prop​Provider</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/ProximityPrompt">​Proximity​Prompt</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/ReplicationService">​Replication​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/SerializationService">​Serialization​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/ServerBee">​Server​Bee</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/ServerBeeClient">​Server​Bee​Client</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/SmartTextService">​Smart​Text​Service</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/SpatialArea">​Spatial​Area</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/SpatialAreaClass">​Spatial​Area​Class</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/StateManager">​State​Manager</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/StateManagerClass">​State​Manager​Class</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/useRawset">use​Rawset</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/PowerHorseEngine/api/VoteKickService">​Vote​Kick​Service</a></li></ul></nav></div></div><main class="docMainContainer_HJE1"><div class="container padding-vert--lg"><div class="row"><div class="col docItemCol_MU3C"><div class="docItemContainer_Wv98"><article><div class="member_J0w1 markdown"><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_oUs_"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">On this page</button></div><header><h1 class="docTitle_mZRt" style="text-decoration:none"><span style="display:inline-block">Custom</span><span style="display:inline-block">Class</span><span style="display:inline-block">Service</span></h1><div class="luaClassTags_EipM"></div><div>
+<p><code>CustomClassService</code> is a way to create custom Pseudo elements into your projects.</p>
+<div class="admonition admonition-warning alert alert--danger">
+  <div class="admonition-heading">
+    <h5><span class="admonition-icon"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="16" viewBox="0 0 12 16">
+          <path d="M5.05.31c.81 2.17.41 3.38-.52 4.31C3.55 5.67 1.98 6.45.9 7.98c-1.45 2.05-1.7 6.53 3.53 7.7-2.2-1.16-2.67-4.52-.3-6.61-.61 2.03.53 3.33 1.94 2.86 1.39-.47 2.3.53 2.27 1.67-.02.78-.31 1.44-1.13 1.81 3.42-.59 4.78-3.42 4.78-5.56 0-2.84-2.53-3.22-1.25-5.61-1.52.13-2.03 1.13-1.89 2.75.09 1.08-1.02 1.8-1.86 1.33-.67-.41-.66-1.19-.06-1.78C8.18 5.31 8.68 2.45 5.05.32L5.03.3l.02.01z"></path>
+        </svg></span>warning</h5>
+  </div>
+  <div class="admonition-content">
+    <p>
+      CustomClasses will not replicate, They are completely bounded to their environment. After creating a custom class
+      it cannot be constructed with .new
+    </p>
+  </div>
+</div>
+<div class="admonition admonition-warning alert alert--danger">
+  <div class="admonition-heading">
+    <h5><span class="admonition-icon"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="16" viewBox="0 0 12 16">
+          <path d="M5.05.31c.81 2.17.41 3.38-.52 4.31C3.55 5.67 1.98 6.45.9 7.98c-1.45 2.05-1.7 6.53 3.53 7.7-2.2-1.16-2.67-4.52-.3-6.61-.61 2.03.53 3.33 1.94 2.86 1.39-.47 2.3.53 2.27 1.67-.02.78-.31 1.44-1.13 1.81 3.42-.59 4.78-3.42 4.78-5.56 0-2.84-2.53-3.22-1.25-5.61-1.52.13-2.03 1.13-1.89 2.75.09 1.08-1.02 1.8-1.86 1.33-.67-.41-.66-1.19-.06-1.78C8.18 5.31 8.68 2.45 5.05.32L5.03.3l.02.01z"></path>
+        </svg></span>warning</h5>
+  </div>
+  <div class="admonition-content">
+    <p>CustomClasses require a <code>.ClassName</code> property and a <code>:_Render</code> method. more about this is included in the example below</p>
+  </div>
+</div>
+<p>Let's create a class that is responsible for teleporting players during rounds</p>
+<pre class="language-lua"><code class="language-lua">	<span class="token keyword">local</span> TeleportClass <span class="token operator">=</span> <span class="token punctuation">{</span>
+		Name <span class="token operator">=</span> <span class="token string">"TeleportClass"</span><span class="token punctuation">,</span> <span class="token comment">--> Optional</span>
+		ClassName <span class="token operator">=</span> <span class="token string">"TeleportClass"</span><span class="token punctuation">,</span> <span class="token comment">--> Required (Cannot be an existing built in ClassName)</span>
+		OtherProperty <span class="token operator">=</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+		TextColor3 <span class="token operator">=</span> Color3<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+	<span class="token comment">--//Required</span>
+	<span class="token keyword">function</span> TeleportClass<span class="token punctuation">:</span><span class="token function">_Render</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+		<span class="token comment">--//Before we continue, let's understand the :_Render Method</span>
+	<span class="token keyword">end</span><span class="token punctuation">;</span>
+</code></pre>
+<h2>:_Render</h2>
+<p>
+  Whenever a class is in the process of being created, the <code>:_Render</code> method will be called upon. This method
+  will only be called <code>once</code> in the classes lifecycle. The class expects the :_Render function to return some sort of value
+  to understand how the component should be rendered.
+</p>
+<p>There are two types of rendering, Array Rendering and Functional Rendering</p>
+<h3>Array Rendering</h3>
+<p>With array rendering, you return a dictionary within the :_Render function.</p>
+<pre class="language-lua"><code class="language-lua">	<span class="token keyword">function</span> TeleportClass<span class="token punctuation">:</span><span class="token function">_Render</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+		<span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+	<span class="token keyword">end</span><span class="token punctuation">;</span>
+</code></pre>
+<p>
+  Within that dictionary you can pass a string as a key which represents a property of the class and a value which is callback
+  function that will be called whenever that property is changed
+</p>
+<pre class="language-lua"><code class="language-lua">	<span class="token keyword">function</span> TeleportClass<span class="token punctuation">:</span><span class="token function">_Render</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+		<span class="token comment">-- You would most likely create components here (this is called only once)</span>
+		<span class="token keyword">local</span> TextLabel <span class="token operator">=</span> Instance<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token string">"TextLabel"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">return</span> <span class="token punctuation">{</span>
+			<span class="token punctuation">[</span><span class="token string">"OtherProperty"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span>newValue<span class="token punctuation">)</span>
+				<span class="token comment">-- this is called everytime "OtherProperty" changed, you must likely would not create components here.</span>
+				<span class="token function">print</span><span class="token punctuation">(</span><span class="token string">"OtherPropertyChanged to : "</span><span class="token punctuation">,</span> newValue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+				TextLabel<span class="token punctuation">.</span>Text <span class="token operator">=</span> newValue<span class="token punctuation">;</span> <span class="token comment">-- this will now give the TextLabel a type of "Reactive" feel, since the text is now dynamically linked with our "OtherProperty" property.</span>
+			<span class="token keyword">end</span><span class="token punctuation">;</span>
+		<span class="token punctuation">}</span><span class="token punctuation">;</span>
+	<span class="token keyword">end</span><span class="token punctuation">;</span>
+</code></pre>
+<p>There's also some keys that are reserved that have different functionalities</p>
+<h4>_Components</h4>
+<p>Anything listed here will be stored in the components _Components list, which you can then use :GET to retrieve</p>
+<pre class="language-lua"><code class="language-lua">	<span class="token keyword">function</span> TeleportClass<span class="token punctuation">:</span><span class="token function">_Render</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+		<span class="token keyword">local</span> TextLabel <span class="token operator">=</span> Instance<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token string">"TextLabel"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">return</span> <span class="token punctuation">{</span>
+			<span class="token punctuation">[</span><span class="token string">"OtherProperty"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span>newValue<span class="token punctuation">)</span>
+				<span class="token function">print</span><span class="token punctuation">(</span><span class="token string">"OtherPropertyChanged to : "</span><span class="token punctuation">,</span> newValue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+				TextLabel<span class="token punctuation">.</span>Text <span class="token operator">=</span> <span class="token function">tostring</span><span class="token punctuation">(</span>newValue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+			<span class="token keyword">end</span><span class="token punctuation">;</span>
+			_Components <span class="token operator">=</span> <span class="token punctuation">{</span>
+				ImportantTextLabel <span class="token operator">=</span> TextLabel
+			<span class="token punctuation">}</span>
+		<span class="token punctuation">}</span><span class="token punctuation">;</span>
+	<span class="token keyword">end</span><span class="token punctuation">;</span>
+	<span class="token comment">--Elsewhere:</span>
+		TeleportClassObject<span class="token punctuation">:</span><span class="token function">GET</span><span class="token punctuation">(</span><span class="token string">"ImportantTextLabel"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4>_Mapping</h4>
+<p>Mapping is used to automatically link two properties with the same key and value type together.</p>
+<pre class="language-lua"><code class="language-lua">	<span class="token keyword">function</span> TeleportClass<span class="token punctuation">:</span><span class="token function">_Render</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+		<span class="token keyword">local</span> TextLabel <span class="token operator">=</span> Instance<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token string">"TextLabel"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">return</span> <span class="token punctuation">{</span>
+			<span class="token punctuation">[</span><span class="token string">"OtherProperty"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span>newValue<span class="token punctuation">)</span>
+				<span class="token function">print</span><span class="token punctuation">(</span><span class="token string">"OtherPropertyChanged to : "</span><span class="token punctuation">,</span> newValue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+				TextLabel<span class="token punctuation">.</span>Text <span class="token operator">=</span> <span class="token function">tostring</span><span class="token punctuation">(</span>newValue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+			<span class="token keyword">end</span><span class="token punctuation">;</span>
+			_Components <span class="token operator">=</span> <span class="token punctuation">{</span>
+				ImportantTextLabel <span class="token operator">=</span> TextLabel
+			<span class="token punctuation">}</span>
+			_Mapping <span class="token operator">=</span> <span class="token punctuation">{</span>
+				<span class="token punctuation">[</span>TextLabel<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+					<span class="token string">"OtherProperty"</span><span class="token punctuation">,</span> <span class="token comment">-- this will not work because text labels do not have a property called "OtherProperty"</span>
+					<span class="token string">"TextColor3"</span><span class="token punctuation">,</span> <span class="token comment">-- this will work because both the component and textlabel has a "TextColor3" which are Color3's</span>
+				<span class="token punctuation">}</span>
+			<span class="token punctuation">}</span>
+		<span class="token punctuation">}</span><span class="token punctuation">;</span>
+	<span class="token keyword">end</span><span class="token punctuation">;</span>
+</code></pre>
+<h3>Functional Rendering</h3>
+<p>When using functional rendering, you need to return a function instead of a dictionary within the :_Render Method</p>
+<pre class="language-lua"><code class="language-lua">	<span class="token keyword">function</span> TeleportClass<span class="token punctuation">:</span><span class="token function">_Render</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+		<span class="token keyword">return</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span>
+			<span class="token function">print</span><span class="token punctuation">(</span><span class="token string">"This is called whenever any property of the component is changed"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">end</span><span class="token punctuation">;</span>
+
+	<span class="token keyword">end</span><span class="token punctuation">;</span>
+</code></pre>
+<p>
+  All :_Render functions pass a argument of "App" being the PowerHorseEngine module which it was created from.
+  With functional rendering, you now have access to a second argument which is passed "hooks"
+</p>
+<p>learn more about functional rendering hooks <code>here</code></p>
+<p>
+  Here's a quick example of using the <code>useEffect</code> along side the <code>useState</code> hook. We highly recommending viewing the <code>documentation</code> on it
+  for a better understanding
+</p>
+<pre class="language-lua"><code class="language-lua">	<span class="token keyword">function</span> TeleportClass<span class="token punctuation">:</span><span class="token function">_Render</span><span class="token punctuation">(</span>App<span class="token punctuation">,</span>hooks<span class="token punctuation">)</span>
+		<span class="token keyword">local</span> useState <span class="token operator">=</span> hooks<span class="token punctuation">.</span>useState<span class="token punctuation">;</span>
+		<span class="token keyword">local</span> useEffect <span class="token operator">=</span> hooks<span class="token punctuation">.</span>useEffect<span class="token punctuation">;</span>
+
+		<span class="token keyword">local</span> AwesomeState<span class="token punctuation">,</span>setAwesomeState <span class="token operator">=</span> <span class="token function">useState</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+		<span class="token function">useEffect</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+			<span class="token function">print</span><span class="token punctuation">(</span><span class="token string">"This is only called when the state is changed"</span><span class="token punctuation">)</span>
+		<span class="token keyword">end</span><span class="token punctuation">,</span><span class="token punctuation">{</span>AwesomeState<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+		<span class="token function">useEffect</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+			<span class="token function">print</span><span class="token punctuation">(</span><span class="token string">"This is only called when \"OtherProperty\" and \"TextColor3\" are changed"</span><span class="token punctuation">)</span>
+		<span class="token keyword">end</span><span class="token punctuation">,</span><span class="token punctuation">{</span><span class="token string">"OtherProperty"</span><span class="token punctuation">,</span><span class="token string">"TextColor3"</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+		<span class="token function">useEffect</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+			<span class="token keyword">local</span> doCleanupOnPreviousLoop <span class="token operator">=</span> <span class="token keyword">false</span><span class="token punctuation">;</span>
+			<span class="token keyword">for</span> i <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">,</span>AwesomeState<span class="token punctuation">,</span><span class="token number">1</span> <span class="token keyword">do</span>
+				<span class="token keyword">if</span><span class="token punctuation">(</span>doCleanupOnPreviousLoop<span class="token punctuation">)</span><span class="token keyword">then</span> <span class="token keyword">break</span><span class="token punctuation">;</span><span class="token keyword">end</span><span class="token punctuation">;</span>
+				<span class="token function">print</span><span class="token punctuation">(</span><span class="token string">"Running at index : "</span><span class="token punctuation">,</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+				<span class="token function">wait</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+			<span class="token keyword">end</span><span class="token punctuation">;</span>
+			<span class="token keyword">return</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span>
+				<span class="token comment">--//This will cause the previous for loop if still running to end whenever this useEffect hook is called</span>
+				doCleanupOnPreviousLoop <span class="token operator">=</span> <span class="token keyword">true</span><span class="token punctuation">;</span> 
+			<span class="token keyword">end</span><span class="token punctuation">;</span>
+			
+		<span class="token keyword">end</span><span class="token punctuation">,</span><span class="token punctuation">{</span>AwesomeState<span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+
+		<span class="token keyword">return</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span>
+			<span class="token function">print</span><span class="token punctuation">(</span><span class="token string">"This is called whenever any property of the component is changed"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">end</span><span class="token punctuation">;</span>
+
+	<span class="token keyword">end</span><span class="token punctuation">;</span>
+</code></pre>
+<p>Great. Now that we understand the :_Render method, let's actually make the teleporting class</p>
+<pre class="language-lua"><code class="language-lua">	<span class="token comment">-- somewhere is a module script on the server</span>
+	<span class="token comment">-- this is a very very basic example just for you to understand. we recommend looking into the `framework` library which is similar to `Knit`.</span>
+
+<span class="token keyword">local</span> TeleportClass <span class="token operator">=</span> <span class="token punctuation">{</span>
+		Name <span class="token operator">=</span> <span class="token string">"TeleportClass"</span><span class="token punctuation">,</span>
+		ClassName <span class="token operator">=</span> <span class="token string">"TeleportClass"</span><span class="token punctuation">,</span> 
+		BannedFromTeleporting <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span><span class="token punctuation">;</span>
+	<span class="token keyword">function</span> TeleportClass<span class="token punctuation">:</span><span class="token function">_Render</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+		<span class="token keyword">return</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+	<span class="token keyword">end</span><span class="token punctuation">;</span>
+
+	<span class="token keyword">function</span> TeleportClass<span class="token punctuation">:</span><span class="token function">TeleportUser</span><span class="token punctuation">(</span>Player<span class="token punctuation">)</span>
+		<span class="token keyword">if</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>BannedFromTeleporting<span class="token punctuation">[</span>Player<span class="token punctuation">.</span>UserId<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token keyword">then</span> <span class="token keyword">return</span> <span class="token keyword">end</span><span class="token punctuation">;</span>
+		Player<span class="token punctuation">.</span>Character<span class="token punctuation">.</span>BlahBlahBlah <span class="token operator">=</span> BlahBlahBlah<span class="token punctuation">;</span>
+	<span class="token keyword">end</span><span class="token punctuation">;</span>
+
+<span class="token keyword">return</span> CustomClassService<span class="token punctuation">:</span><span class="token function">CreateClassAsync</span><span class="token punctuation">(</span>TeleportClass<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+</div></header><h2 class="anchor anchorWithStickyNavbar_LWe7" id="functions">Functions<a class="hash-link" href="#functions" title="Direct link to heading">​</a></h2><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="CreateClassAsync"><code style="text-decoration:none">CreateClassAsync</code><a class="hash-link" href="#CreateClassAsync" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/lanzoinc/PowerHorseEngine/blob/main/src/Core/Services/CustomClassService.lua#L210"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CustomClassService<!-- -->:</code><code class="green_DgR4">CreateClassAsync</code><code>(</code><div class="inset_uKQm"><div><code>ClassData<!-- -->: </code><code class="blue_P4bS">table</code><code>,</code></div><div><code>Parent<!-- -->: </code><code class="blue_P4bS">any</code><code>,</code></div><div><code>...<!-- -->: </code><code class="blue_P4bS">any</code></div></div><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/PowerHorseEngine/api/CustomClass">CustomClass</a></code></div><div>
+<p>Creates a custom class</p>
+</div><div class="divider_rE5g"></div><h3 class="anchor anchorWithStickyNavbar_LWe7" id="Create"><code style="text-decoration:none">Create</code><a class="hash-link" href="#Create" title="Direct link to heading">​</a></h3><div class="repositoryDetailsContainer_BPdw"><a class="sourceButton_sEho" href="https://github.com/lanzoinc/PowerHorseEngine/blob/main/src/Core/Services/CustomClassService.lua#L218"><div class="sourceButtonText_Vh0m">&lt;/&gt;</div></a></div><div class="memberString_GwaU"><code>CustomClassService<!-- -->:</code><code class="green_DgR4">Create</code><code>(</code><code>...<!-- -->: </code><code class="blue_P4bS">any</code><code>) → </code><code class="blue_P4bS"><a style="text-decoration:underline;color:inherit" href="/PowerHorseEngine/api/CustomClass">CustomClass</a></code></div><div>
+<p>Alias for :CreateClassAsync</p>
+</div></div></article></div><details><summary>Show raw api</summary><pre style="max-width:100%;white-space:pre-wrap">{
+    &quot;functions&quot;: [
+        {
+            &quot;name&quot;: &quot;CreateClassAsync&quot;,
+            &quot;desc&quot;: &quot;Creates a custom class&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;ClassData&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;table&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;Parent&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;any&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;...&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;any&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;CustomClass&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 210,
+                &quot;path&quot;: &quot;src/Core/Services/CustomClassService.lua&quot;
+            }
+        },
+        {
+            &quot;name&quot;: &quot;Create&quot;,
+            &quot;desc&quot;: &quot;Alias for :CreateClassAsync&quot;,
+            &quot;params&quot;: [
+                {
+                    &quot;name&quot;: &quot;...&quot;,
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;any&quot;
+                }
+            ],
+            &quot;returns&quot;: [
+                {
+                    &quot;desc&quot;: &quot;&quot;,
+                    &quot;lua_type&quot;: &quot;CustomClass&quot;
+                }
+            ],
+            &quot;function_type&quot;: &quot;method&quot;,
+            &quot;source&quot;: {
+                &quot;line&quot;: 218,
+                &quot;path&quot;: &quot;src/Core/Services/CustomClassService.lua&quot;
+            }
+        }
+    ],
+    &quot;properties&quot;: [],
+    &quot;types&quot;: [],
+    &quot;name&quot;: &quot;CustomClassService&quot;,
+    &quot;desc&quot;: &quot;`CustomClassService` is a way to create custom Pseudo elements into your projects.\n\n:::warning\nCustomClasses will not replicate, They are completely bounded to their environment. After creating a custom class\nit cannot be constructed with .new\n:::\n\n:::warning\nCustomClasses require a `.ClassName` property and a `:_Render` method. more about this is included in the example below\n:::\n\nLet&#x27;s create a class that is responsible for teleporting players during rounds\n\n```lua\n\tlocal TeleportClass = {\n\t\tName = \&quot;TeleportClass\&quot;, --&gt; Optional\n\t\tClassName = \&quot;TeleportClass\&quot;, --&gt; Required (Cannot be an existing built in ClassName)\n\t\tOtherProperty = \&quot;string\&quot;,\n\t\tTextColor3 = Color3.new()\n\t};\n\n\t--//Required\n\tfunction TeleportClass:_Render()\n\t\t--//Before we continue, let&#x27;s understand the :_Render Method\n\tend;\n```\n\n## :_Render\n\nWhenever a class is in the process of being created, the `:_Render` method will be called upon. This method\nwill only be called `once` in the classes lifecycle. The class expects the :_Render function to return some sort of value\nto understand how the component should be rendered.\n\nThere are two types of rendering, Array Rendering and Functional Rendering\n\n### Array Rendering\nWith array rendering, you return a dictionary within the :_Render function.\n\n```lua\n\tfunction TeleportClass:_Render()\n\t\treturn {};\n\tend;\n```\nWithin that dictionary you can pass a string as a key which represents a property of the class and a value which is callback\nfunction that will be called whenever that property is changed\n\n```lua\n\tfunction TeleportClass:_Render()\n\t\t-- You would most likely create components here (this is called only once)\n\t\tlocal TextLabel = Instance.new(\&quot;TextLabel\&quot;);\n\t\treturn {\n\t\t\t[\&quot;OtherProperty\&quot;] = function(newValue)\n\t\t\t\t-- this is called everytime \&quot;OtherProperty\&quot; changed, you must likely would not create components here.\n\t\t\t\tprint(\&quot;OtherPropertyChanged to : \&quot;, newValue);\n\t\t\t\tTextLabel.Text = newValue; -- this will now give the TextLabel a type of \&quot;Reactive\&quot; feel, since the text is now dynamically linked with our \&quot;OtherProperty\&quot; property.\n\t\t\tend;\n\t\t};\n\tend;\n```\n\nThere&#x27;s also some keys that are reserved that have different functionalities\n\n#### _Components\n\nAnything listed here will be stored in the components _Components list, which you can then use :GET to retrieve\n\n```lua\n\tfunction TeleportClass:_Render()\n\t\tlocal TextLabel = Instance.new(\&quot;TextLabel\&quot;);\n\t\treturn {\n\t\t\t[\&quot;OtherProperty\&quot;] = function(newValue)\n\t\t\t\tprint(\&quot;OtherPropertyChanged to : \&quot;, newValue);\n\t\t\t\tTextLabel.Text = tostring(newValue);\n\t\t\tend;\n\t\t\t_Components = {\n\t\t\t\tImportantTextLabel = TextLabel\n\t\t\t}\n\t\t};\n\tend;\n\t--Elsewhere:\n\t\tTeleportClassObject:GET(\&quot;ImportantTextLabel\&quot;);\n```\n\n#### _Mapping\n\nMapping is used to automatically link two properties with the same key and value type together.\n\n```lua\n\tfunction TeleportClass:_Render()\n\t\tlocal TextLabel = Instance.new(\&quot;TextLabel\&quot;);\n\t\treturn {\n\t\t\t[\&quot;OtherProperty\&quot;] = function(newValue)\n\t\t\t\tprint(\&quot;OtherPropertyChanged to : \&quot;, newValue);\n\t\t\t\tTextLabel.Text = tostring(newValue);\n\t\t\tend;\n\t\t\t_Components = {\n\t\t\t\tImportantTextLabel = TextLabel\n\t\t\t}\n\t\t\t_Mapping = {\n\t\t\t\t[TextLabel] = {\n\t\t\t\t\t\&quot;OtherProperty\&quot;, -- this will not work because text labels do not have a property called \&quot;OtherProperty\&quot;\n\t\t\t\t\t\&quot;TextColor3\&quot;, -- this will work because both the component and textlabel has a \&quot;TextColor3\&quot; which are Color3&#x27;s\n\t\t\t\t}\n\t\t\t}\n\t\t};\n\tend;\n```\n\n### Functional Rendering\n\nWhen using functional rendering, you need to return a function instead of a dictionary within the :_Render Method\n\n\n```lua\n\tfunction TeleportClass:_Render()\n\t\treturn function ()\n\t\t\tprint(\&quot;This is called whenever any property of the component is changed\&quot;);\n\t\tend;\n\n\tend;\n```\n\nAll :_Render functions pass a argument of \&quot;App\&quot; being the PowerHorseEngine module which it was created from.\nWith functional rendering, you now have access to a second argument which is passed \&quot;hooks\&quot;\n\nlearn more about functional rendering hooks `here`\n\nHere&#x27;s a quick example of using the `useEffect` along side the `useState` hook. We highly recommending viewing the `documentation` on it\nfor a better understanding\n\n\n```lua\n\tfunction TeleportClass:_Render(App,hooks)\n\t\tlocal useState = hooks.useState;\n\t\tlocal useEffect = hooks.useEffect;\n\n\t\tlocal AwesomeState,setAwesomeState = useState(0);\n\n\t\tuseEffect(function()\n\t\t\tprint(\&quot;This is only called when the state is changed\&quot;)\n\t\tend,{AwesomeState});\n\n\t\tuseEffect(function()\n\t\t\tprint(\&quot;This is only called when \\\&quot;OtherProperty\\\&quot; and \\\&quot;TextColor3\\\&quot; are changed\&quot;)\n\t\tend,{\&quot;OtherProperty\&quot;,\&quot;TextColor3\&quot;})\n\n\t\tuseEffect(function()\n\t\t\tlocal doCleanupOnPreviousLoop = false;\n\t\t\tfor i = 1,AwesomeState,1 do\n\t\t\t\tif(doCleanupOnPreviousLoop)then break;end;\n\t\t\t\tprint(\&quot;Running at index : \&quot;,i);\n\t\t\t\twait(1);\n\t\t\tend;\n\t\t\treturn function ()\n\t\t\t\t--//This will cause the previous for loop if still running to end whenever this useEffect hook is called\n\t\t\t\tdoCleanupOnPreviousLoop = true; \n\t\t\tend;\n\t\t\t\n\t\tend,{AwesomeState})\n\n\n\t\treturn function ()\n\t\t\tprint(\&quot;This is called whenever any property of the component is changed\&quot;);\n\t\tend;\n\n\tend;\n```\n\nGreat. Now that we understand the :_Render method, let&#x27;s actually make the teleporting class\n\n```lua\n\t-- somewhere is a module script on the server\n\t-- this is a very very basic example just for you to understand. we recommend looking into the `framework` library which is similar to `Knit`.\n\nlocal TeleportClass = {\n\t\tName = \&quot;TeleportClass\&quot;,\n\t\tClassName = \&quot;TeleportClass\&quot;, \n\t\tBannedFromTeleporting = {};\n\t};\n\tfunction TeleportClass:_Render()\n\t\treturn {};\n\tend;\n\n\tfunction TeleportClass:TeleportUser(Player)\n\t\tif(self.BannedFromTeleporting[Player.UserId])then return end;\n\t\tPlayer.Character.BlahBlahBlah = BlahBlahBlah;\n\tend;\n\nreturn CustomClassService:CreateClassAsync(TeleportClass);\n```&quot;,
+    &quot;source&quot;: {
+        &quot;line&quot;: 205,
+        &quot;path&quot;: &quot;src/Core/Services/CustomClassService.lua&quot;
+    }
+}</pre></details></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#types" class="table-of-contents__link toc-highlight">Types</a></li><li><a href="#properties" class="table-of-contents__link toc-highlight">Properties</a></li><li><a href="#functions" class="table-of-contents__link toc-highlight">Functions</a><ul><li><a href="#Create" class="table-of-contents__link toc-highlight">:Create</a></li><li><a href="#CreateClassAsync" class="table-of-contents__link toc-highlight">:CreateClassAsync</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="col footer__col"><div class="footer__title">Socials</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://twitter.com/lanzoinc" target="_blank" rel="noopener noreferrer" class="footer__link-item">Twitter<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2022 Lanzo</div></div></div></footer></div>
+<script src="/PowerHorseEngine/assets/js/runtime~main.358d0fc0.js"></script>
+<script src="/PowerHorseEngine/assets/js/main.1672a453.js"></script>
+</body>
+</html>

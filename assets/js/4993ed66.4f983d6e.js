@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[2395],{64714:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"ModuleFetcherProvider","desc":"","source":{"line":4,"path":"src/Core/Providers/ModuleFetcherProvider.lua"}}')}}]);

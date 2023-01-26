@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[3347],{37306:e=>{e.exports=JSON.parse('{"functions":[],"properties":[],"types":[],"name":"LineBreak","desc":"","source":{"line":9,"path":"src/Pseudo/Core/Classes/BaseGuis/LineBreak.lua"}}')}}]);
