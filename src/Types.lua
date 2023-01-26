@@ -176,7 +176,7 @@ export type App = {
         ((self:any,"DirectionalArrow3D")->DirectionalArrow3DLibrary)
         &((self:any,"Sillito")->SillitoLibrary)
         &((self:any,"Collector")->CollectorLibrary)
-        &((self:any,"Contextor")->ContextorLibrary)
+        &((self:any,"Contextor")->ContextActionService)
         &((self:any,"Math")->MathLibrary)
         &((self:any,"Pointer")->PointerLibrary)
         &((self:any,"Query")->QueryLibrary)
@@ -487,6 +487,8 @@ export type DamageIndicator = Pseudo&BaseGui&{
     Damage: string|number,
     Origin: UDim2|Vector3|Instance|CFrame,
     TextColor3: Color3|{[any]:any},
+    TextSize: number,
+    Lifetime: number,
     PositionOffset: UDim2,
     PopoutTweenInfo: TweenInfo,
     _Initiate: (self:any) -> any,

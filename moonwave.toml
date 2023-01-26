@@ -63,7 +63,7 @@ classes = [
 [[classOrder]]
 section = "Built In Libraries"
 classes = [
-"Collector","Framework","FrameworkClient","FrameworkServer","StateLibrary","Whiplash","Array","Math","ReClasser"
+"Collector","Sillito","SillitoBranch","StateLibrary","Whiplash","Array","Math","ReClasser"
 ]
 
 [[classOrder]]

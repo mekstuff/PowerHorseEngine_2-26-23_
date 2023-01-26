@@ -11,6 +11,8 @@ local DamageIndicator = {
     Damage = "**any",
     Origin = "**any",
     TextColor3 = "**any",
+    TextSize = 35,
+    Lifetime = .1,
     PositionOffset = UDim2.fromOffset(0,0);
     PopoutTweenInfo = TweenInfo.new(.7,Enum.EasingStyle.Elastic);
 };
@@ -30,6 +32,14 @@ DamageIndicator.__inherits = {"BaseGui"}
     @within DamageIndicator
 ]=]
 --[=[
+    @prop TextSize number
+    @within DamageIndicator
+]=]
+--[=[
+    @prop Lifetime number
+    @within DamageIndicator
+]=]
+--[=[
     @prop PositionOffset UDim2
     @within DamageIndicator
 ]=]
@@ -37,6 +47,20 @@ DamageIndicator.__inherits = {"BaseGui"}
     @prop PopoutTweenInfo TweenInfo
     @within DamageIndicator
 ]=]
+
+function DamageIndicator:Destroy()
+    local App = self:_GetAppModule();
+    local TweenService = App:GetService("TweenService");
+    local Text = self:GET("Text");
+    local transparentTween = TweenService:Create(Text, TweenInfo.new(.2), {
+        TextTransparency = 1;
+        TextStrokeTransparency = 1;
+    });
+    transparentTween.Completed:Connect(function()
+        self:GetRef():Destroy();
+    end)
+    transparentTween:Play();
+end
 
 --[=[]=]
 function DamageIndicator:_Initiate(Hooks:PseudoHooks)
@@ -75,7 +99,7 @@ function DamageIndicator:_Initiate(Hooks:PseudoHooks)
 
     local Text = App.new("Text");
     Text.Text = tostring(Damage) or "???";
-    Text.TextSize = 35;
+    Text.TextSize = self.TextSize;
     Text.Rotation = 90;
     Text.TextStrokeTransparency = .2;
     Text.Position = Origin;
@@ -95,20 +119,18 @@ function DamageIndicator:_Initiate(Hooks:PseudoHooks)
         Rotation = 0;
     });
     pt.Completed:Connect(function()
-        local transparentTween = TweenService:Create(Text, TweenInfo.new(.2), {
-            TextTransparency = 1;
-            TextStrokeTransparency = 1;
-        });
-        transparentTween.Completed:Connect(function()
-            self:Destroy();
-        end)
-        transparentTween:Play();
+        if(self.Lifetime == -1)then
+            return;
+        end;
+        task.wait(self.Lifetime);
+        self:Destroy();
     end)
 
     pt:Play();
 
     Hooks.useComponents({
         FatherComponent = Text:GetGUIRef();
+        Text = Text;
     });
 
     Text.Parent = self:GetRef();

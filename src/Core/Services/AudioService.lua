@@ -338,10 +338,10 @@ end;
 function AudioService:CreateSoundEffectsChannel(ChannelName:string)
 	return AudioService:CreateChannel(ChannelName or "SoundEffects",15,nil,nil,true);
 end
+local AudioServiceChannelsFolder;
 --[=[
 	@return AudioChannel
 ]=]
-local AudioServiceChannelsFolder;
 function AudioService:CreateChannel(ChannelName:string, AudiosAllowedInParallel:number?, DefaultVolume:number?, DefaultLoop:boolean?, AudiosInstant:boolean?)
 	
 	if(not AudioServiceChannelsFolder)then
