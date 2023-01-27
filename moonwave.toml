@@ -12,7 +12,7 @@ onBrokenMarkdownLinks = "warn"
 organizationName = "Lanzo"
 projectName = "PowerHorseEngine"
 url = "https://LanzoInc.github.io"
-tagline = "Your project's tagline"
+tagline = ""
 
 [footer]
 style = "dark"
