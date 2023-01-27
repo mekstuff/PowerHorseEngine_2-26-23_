@@ -11,7 +11,7 @@ export default function Home(){
             <div className="hero-section">
                 <p className="hero-heading">PowerHorseEngine</p>
                 <p>
-                    PowerHorseEngine is an object-oriented ROBLOX Framework that provides the ability to create custom classes and has a bunch out of the box classes, services & built in libraries
+                    PowerHorseEngine is an object-oriented ROBLOX Framework that provides the ability to create custom classes and has a bunch of out of the box classes, services & built in libraries
                 </p>
                 <Link
                     className="button button--secondary button--lg"
