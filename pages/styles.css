@@ -1,0 +1,13 @@
+.hero-section{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+    font-size: 20px;
+    padding: 20px;
+}
+.hero-heading{
+    font-weight: 800;
+    font-size: xx-large;
+}
