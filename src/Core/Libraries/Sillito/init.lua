@@ -33,8 +33,11 @@ end
 local Sillito = {};
 local Branches = {};
 
---[=[]=]
-function Sillito:GetBranch(BranchName:string,tries:number?):Types.SillitoBranch?
+--[=[
+    @return SillitoBranch
+
+]=]
+function Sillito:GetBranch(BranchName:string,tries:number?)
     if(Branches[BranchName])then
         return Branches[BranchName]
     else
@@ -50,7 +53,10 @@ function Sillito:GetBranch(BranchName:string,tries:number?):Types.SillitoBranch?
     end;
 end;
 
---[=[]=]
+--[=[
+    @return boolean, SillitoBranch?
+
+]=]
 function Sillito:HasBranch(BranchName:string)
     local tBranch = Branches[BranchName];
     return tBranch and true or false, Branches[BranchName];
@@ -58,8 +64,10 @@ end
 --[=[
     A branch is a wrapper for services and modulars. By default you use the 'main' branch which should be enough.
     But in some cases, a thirdparty may need to use this library, and to prevent naming errors mismatch, we added branches
+
+    @return SillitoBranch
 ]=]
-function Sillito:CreateBranch(BranchName:string):Types.SillitoBranch
+function Sillito:CreateBranch(BranchName:string)
     ErrorService.assert(typeof(BranchName) == "string", ("string expected for BranchName, got %s"):format(typeof(BranchName)));
     if(Branches[BranchName])then
         return ErrorService.tossError("Branch \""..BranchName.."\" is already a Sillito Branch")

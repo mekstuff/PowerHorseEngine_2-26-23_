@@ -93,10 +93,6 @@ return {
     ["-flags"] = {
         -- "force-env {game}"
     },
-
-    --DO NOT EDIT
-    v = "0.1.0";
-
 }
 
 ```

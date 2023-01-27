@@ -31,34 +31,6 @@ Learn more about [npm](https://www.npmjs.com)
 
 ---
 
-## Aftman
-
-:::tip Recommended
-This is a recommended way to install `PowerHorseEngine` into your projects, but you'll need to use [rojo](https://rojo.space/) sync it in.
-:::
-
-Add
-```
-powerhorseengine = "LanzoInc/PowerHorseEngine"
-```
-to your aftman.toml file and run aftman install
-
----
-
-## Wally
-
-:::tip Recommended
-This is a recommended way to install `PowerHorseEngine` into your projects, but you'll need to use [rojo](https://rojo.space/) sync it in.
-:::
-
-Add
-```
-lanzoinc/PowerHorseEngine
-```
-to your wally dependency list then run wally install
-
----
-
 ## Github
 
 Visit [LanzoInc](https://github.com/lanzoinc) on GitHub and look for our `PowerHorseEngine` repository.

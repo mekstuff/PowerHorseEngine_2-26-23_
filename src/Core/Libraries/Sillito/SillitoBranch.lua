@@ -34,7 +34,7 @@ end;
 function SillitoBranch:CreateDedicatedScreenGui(ScreenGuiProps:{[string]:any}?)
     local ErrorService = self:_GetAppModule():GetService("ErrorService");
     if(not IsClient)then
-        ErrorService.tossError("CreateDedicatedScreenGui Can only be called by a framework client branch", self.Name);
+        ErrorService.tossError("CreateDedicatedScreenGui Can only be called by a Sillito client branch", self.Name);
         return;
     end;
     local ScreenGui = Instance.new("ScreenGui");
@@ -55,7 +55,7 @@ end;
 --[=[
     @client
 ]=]
-function SillitoBranch:PortModulars(...:any):Types.FrameworkLibrary
+function SillitoBranch:PortModulars(...:any)
     local arr = {...};
     for _,v in pairs(arr) do
         for _,x in pairs(typeof(v) == "Instance" and v:GetDescendants() or v) do
@@ -67,14 +67,14 @@ function SillitoBranch:PortModulars(...:any):Types.FrameworkLibrary
     return self;
 end;
 --[=[]=]
-function SillitoBranch:PortComponentClass(Component:any):Types.FrameworkLibrary
+function SillitoBranch:PortComponentClass(Component:any)
     assert(not self._ComponentClasses[Component.Name], ("%s is already a component class stored in memory"):format(Component.Name));
     assert(Component:IsA("ModuleScript"), ("Expected ModuleScript as ComponentClass, got %s"):format(Component.ClassName))
     self._ComponentClasses[Component.Name] = require(Component);
     return self;
 end;
 --[=[]=]
-function SillitoBranch:PortComponentClasses(...:any):Types.FrameworkLibrary
+function SillitoBranch:PortComponentClasses(...:any)
     local arr = {...};
     for _,v in pairs(arr) do
         for _,x in pairs(typeof(v) == "Instance" and v:GetDescendants() or v) do
@@ -114,7 +114,7 @@ end
 --[=[
     @client
 ]=]
-function SillitoBranch:PortModular(Modular:any):Types.FrameworkLibrary
+function SillitoBranch:PortModular(Modular:any)
     local App = self:_GetAppModule();
     local CustomClassService = App:GetService("CustomClassService");
     local ErrorService = App:GetService("ErrorService");
@@ -385,38 +385,34 @@ function SillitoBranch:PortService(Service:any)
     end;
 
     local ogSelf = self;
-    --[=[
-        @within FrameworkServer
-        @tag FrameworkService
-    ]=]
+    
     function Service:GetService(...:any)
         return ogSelf:GetService(...);
     end;
     --[=[
-        @within FrameworkServer
-        @tag FrameworkService
+        @within SillitoBranch
     ]=]
     function Service:GetBranch(Branch:string)
         return ogSelf:GetBranch(Branch);
     end;
-    
+    --[=[
+        @within SillitoBranch
+    ]=] 
     function Service:HasBranch(Branch:string)
         return ogSelf:HasBranch(Branch);
     end;
 
     --[=[
-        @within FrameworkServer
-        @tag FrameworkService
+        @within SillitoBranch
     ]=]
     function Service:GetComponentClass(...:any)
         return ogSelf:GetComponentClass(...);
     end;
 
     --[=[
-        @within FrameworkServer
+        @within SillitoBranch
         :::warning
         In Order for this to work the service must have a `Shared` property.
-        @tag FrameworkService
         :::
 
         Idealy, you would want to call this method during the services Init lifecycle. You will then be able to access
@@ -427,7 +423,7 @@ function SillitoBranch:PortService(Service:any)
     function Service:UseChannel(ChannelName:string, ...:any):RemoteEvent
         local hasSharedContainer = self._dev.__SharedContainer;
         if(not hasSharedContainer)then
-            error( ("Internal FrameworkError: Tried to UseChannel(\"%s\") on Service \"%s\" but no .Shared Property was provided, Services must be shared to use channel"):format(ChannelName,self.Name))
+            error( ("Internal Sillito: Tried to UseChannel(\"%s\") on Service \"%s\" but no .Shared Property was provided, Services must be shared to use channel"):format(ChannelName,self.Name))
         end;
         local hasChannelsContainer = self._dev.__SharedContainer:FindFirstChild("@Channels");
         if(not hasChannelsContainer)then

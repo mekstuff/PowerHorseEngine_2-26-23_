@@ -6,4 +6,4 @@ If you're using a Package Manager like `Aftman` or `Foreman`, You should sync th
 
 ## Supported Libraries
 
-They're some libraries made by us which aren't included in Built in libraries, Some of these packages require to be `Cloud Libraries` in order to work properly, Here is where you'll sync such libraries. For example `LanzoInc/LanzUiMaterial`
+Built in libraries are shipped with `PowerHorseEngine`
