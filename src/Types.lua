@@ -1263,19 +1263,29 @@ export type WhiplashLibrary = {
 
 export type PointerLibrary = (Instance:Instance,Parent:any?) -> Pseudo;
 
-export type SillitoBranch = Pseudo&SillitoLibrary&{
-    -- GetService: (self:any, ServiceName:string)->nil,
-    -- GetModular: (self:any, ServiceName:string)->nil,
-    -- PortService: (self:any, Service:any)->nil,
-    -- PortServices: (self:any, ...any)->nil?,
-    -- PortModular: (self:any, Modular:any)->nil,
-    -- PortModulars: (self:any, ...any)->nil,
-    -- GetComponentClass: (self:any, ComponentClass:string)->nil,
-    -- PortComponentClass: (self:any, Component:any)->nil,
-    -- PortComponentClasses: (self:any, ...any)->nil,
-    -- GetBranch: (self:any, BranchName:string)->SillitoBranch,
-    -- HasBranch: (self:any, BranchName:string)->SillitoBranch?,
-}
+export type Sillito = {
+    Start: (self:any)->Promise,
+    PortService: (self:any, Service:any)->SillitoBranch,
+    PortServices: (self:any, ...any)->SillitoBranch?,
+    PortModular: (self:any, Modular:any)->SillitoBranch,
+    PortModulars: (self:any, ...any)->SillitoBranch,
+    GetBranch: (self:any, BranchName:string)->SillitoBranch,
+    HasBranch: (self:any, BranchName:string)->(boolean,SillitoBranch?),
+    GetModular: (self:any,ServiceName:string)->SillitoBranch,
+    GetService: (self:any,ServiceName:string)->SillitoBranch,
+
+};
+
+export type SillitoBranch = {
+    PortComponentClass: (self:any,ComponentClass:ModuleScript)->SillitoLibrary,
+    PortComponentClasses: (self:any,ComponentClasses:Folder|any)->SillitoLibrary,
+    GetComponentClass: (self:any,ComponentClassName:string)->any,
+    GetService: (self:any,ServiceName:string)->SillitoBranch,
+    GetModular: (self:any,ServiceName:string)->SillitoBranch,
+    CreateDedicatedScreenGui: (self:any, ScreenGuiProps:{[string]:any}?) -> ScreenGui,
+    [any]:any
+}&Pseudo
+
 
 export type FrameworkLibraryService = {
     Init: (self:any)->(nil)?,
@@ -1299,22 +1309,6 @@ export type DirectionalArrow3DLibrary = {
     new: (Origin:any, Target:any) -> DirectionalArrowClass
 }
 
-export type SillitoLibrary = {
-    Start: (self:any)->Promise,
-    PortService: (self:any, Service:any)->SillitoLibrary,
-    PortServices: (self:any, ...any)->SillitoLibrary?,
-    PortModular: (self:any, Modular:any)->SillitoLibrary,
-    PortModulars: (self:any, ...any)->SillitoLibrary,
-    PortComponentClass: (self:any,ComponentClass:ModuleScript)->SillitoLibrary,
-    PortComponentClasses: (self:any,ComponentClasses:Folder|any)->SillitoLibrary,
-    GetComponentClass: (self:any,ComponentClassName:string)->any,
-    GetService: (self:any,ServiceName:string)->FrameworkLibraryService,
-    GetModular: (self:any,ServiceName:string)->FrameworkLibraryService,
-    GetBranch: (self:any, BranchName:string)->SillitoBranch,
-    HasBranch: (self:any, BranchName:string)->(boolean,SillitoBranch?),
-    CreateDedicatedScreenGui: (self:any, ScreenGuiProps:{[string]:any}?) -> ScreenGui,
-};
-export type PHeFrameworkLibrary = SillitoLibrary;
 
 export type FrameworkLibraryModular = Pseudo&{
     Init: (self:any)->nil,
