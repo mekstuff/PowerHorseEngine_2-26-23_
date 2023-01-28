@@ -12,7 +12,9 @@ return {
         Font = Enum.Font.FredokaOne;
     };
 
-    PHePanel = {                                                                                                                                            --[[
+    PHePanel = { 
+        Disabled = false;
+                                                                                                                                                    --[[
 
                                                 PHE PANEL RANKING
                                 +--------+---------------+----------------------+
