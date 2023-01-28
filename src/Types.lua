@@ -1263,7 +1263,7 @@ export type WhiplashLibrary = {
 
 export type PointerLibrary = (Instance:Instance,Parent:any?) -> Pseudo;
 
-export type Sillito = {
+export type SillitoLibrary = {
     Start: (self:any)->Promise,
     PortService: (self:any, Service:any)->SillitoBranch,
     PortServices: (self:any, ...any)->SillitoBranch?,
@@ -1274,7 +1274,7 @@ export type Sillito = {
     GetModular: (self:any,ServiceName:string)->SillitoBranch,
     GetService: (self:any,ServiceName:string)->SillitoBranch,
 
-};
+}&SillitoBranch;
 
 export type SillitoBranch = {
     PortComponentClass: (self:any,ComponentClass:ModuleScript)->SillitoLibrary,
