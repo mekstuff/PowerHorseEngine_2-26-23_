@@ -232,8 +232,8 @@ export type Pseudo = {
     _lockProperty: (self:Pseudo,propertyName:string,propertyCallback:any)->nil,
     _lockProperties: (self:Pseudo,...string|any)->nil,
     _unlockProperty: (self:Pseudo,...string|any)->nil,
+    _Render: (self:Pseudo)->{}|(Hooks:PseudoHooks)->any,
     [any]: any?
-    -- _Render: PseudoRender
 }
 
 
