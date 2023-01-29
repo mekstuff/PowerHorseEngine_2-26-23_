@@ -114,6 +114,8 @@ local function getModuleProps(Module:{},Sheet:any,force:boolean?):nil
 end
 
 --> Main Rendering for :_Render
+
+
 local function renderAsync(renderMap:table?,prop:string,value:any,_ReferenceInstance:Instance,QuickMap:table?, me:any):nil
 	if(typeof(value) == "string" and value:match("^%*%*"))then
 		return;
@@ -121,17 +123,59 @@ local function renderAsync(renderMap:table?,prop:string,value:any,_ReferenceInst
 
 	--> handles _Mapping
 	if(QuickMap)then
+		for Instance_,Map in pairs(QuickMap) do
+			if(typeof(Map) == "table")then
+				for _,x in pairs(Map) do
+					if(typeof(x) == "string")then
+						if(x == prop)then
+							local s,r = pcall(function()
+								Instance_[prop] = value;
+							end);
+							if(not s)then
+								warn(("[QuickMap] Failed Applying Property Value \"%s\" on Item \"%s\". ERROR: %s"):format(prop,tostring(Instance_),r));
+							end;
+						end;
+					--[[
+						for key,value mapping 
+						["mycustomtextprop"] = "text"
+					]]
+					elseif(typeof(x) == "table")then
+						if(x.mp == prop)then
+							local s,r = pcall(function()
+								Instance_[x.p] = value;
+							end);
+							if(not s)then
+								warn(("[QuickMap] Failed Applying Property Value \"%s\" on Item \"%s\". ERROR: %s"):format(prop,tostring(Instance_),r));
+							end;
+						end
+					else
+						error(("Something is wrong with your mapping source! %s"):format(tostring(Instance_)));
+					end
+				end;
+			end
+		end
+	end
+	--[[
+	if(QuickMap)then
 		for Instance_,Map in pairs(QuickMap)do
-			if(typeof(Map) == "table" and table.find(Map, prop))then
-				local ran,error_ = pcall(function()
-					Instance_[prop]=value;
-				end);if(not ran)then
-					warn("Mapping Failed: \""..prop.."\" Error?: "..error_);
-
+			if(typeof(Map) == "table")then
+				for _,x in pairs(Map) do
+					if(typeof(x) == "table")then
+						print("Found Table");
+					end
+				end
+				if(table.find(QuickMap, prop))then
+					local ran,error_ = pcall(function()
+						Instance_[prop]=value;
+					end);
+					if(not ran)then
+						warn("Mapping Failed: \""..prop.."\" Error?: "..error_);
+					end
 				end
 			end
 		end;
 	end;
+	]]
 
 	--> main render
 	if(renderMap and renderMap[prop])then
@@ -748,10 +792,13 @@ local function createPseudoObject(Object:{[any]:any}, DirectParent:Instance?, Di
 				--[=[
 					@function useMapping
 					@within useMapping
-					@param props table
-					@param dependencies table
+					@param props {[string|number]:string
+					@param dependencies {any}
+
+					As of >= v1.12.2 you can define the prop name and convert it to the required props that is being mapped
+					["UniqueBackground3PropertyName"] = "BackgroundColor3"
 				]=]
-				hooks.useMapping = function(props:table,dependencies:table):nil
+				hooks.useMapping = function(props:{[string|number]:string},dependencies:{any}):nil
 					assert(typeof(props) == "table", ("got %s on useMapping props expected table"):format(typeof(props)));
 					assert(typeof(dependencies) == "table", ("got %s on useMapping dependencies expected table"):format(typeof(dependencies)));
 					if(not quickMap)then
@@ -761,12 +808,20 @@ local function createPseudoObject(Object:{[any]:any}, DirectParent:Instance?, Di
 						if(not quickMap[dependency])then
 							quickMap[dependency] = {};
 						end;
-						for _,prop in pairs(props) do
+						for index,prop in pairs(props) do
+							-- if(typeof(index) ~= "number")then
+							-- end
 							if(table.find(quickMap[dependency],prop))then
 								warn(debug.traceback(("Double call on useMapping hook dependency: %s || %s"):format(dependency.Name,prop),2))
 							else
-								table.insert(quickMap[dependency],prop);
-								renderAsync(nil,prop,Pseudo[prop],_ReferenceInstance,quickMap,Pseudo)
+								--[[
+									adds to quick map, 
+									if [1] = "property" then add property
+									but if ["myproperty"] = "property" then add table
+								]]
+								local isIndexNotNumber = typeof(index) ~= "number";
+								table.insert(quickMap[dependency],isIndexNotNumber and {mp=index,p=prop} or prop);
+								renderAsync(nil,isIndexNotNumber and index or prop ,Pseudo[isIndexNotNumber and index or prop],_ReferenceInstance,quickMap,Pseudo)
 							end;
 						end;
 					end;
