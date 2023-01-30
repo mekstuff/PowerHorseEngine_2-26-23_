@@ -36,6 +36,7 @@ export type App = {
         &(("DamageIndicator") -> DamageIndicator)
         &(("DatePicker") -> DatePicker)
         &(("Dialog") -> Dialog)
+        &(("DialogBox") -> DialogBox)
         &(("DialogueGUI") -> DialogueGUI)
         &(("DropdownButton") -> DropdownButton)
         &(("FormControl") -> FormControl)
@@ -175,6 +176,7 @@ export type App = {
     Import: (
         ((self:any,"DirectionalArrow3D")->DirectionalArrow3DLibrary)
         &((self:any,"Sillito")->SillitoLibrary)
+        &((self:any,"Array")->ArrayLibrary)
         &((self:any,"Collector")->CollectorLibrary)
         &((self:any,"Contextor")->ContextActionService)
         &((self:any,"Math")->MathLibrary)
@@ -239,7 +241,7 @@ export type Pseudo = {
 
 type useEffect = (Handler:any, Depedencies:any?) -> Servant
 type useRender = (Handler:any, Depedencies:any?) -> Servant
-type useMapping = (props:{string},depedencies:{Instance|Pseudo|any}) -> nil
+type useMapping = (props:{[string|number]:string},depedencies:{Instance|Pseudo|any},trackMap:boolean?) -> Servant|nil
 type useRawset = (handler:(newValue:any)->any,dependency:string) -> nil
 type useComponents = (components:{[string]:any}) -> nil
 
@@ -495,6 +497,39 @@ export type DamageIndicator = Pseudo&BaseGui&{
 }
 
 -- export type DatePicker = 
+export type DialogBox = {
+    -- HorizontalAlignment: Enum.HorizontalAlignment,
+    SpeakerText: string,
+    SpeakerTextColor3: Color3,
+    SpeakerTextSize: number,
+    SpeakerRichText: boolean,
+    SpeakerSmartText: boolean,
+    SpeakerRotation: number,
+    SpeakerFont: Enum.Font,
+    SpeakerBackgroundColor3: Color3,
+    SpeakerPaddingBottom: UDim,
+    SpeakerPaddingLeft: UDim,
+    SpeakerPaddingRight: UDim,
+    SpeakerPaddingTop: UDim,
+    ContentText: string,
+    ContentTextColor3: Color3,
+    ContentTextSize: boolean,
+    ContentFont: boolean,
+
+    Options: {
+        id: string,
+        [any]:any,
+    },
+    OptionsFillDirection: Enum.FillDirection,
+    OptionsHorizontalAlignment: Enum.HorizontalAlignment,
+    OptionsVerticalAlignment: Enum.VerticalAlignment,
+    OptionsSortOrder: Enum.SortOrder,
+    OptionsPosition: UDim2,
+    OptionsAnchorPoint: Vector2,
+
+    OptionClicked: PHeSignal<Button,any>
+
+}&BaseGui&Pseudo;
 -- export type Dialog
 -- export type DialogueGUI
 -- export type FormControl
@@ -1286,16 +1321,11 @@ export type SillitoBranch = {
     [any]:any
 }&Pseudo
 
-
-export type FrameworkLibraryService = {
-    Init: (self:any)->(nil)?,
-    Start: (self:any)->nil,
-    GetService: (self:any,ServiceName:string)->FrameworkLibraryService,
-    GetComponentClass: (self:any,ComponentClassName:string)->any,
-    UseChannel: (self:any, ChannelName:string)->RemoteEvent,
-    Shared: any?
-};
-export type PHeFrameworkLibraryService = FrameworkLibraryService;
+export type ArrayLibrary = {
+    new: () -> {};
+    Adapt: (self:any, originalTable:{},properTypes:boolean?,AdaptNestedArrays:boolean?,onImproperType:(key:any,value:any,selfvalue:any,self:{},originalArray:{})->any) -> {},
+    detach: (self:any,conditional:(key:any,value:any)->boolean|nil) -> any,
+}
 
 export type DirectionalArrowClass = Pseudo&{
     Origin: any,

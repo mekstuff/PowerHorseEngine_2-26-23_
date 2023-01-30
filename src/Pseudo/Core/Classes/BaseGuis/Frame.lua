@@ -15,7 +15,6 @@ local Frame = {
 	
 	Name = "Frame";
 	ClassName = "Frame";
-	Roundness = UDim.new(0,0);
 	
 	HoverEffect = Enumeration.HoverEffect.None;
 	ActiveBehaviour = Enumeration.ActiveBehaviour.None;

@@ -21,10 +21,8 @@ local BaseGui = {
 	Name = "BaseGui";
 	ClassName = "BaseGui";
 	Position = UDim2.new(0);
+	AutomaticSize = Enum.AutomaticSize.None;
 	AnchorPoint = Vector2.new(0);
-	--AbsolutePosition = Vector2.new(0,0);
-	--AbsoluteSize = Vector2.new(0,0);
-	--Size = UDim2.new(0,350,0,250);
 	Size = UDim2.new(0,120,0,40);
 	Visible = true;
 	ZIndex = 1;
@@ -32,6 +30,18 @@ local BaseGui = {
 	SupportsRBXUIBase = false;
 	Rotation = 0;
 	LayoutOrder = 0;
+
+	Active = true;
+	BackgroundColor3 = Theme.getCurrentTheme().Primary;
+	BackgroundTransparency = 0;
+	BorderSizePixel = 0;
+	
+	ClipsDescendants = false;
+	StrokeColor3 = Theme.getCurrentTheme().Border;
+	StrokeThickness = 1.5;
+	StrokeTransparency = 1;
+
+	Roundness = UDim.new(0,0);
 };
 BaseGui.__inherits = {}
 --[=[
