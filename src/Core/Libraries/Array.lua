@@ -34,7 +34,7 @@ local Array = {};
     ```
 
 ]=]
-function Array.Adapt(self:table,originalArray:table,properTypes:boolean?,AdaptNestedArrays:boolean?,onImproperType:any?):table
+function Array.Adapt(self:table,originalArray:{},properTypes:boolean?,AdaptNestedArrays:boolean?,onImproperType:any?):{}
     for a,b in pairs(originalArray) do
         if(self[a] == nil)then
             self[a] = b;
@@ -62,8 +62,41 @@ function Array.Adapt(self:table,originalArray:table,properTypes:boolean?,AdaptNe
 end;
 
 --[=[]=]
-function Array.new():table
+function Array.new():{}
     return {};
 end;
+
+
+--[=[
+    Loops through the array and calls the conditional statement on each member, if condition returns true then the item will be removed after
+    each member was finished iterating
+
+    This function is not yet well optimized.
+
+    @return {}
+]=]
+function Array.detach(self:any, conditional:(key:any,value:any)->boolean|nil)
+    local neededContent = {};
+    for a,b in pairs(self) do
+        local res = conditional(a,b);
+        assert(typeof(res) == "boolean" or res == nil, ("Array.detach conditional handler must return a boolean or nil, got \"%s\""):format(tostring(res)))
+        if(res ~= true)then
+            table.insert(neededContent,b);
+        end
+    end;
+
+    for i,x in pairs(neededContent) do
+        table.insert(self,i,x);
+    end;
+
+    for i = #self,1,-1 do
+        if(i == #neededContent)then
+            break;
+        end
+        table.remove(self,i);
+    end;
+    neededContent = nil;
+    return self;
+end
 
 return Array;
