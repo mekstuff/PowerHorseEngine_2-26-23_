@@ -794,11 +794,15 @@ local function createPseudoObject(Object:{[any]:any}, DirectParent:Instance?, Di
 					@within useMapping
 					@param props {[string|number]:string
 					@param dependencies {any}
+					@param trackMap boolean -- if true, returns a servant which when destroyed will undo the mapping.
 
 					As of >= v1.12.2 you can define the prop name and convert it to the required props that is being mapped
 					["UniqueBackground3PropertyName"] = "BackgroundColor3"
+					
+
+					@return Servant?
 				]=]
-				hooks.useMapping = function(props:{[string|number]:string},dependencies:{any}):nil
+				hooks.useMapping = function(props:{[string|number]:string},dependencies:{any},trackMap:boolean?)
 					assert(typeof(props) == "table", ("got %s on useMapping props expected table"):format(typeof(props)));
 					assert(typeof(dependencies) == "table", ("got %s on useMapping dependencies expected table"):format(typeof(dependencies)));
 					if(not quickMap)then
@@ -809,8 +813,6 @@ local function createPseudoObject(Object:{[any]:any}, DirectParent:Instance?, Di
 							quickMap[dependency] = {};
 						end;
 						for index,prop in pairs(props) do
-							-- if(typeof(index) ~= "number")then
-							-- end
 							if(table.find(quickMap[dependency],prop))then
 								warn(debug.traceback(("Double call on useMapping hook dependency: %s || %s"):format(dependency.Name,prop),2))
 							else
@@ -825,6 +827,33 @@ local function createPseudoObject(Object:{[any]:any}, DirectParent:Instance?, Di
 							end;
 						end;
 					end;
+					if(trackMap)then
+						local MappedServant = App.new("Servant");
+						MappedServant.Destroying:Connect(function()
+							local Array = App:Import("Array");
+							for _,dependency in pairs(dependencies) do
+								if(quickMap and quickMap[dependency])then
+									Array.detach(quickMap[dependency], function(_,value)
+										--> for detecting dynamic maps
+										if(typeof(value) == "table")then
+											for q,x in pairs(props) do
+												if(typeof(q) ~= "number" and q == value.mp and x == value.p)then
+													return true;
+												end
+											end;
+											return false;
+										end;
+										--> for normal maps
+										local find = table.find(props,value);
+										if(find)then
+											return true;
+										end;
+									end)
+								end
+							end
+						end)
+						return MappedServant;
+					end
 					--[[ OLD VERSION 11/6/2022 : Had DoubleCall errors and did not map properly || new version may need to be optimized using this concept.
 					for _,dependency in pairs(dependencies) do
 						if(not quickMap[dependency])then
