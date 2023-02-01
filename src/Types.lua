@@ -497,6 +497,14 @@ export type DamageIndicator = Pseudo&BaseGui&{
 }
 
 -- export type DatePicker = 
+export type DialogBoxSequence = {
+    Play: (self:any) -> any;
+    Stop: (self:any) -> any;
+    Resume: (self:any) -> any;
+    Pause: (self:any) -> any;
+
+}&Pseudo;
+
 export type DialogBox = {
     -- HorizontalAlignment: Enum.HorizontalAlignment,
     SpeakerText: string,
@@ -517,7 +525,7 @@ export type DialogBox = {
     ContentFont: boolean,
 
     Options: {
-        id: string,
+        id: string?,
         [any]:any,
     },
     OptionsFillDirection: Enum.FillDirection,
@@ -527,7 +535,15 @@ export type DialogBox = {
     OptionsPosition: UDim2,
     OptionsAnchorPoint: Vector2,
 
-    OptionClicked: PHeSignal<Button,any>
+    OptionClicked: PHeSignal<Button,any>,
+    CreateDialogSequence: (self:any,Sequence:{[number]:{
+        id:string|number|nil,
+        options: {
+            id: string?,
+            [any]:any,
+        },
+        props: {[any]:any}
+    }}) -> DialogBoxSequence
 
 }&BaseGui&Pseudo;
 -- export type Dialog
@@ -1325,6 +1341,7 @@ export type ArrayLibrary = {
     new: () -> {};
     Adapt: (self:any, originalTable:{},properTypes:boolean?,AdaptNestedArrays:boolean?,onImproperType:(key:any,value:any,selfvalue:any,self:{},originalArray:{})->any) -> {},
     detach: (self:any,conditional:(key:any,value:any)->boolean|nil) -> any,
+    find: (self:any,conditional:(key:any,value:any)->any,handler:(key:any,value:any)->any??,executeHandlersAfterConditionals:boolean?)->(any,any)
 }
 
 export type DirectionalArrowClass = Pseudo&{

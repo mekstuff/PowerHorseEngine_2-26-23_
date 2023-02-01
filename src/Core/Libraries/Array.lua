@@ -97,6 +97,49 @@ function Array.detach(self:any, conditional:(key:any,value:any)->boolean|nil)
     end;
     neededContent = nil;
     return self;
+end;
+
+--[=[
+```lua
+local x = {
+    {Name = "Hello"},
+    {Name = "World"},
+};
+
+Array.find(x,function(key, value)
+    return value.Name == "Hello" and true or false;
+end, function(key, value)
+    print("Found ! ",key,value)
+end)
+```
+You can also query for the first item to match by not passing a handler
+
+```lua
+print(Array.find(x,function(key, value) return value.Name == "World" and true;end));
+```
+]=]
+function Array.find(self:any,conditional:(key:any,value:any)->any,handler:(key:any,value:any)->any?,executeHandlersAfterConditionals:boolean?)
+    local toexec = executeHandlersAfterConditionals and {};
+    for a,b in pairs(self) do
+        local res = conditional(a,b);
+        assert(typeof(res) == "boolean" or res == nil, ("Array.find conditional handler must return a boolean or nil, got \"%s\""):format(tostring(res))) 
+        if(res)then
+            if(not handler)then
+                return a,b;
+            end
+            if(executeHandlersAfterConditionals)then
+                table.insert(toexec, {a = a,b = b});
+            else
+                handler(a,b);
+            end
+        end
+    end;
+    if(toexec)then
+        for _,x in pairs(toexec) do
+            handler(x.a,x.b);
+        end;
+        toexec = nil;
+    end
 end
 
 return Array;

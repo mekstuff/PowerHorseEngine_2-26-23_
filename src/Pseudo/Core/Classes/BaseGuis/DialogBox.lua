@@ -146,9 +146,139 @@ DialogBox.__inherits = {"BaseGui"}
 ]=]
 
 
-function DialogBox:_Render()
+--[=[
+    @class DialogSequence
+]=]
+local DialogBoxSequence = {
+    Name = "DialogBoxSequence",
+    ClassName = "DialogBoxSequence",
+}
+
+function DialogBoxSequence:_Render()
     local App = self:_GetAppModule();
     local ErrorService = App:GetService("ErrorService");
+
+    local Array = App:Import("Array");
+    local Sequence = self._dev.args.Sequence;
+
+    local ids = {};
+    for _,x in pairs(Sequence) do
+        local tid = x.id;
+
+        if(tid == nil)then
+            tid = #ids+1
+        end;
+        
+        ErrorService.assert(typeof(tid) == "string" or typeof(tid) == "number", ("id of sequence is required to be a string or number, got %s. You can set to nil to automatically assign id number"):format(typeof(tid)))
+        if(Array.find(ids,function(_,v) return v.id == tid and true end))then
+            ErrorService.tossMessage("sequence item -> ", x);
+            ErrorService.tossError(("The sequence id \"%s\" was already used previously"):format(tostring(tid)))
+            return;
+        end;
+        x.id = tid;
+        table.insert(ids,x);
+    end;
+
+    self._ids = ids;
+
+    return {};
+end;
+
+--[=[
+    @private
+]=]
+function DialogBoxSequence:_PlaySequenceById(id:string|number)
+    local App = self:_GetAppModule();
+    local ErrorService = App:GetService("ErrorService");
+    local TargetDialogBox = self._dev.args.Target;
+    local _,Sequence = self:_FetchSequenceById(id);
+    ErrorService.assert(("Could not play sequence because the id \"%s\" could not be resolved"):format(tostring(id)));
+    for a,b in pairs(Sequence.props) do
+        if(a~="Options")then
+            TargetDialogBox[a] = b;
+        else
+            ErrorService.tossWarn("You tried to pass a .Options property directly to sequence.props, this is not supported, use the .options inside to sequence instead.")
+        end
+    end;
+    TargetDialogBox.Options = Sequence.options or {};
+    local Connection;
+    Connection = TargetDialogBox.OptionClicked:Connect(function(SelectedOption)
+        Connection:Disconnect();
+        Connection = nil;
+        self:_PlaySequenceById(SelectedOption.___dialogtargetid);
+    end)
+end;
+
+--[=[
+    @private
+]=]
+function DialogBoxSequence:_FetchSequenceById(id:string|number)
+    local App = self:_GetAppModule();
+    local Array = App:Import("Array");
+
+    return Array.find(self._ids, function(_,x)
+        return x.id == id and true;
+    end)
+end;
+
+--[=[
+    Plays the sequence from "start"
+]=]
+function DialogBoxSequence:Play()
+    local App = self:_GetAppModule();
+    --[[
+    local PlayPromise = App.new("Promise");
+    PlayPromise:Try(function(res,rej)
+        if(self._ids)then
+            self:_PlaySequenceById("start");
+            res();
+        end;
+        rej()
+    end):Catch(function(err)
+        warn("Could not :Play sequence, Promise failed");
+    end)
+    ]]
+end;
+
+--[=[
+    Plays the sequence at the last known target, if none it will play from "start"
+]=]
+function DialogBoxSequence:Resume()
+    
+end;
+
+--[=[
+    Sets the last known target to "start" and stops all executions
+]=]
+function DialogBoxSequence:Stop()
+    
+end;
+
+--[=[
+    Sets the last known target to the current target and stops all executions to be `:Resume`
+]=]
+function DialogBoxSequence:Pause()
+    
+end
+
+--[=[
+    @return DialogBoxSequence
+]=]
+function DialogBox:CreateDialogSequence(Sequence:{[number]:{
+    id:string,
+    options: {
+        id: string|number|nil?,
+        [any]:any,
+    },
+}})
+
+local App = self:_GetAppModule();
+local CustomClassService = App:GetService("CustomClassService");
+return CustomClassService:Create(DialogBoxSequence,self,{Sequence = Sequence,Target = self});
+end;
+
+function DialogBox:_Render()
+    local App = self:_GetAppModule();
 
     local Container = App.new("Frame");
     Container.BackgroundTransparency = 1;
@@ -205,7 +335,6 @@ function DialogBox:_Render()
             ["OptionsAnchorPoint"] = "AnchorPoint",
         },{OptionsWrapper})
 
-
         useMapping({
             ["SpeakerPaddingBottom"] = "PaddingBottom",
             ["SpeakerPaddingTop"] = "PaddingTop",
@@ -237,14 +366,56 @@ function DialogBox:_Render()
             @prop OptionClicked PHeSignal<Button,id>
         ]=]
         self:AddEventListener("OptionClicked",true)
+
         useEffect(function()
+            if(#self.Options <= 0)then
+                return;
+            end
+            local btns = {};
+            for _,option in pairs(self.Options) do
+                local optionbtn = App.new("Button");
+                optionbtn.ButtonFlexSizing = true;
+                optionbtn.___dialogtargetid = option.target;
+                table.insert(btns,optionbtn);
+                for a,b in pairs(option) do
+                    if(a == "target")then
+                        optionbtn.___dialogtargetid = b;
+                    end
+                    if(a ~= "id" and a ~= "target")then
+                        optionbtn[a] = b;
+                    end
+                end;
+                optionbtn.Parent = OptionsWrapper;
+                optionbtn.SupportsRBXUIBase = true;
+                optionbtn.MouseButton1Click:Connect(function()
+                    self:GetEventListener("OptionClicked"):Fire(optionbtn)
+                end);
+            end;
+            return function ()
+                for _,x in pairs(btns) do
+                    x:Destroy();
+                end;
+                btns = nil;
+            end
+        end,{"Options"})
+        --[[
+        useEffect(function()
+            if(#self.Options <= 0)then
+                return;
+            end
+            print("Options called", self.Options);
+            local opts = {};
             for _,btnprops in pairs(self.Options) do
                 if(btnprops.ButtonFlexSizing == nil)then
                     btnprops.ButtonFlexSizing = true;
                 end;
                 local btn = App.new("Button");
+                table.insert(opts,btn)
                 for a,b in pairs(btnprops) do
-                    if(a ~= "id")then
+                    if(a == "target")then
+                        btn.___dialogtargetid = b;
+                    end
+                    if(a ~= "id" and a ~= "target")then
                         btn[a] = b;
                     end
                 end;
@@ -254,7 +425,16 @@ function DialogBox:_Render()
                 btn.Parent = OptionsWrapper;
                 btn.SupportsRBXUIBase = true;
             end;
-        end,{"Options"})
+            return function ()
+                for _,x in pairs(opts) do
+                    x:Destroy();
+                end;
+                opts = nil;
+                -- print("Clean up called");
+                -- print("Remove previous options")
+            end;
+        end,{"Options"});
+        ]]
 
         useEffect(function()
             if(self.ContentText ~= "")then

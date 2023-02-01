@@ -33,6 +33,10 @@ function Promise:_Render()
 end;
 
 function Promise:_handleResolved()
+    print("res")
+    if(self._dev.WhenThen)then
+        self._dev.WhenThen:Fire();
+    end;
     for _,x in pairs(self._then) do
         local res = x(self._resolve);
         if(res)then
@@ -100,6 +104,23 @@ function Promise:Try(handler:any)
     return self;
 end;
 
+--[=[
+    Waits until the promise is resolved, if it isn't resolve then it will yield forever.
+]=]
+function Promise:WhenThen(...)
+    local App = self:_GetAppModule();
+    local SignalProvider = App:GetProvider("SignalProvider");
+    if(self.State == "stale")then
+        local ThenConnector = self._dev.WhenThen;
+        if(not ThenConnector)then
+            ThenConnector = SignalProvider.new("WhenThen-"..self.__id);
+        end;
+        ThenConnector:Wait();
+        return self:Then(...);
+    else
+        return self:Then(...)
+    end
+end
 --[=[
     @return Promise
     @tag Chainable
