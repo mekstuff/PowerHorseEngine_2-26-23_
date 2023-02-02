@@ -33,7 +33,6 @@ function Promise:_Render()
 end;
 
 function Promise:_handleResolved()
-    print("res")
     if(self._dev.WhenThen)then
         self._dev.WhenThen:Fire();
     end;

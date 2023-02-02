@@ -12,6 +12,8 @@ local ModalService = {
 --[=[
     Converts the target frame into a modal. For prompt usage, use Prompt:GET("Modal")
     if target Frame is an Instance, the [Pointer] Library will be used to convert to Pseudo.
+
+    @deprecated v1.4 -- You should pass a useSkin argument to the Pseudo/Modal instead. PHe.new("Modal",nil,{useSkin=CustomSkin})
 ]=]
 function ModalService:ConvertToModal(Frame:any,TargetModal:Types.Modal|any?,ModalCloseButton:any?,ModalAppender:any?,ModalHeader:any?)
     local App = self:_GetAppModule();

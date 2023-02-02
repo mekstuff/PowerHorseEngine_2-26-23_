@@ -179,6 +179,7 @@ export type App = {
         &((self:any,"Array")->ArrayLibrary)
         &((self:any,"Collector")->CollectorLibrary)
         &((self:any,"Contextor")->ContextActionService)
+        &((self:any,"fetch")->fetchLibrary)
         &((self:any,"Math")->MathLibrary)
         &((self:any,"Pointer")->PointerLibrary)
         &((self:any,"Query")->QueryLibrary)
@@ -934,7 +935,14 @@ export type CoordinateService = {
 };
 
 export type CoreGuiService = {
-
+    SetNativeGuiEnabled: (self:any,coreGuiType:Enum.CoreGuiType,enabled:boolean,MAX_TRIES:number?) -> Promise,
+    SetCoreGuiEnabled: (self:any,name:string,state:boolean) -> any,
+    GetIsCoreScript: (self:any,Script:Script|LocalScript|ModuleScript) -> boolean,
+    GetCoreGuiRepository: (self:any) -> ScreenGui,
+    WaitFor: (self:any,CoreGuiName:string,TIME:number?) -> ScreenGui,
+    RemoveObject: (Name:string) -> any,
+    ShareObject: (Name:string) -> any,
+    GetCoreGui: (self:any,Name:string) -> any,
 };
 
 export type CoreProviderService = {
@@ -1260,6 +1268,8 @@ export type Engine = {
 }
 export type PHeEngine = Engine;
 --> Built in libraries
+
+export type fetchLibrary = (params:{[any]:any})-> Promise;
 
 export type MathLibrary = {
     oscillate: (min:number,max:number?,Time:number?)->number,

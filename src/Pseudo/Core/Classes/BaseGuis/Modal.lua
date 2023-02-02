@@ -247,44 +247,100 @@ function Modal:_AdjustButtons()
 	end
 end;
 
+function Modal:_ApplyuseSkinPropertiesToSelf(targetSelf:any)
+	targetSelf = targetSelf or self;
+	local skin = self._dev.args.useSkin;
+	if(targetSelf:IsA("Prompt"))then
+		targetSelf.StartAnchorPoint = skin.AnchorPoint;
+		targetSelf.StartPosition = skin.Position;
+	end;
+	if(self.__targetHeader)then
+		targetSelf.Header = self.__targetHeader.Text;
+		targetSelf.HeaderTextFont = self.__targetHeader.Font;
+		targetSelf.HeaderTextSize = self.__targetHeader.TextSize;
+		targetSelf.HeaderTextColor3 = self.__targetHeader.TextColor3;
+	end
+	targetSelf.AnchorPoint = skin.AnchorPoint;
+	targetSelf.Position = skin.Position;
+	targetSelf.BackgroundColor3 = skin.BackgroundColor3;
+	targetSelf.BackgroundTransparency = skin.BackgroundTransparency;
+	targetSelf.Size = skin.Size;
+end
 --//
 function Modal:_Render(App)
 	
-	self._MainFrame = App.new("Frame", self:GetRef());
-	--Modal.AutomaticSize = Enum.AutomaticSize.XY; 15/11/2021
-	self._MainFrame.AutomaticSize = Enum.AutomaticSize.Y;
-	local ModalContainer = self._MainFrame:GetGUIRef()
-	-- Modal.StrokeTransparency = 1;
+	local args = self._dev.args;
+	local useSkin = args and args.useSkin;
+
+	local MainFrame,ModalContainer,ListLayout,CloseButton,Header,Top,Center,Bottom,Bottom_List;
+
+	if(not useSkin)then
+		MainFrame = App.new("Frame");
+		MainFrame.AutomaticSize = Enum.AutomaticSize.Y;
 	
-	local ListLayout = Instance.new("UIListLayout",ModalContainer);
-	ListLayout.SortOrder = Enum.SortOrder.Name;
-	ListLayout.Padding = UDim.new(0,10);
-	ListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left;
-	ListLayout.VerticalAlignment = Enum.VerticalAlignment.Top;
+		ModalContainer = MainFrame:GetGUIRef()
+		ListLayout = Instance.new("UIListLayout",ModalContainer);
+		ListLayout.SortOrder = Enum.SortOrder.Name;
+		ListLayout.Padding = UDim.new(0,10);
+		ListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left;
+		ListLayout.VerticalAlignment = Enum.VerticalAlignment.Top;
 
-	local Padding = Instance.new("UIPadding",ModalContainer);
-	Padding.PaddingTop = UDim.new(0,5);
-	Padding.PaddingLeft = UDim.new(0,10);
-	Padding.PaddingRight = UDim.new(0,10);
-	Padding.PaddingBottom = UDim.new(0,5);
-
-	local Top = Instance.new("Frame", ModalContainer);
-	Top.BackgroundTransparency = 1;
-	Top.AutomaticSize = Enum.AutomaticSize.Y;
-	Top.Size = UDim2.new(1);
-	Top.Name = "A";
-
-	self._Header = App.new("Button");
-	self._Header.TextColor3 = Theme.getCurrentTheme().ForegroundText;
-	self._Header.BackgroundTransparency = 1;
-	self._Header.StrokeTransparency = 1;
-	self._Header.Font = Theme.getCurrentTheme().Font;
-	self._Header.RippleStyle = App.Enumeration.RippleStyle.None;
-	-- Header.ActiveBehaviour = App.Enumeration.ActiveBehaviour.None;
-	-- self._Header.IconAdaptsTextColor = false;
-	self._Header.HoverEffect = Enumeration.HoverEffect.None; --< HoverEffect.None 
-	self._Header.Parent = Top;
+		local Padding = Instance.new("UIPadding",ModalContainer);
+		Padding.PaddingTop = UDim.new(0,5);
+		Padding.PaddingLeft = UDim.new(0,10);
+		Padding.PaddingRight = UDim.new(0,10);
+		Padding.PaddingBottom = UDim.new(0,5);
 	
+		Top = Instance.new("Frame", ModalContainer);
+		Top.BackgroundTransparency = 1;
+		Top.AutomaticSize = Enum.AutomaticSize.Y;
+		Top.Size = UDim2.new(1);
+		Top.Name = "A";
+
+		Header = App.new("Button");
+		Header.TextColor3 = Theme.getCurrentTheme().ForegroundText;
+		Header.BackgroundTransparency = 1;
+		Header.StrokeTransparency = 1;
+		Header.Font = Theme.getCurrentTheme().Font;
+		Header.RippleStyle = App.Enumeration.RippleStyle.None;
+		Header.HoverEffect = Enumeration.HoverEffect.None; --< HoverEffect.None 
+		Header.Parent = Top;
+
+		CloseButton = App.new("CloseButton",Top);
+		CloseButton.Size = UDim2.new(0,0,1);
+		local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint");
+		UIAspectRatioConstraint.AspectType = Enum.AspectType.ScaleWithParentSize;
+		UIAspectRatioConstraint.DominantAxis = Enum.DominantAxis.Height;
+		UIAspectRatioConstraint.Parent = CloseButton:GetGUIRef();
+
+		Center = Instance.new("Frame", ModalContainer);
+		Center.AutomaticSize = Enum.AutomaticSize.Y; --< Offset fix;
+		Center.Size = UDim2.new(1);
+		Center.BackgroundTransparency = 1;
+		Center.Name = "C";
+
+		Bottom = Instance.new("Frame", ModalContainer);
+		Bottom.AutomaticSize = Enum.AutomaticSize.Y;
+		Bottom.Name = "E";
+		Bottom.Size = UDim2.new(1);
+		Bottom.BackgroundTransparency = 1;
+		Bottom_List = Instance.new("UIListLayout",Bottom);
+		Bottom_List.Padding = UDim.new(0,5);
+		Bottom_List.VerticalAlignment = Enum.VerticalAlignment.Top;
+		Bottom_List.FillDirection = Enum.FillDirection.Horizontal;
+		Bottom_List.SortOrder = Enum.SortOrder.Name;
+		Bottom_List.Name = "FILTER_BOTTOM_LIST"
+		Bottom_List.HorizontalAlignment = Enum.HorizontalAlignment.Right;
+	else
+		-- self.Size = useSkin.Size;
+		-- self.BackgroundTransparency = useSkin.BackgroundTransparency;
+		MainFrame = useSkin:IsA("Pseudo") and useSkin or App:Import("Pointer")(useSkin);
+		Header = MainFrame:FindFirstChild("Header") or MainFrame:FindFirstChild("$Header",true);
+		self.__targetHeader = Header;
+		self:_ApplyuseSkinPropertiesToSelf();
+	end;
+
+	MainFrame.Parent = self:GetRef();
 --[=[
 	@prop ButtonClicked PHeSignal
 	@within Modal
@@ -295,67 +351,134 @@ function Modal:_Render(App)
 	@within Modal
 ]=]
 	self:AddEventListener("ButtonAdded",true);
-	
-	local CloseButton = App.new("CloseButton",Top);
-	CloseButton.Size = UDim2.new(0,0,1);
-	-- CloseButton.Position = UDim2.new(1)
-	local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint");
-	UIAspectRatioConstraint.AspectType = Enum.AspectType.ScaleWithParentSize;
-	UIAspectRatioConstraint.DominantAxis = Enum.DominantAxis.Height;
-	UIAspectRatioConstraint.Parent = CloseButton:GetGUIRef();
 
-	
-	self._dev._closebuttonconnection = CloseButton.Activated:Connect(function()
-		self.ButtonClicked:Fire(CloseButton, "close");
-		if(self.CloseButtonBehaviour == Enumeration.CloseButtonBehaviour.Hide)then
-			self.Visible = false;
-		elseif(self.CloseButtonBehaviour == Enumeration.CloseButtonBehaviour.Destroy)then
-			self:Destroy();
+	if(CloseButton)then
+		self._dev._closebuttonconnection = CloseButton.Activated:Connect(function()
+			self.ButtonClicked:Fire(CloseButton, "close");
+			if(self.CloseButtonBehaviour == Enumeration.CloseButtonBehaviour.Hide)then
+				self.Visible = false;
+			elseif(self.CloseButtonBehaviour == Enumeration.CloseButtonBehaviour.Destroy)then
+				self:Destroy();
+			end
+		end)
+	end;
+
+	return function (Hooks:PseudoHooks)
+		local useEffect,useMapping,useComponents = Hooks.useEffect,Hooks.useMapping,Hooks.useComponents;
+		
+		useMapping({"Visible","BackgroundColor3","BackgroundTransparency","Size","Position",
+		"AnchorPoint","Roundness","StrokeColor3","StrokeTransparency","StrokeThickness"}, {MainFrame});
+
+		useMapping({"ZIndex"}, {MainFrame,Top,Header,CloseButton,Center,Bottom});
+
+		useEffect(function()
+			if(self._dev.__HighlightFrame)then
+				self._dev.__HighlightFrame = self.ZIndex-1;
+			end
+		end,{"ZIndex"});
+
+		useEffect(function()
+			if(CloseButton)then				
+				if(self.CloseButtonBehaviour == Enumeration.CloseButtonBehaviour.None)then
+					CloseButton.Visible = false;
+				else
+					CloseButton.Visible = true;
+				end
+			end
+		end,{"CloseButtonBehaviour"});
+
+		useEffect(function()
+			if(self.Body ~= "")then
+				if(not self._dev.__ModalBody)then
+					local txt = App.new("Text");
+					txt.TextWrapped = true;
+					txt.BackgroundTransparency = 1;
+					txt.AutomaticSize = Enum.AutomaticSize.Y;
+					txt.TextColor3 = Theme.getCurrentTheme().ForegroundText;
+					txt.Size = UDim2.new(1);
+					txt.TextSize = self.BodyTextSize;
+					txt.Font = self.BodyTextFont;
+					self._dev.__ModalBody = txt;
+					self._Components["Body"]=txt;
+				
+					txt.Parent = self;
+				end;
+			end;
+			if(self._dev.__ModalBody)then
+				self._dev.__ModalBody.Text = self.Body;
+			end;
+		end,{"Body"});
+
+		useEffect(function()
+			if(self.Blurred)then
+				self:_Blur();
+			else
+				self:_Unblur();
+			end;
+		end,{"Blurred"});
+
+		useEffect(function()
+			if(self.Highlighted)then
+				self:_Highlight();
+			else
+				self:_Unhighlight();
+			end;
+		end,{"Highlighted"});
+
+		useMapping({
+			["Header"] = "Text",
+			["HeaderTextSize"] = "TextSize",
+			["HeaderTextColor3"] = "TextColor3",
+			["HeaderTextFont"] = "Font",
+		}, {Header});
+
+		if(not useSkin)then
+			useMapping({
+				["HeaderIcon"] = "Icon",
+				["HeaderIconColor3"] = "IconColor3",
+				["HeaderIconSize"] = "IconSize",
+			},{Header});
+			useEffect(function()
+				if(self.HeaderAdjustment == Enumeration.Adjustment.Left)then
+					Header.Position = UDim2.new(0);
+					Header.AnchorPoint = Vector2.new(0);
+				else
+					Header.Position = UDim2.fromScale(.5,0);
+					Header.AnchorPoint = Vector2.new(.5);
+				end
+			end,{"HeaderAdjustment"});
+			useEffect(function()
+				if(self.ButtonsAdjustment == Enumeration.Adjustment.Left)then
+					Bottom_List.HorizontalAlignment = Enum.HorizontalAlignment.Left;
+				elseif(self.ButtonsAdjustment == Enumeration.Adjustment.Center)then
+					Bottom_List.HorizontalAlignment = Enum.HorizontalAlignment.Center;
+				else
+					Bottom_List.HorizontalAlignment = Enum.HorizontalAlignment.Right;
+				end;	
+			end,{"ButtonsAdjustment"});
 		end
-	end)
 
-	local Center = Instance.new("Frame", ModalContainer);
-	--Center.AutomaticSize = Enum.AutomaticSize.XY; --< For automatic size on XY (disabled because of offset bug)
-	Center.AutomaticSize = Enum.AutomaticSize.Y; --< Offset fix;
-	Center.Size = UDim2.new(1);
-	Center.BackgroundTransparency = 1;
-	Center.Name = "C";
-
-
-	local Bottom = Instance.new("Frame", ModalContainer);
-	Bottom.AutomaticSize = Enum.AutomaticSize.Y;
-	Bottom.Name = "E";
-	--Bottom.Size = UDim2.fromScale(1,0);
-	Bottom.Size = UDim2.new(1);
-	Bottom.BackgroundTransparency = 1;
-	local Bottom_List = Instance.new("UIListLayout",Bottom);
-	Bottom_List.Padding = UDim.new(0,5);
-	Bottom_List.VerticalAlignment = Enum.VerticalAlignment.Top;
-	Bottom_List.FillDirection = Enum.FillDirection.Horizontal;
-	Bottom_List.SortOrder = Enum.SortOrder.Name;
-	-- Bottom_List.
-	Bottom_List.Name = "FILTER_BOTTOM_LIST"
-	Bottom_List.HorizontalAlignment = Enum.HorizontalAlignment.Right;
+		useComponents({
+			_Appender = useSkin and MainFrame:GetGUIRef() or Center;
+			FatherComponent = MainFrame:GetGUIRef();
+			Bottom = Bottom;
+			Bottom_List = Bottom_List;
+			Top = Top;
+			Header = Header;
+			Center = Center;
+			CloseButton = CloseButton;
+			Wrapper = MainFrame;
+			ModalContainer = ModalContainer;
+			Modal = MainFrame;
+		})
+	end;
 	
-	--Center:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-	--	--Bottom.Size = UDim2.fromOffset(Center.AbsoluteSize.X-5);
-	--end)
-	
-	--[[
-	Modal:GetGUIRef():GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-		--print(Modal:GetGUIRef().AbsoluteSize);
-		Bottom.Size = UDim2.fromOffset(Modal:GetGUIRef().AbsoluteSize.X-(Padding.PaddingLeft.Offset+Padding.PaddingTop.Offset));
-		self:_AdjustButtons();
-		--print("Update")
-	end)
-	]]
-	
-
+--[[
 	return {
 		["ZIndex"] = function(v)
-			self._MainFrame.ZIndex = v;
+			MainFrame.ZIndex = v;
 			Top.ZIndex = v;
-			self._Header.ZIndex = v;
+			Header.ZIndex = v;
 			CloseButton.ZIndex = v;
 			Center.ZIndex = v;
 			Bottom.ZIndex = v;
@@ -390,16 +513,10 @@ function Modal:_Render(App)
 				
 					txt.Parent = self;					
 				end;
-				--if(self._dev.__ModalBody)then self._dev.__ModalBody.Visible = false;end;
-			--else
-				--if(self._dev.__ModalBody)then self._dev.__ModalBody.Visible = false;end;
 			end;
 			if(self._dev.__ModalBody)then
 				self._dev.__ModalBody.Text = Value;
 			end;
-		end,
-		["ButtonsScaled"] = function(Value)
-			-- self:_AdjustButtons();
 		end,
 		["Blurred"] = function(Value)
 			if(Value)then
@@ -416,25 +533,25 @@ function Modal:_Render(App)
 			end
 		end,
 		["Header"] = function(Value)
-			self._Header.Text = Value;
+			Header.Text = Value;
 		end,["HeaderIcon"] = function(Value)
-			self._Header.Icon = Value;
+			Header.Icon = Value;
 		end,["HeaderIconAdaptsHeaderTextColor"] = function(Value)
-			self._Header.IconAdaptsTextColor = Value;
+			Header.IconAdaptsTextColor = Value;
 		end,["HeaderIconColor3"] = function(Value)
-			self._Header.IconColor3 = Value;
+			Header.IconColor3 = Value;
 		end,["HeaderIconSize"] = function(Value)
-			self._Header.IconSize = Value;
+			Header.IconSize = Value;
 		end,
 		["HeaderTextSize"] = function(Value)
-			self._Header.TextSize = Value;
+			Header.TextSize = Value;
 		end,
 		["HeaderTextColor3"] = function(Value)
-			self._Header.TextColor3 = Value;
+			Header.TextColor3 = Value;
 			CloseButton.Color = Value;
 		end,
 		["HeaderTextFont"] = function(Value)
-			self._Header.Font = Value;
+			Header.Font = Value;
 		end,["BodyTextFont"] = function(Value)
 			if(self._dev.__ModalBody)then
 				self._dev.__ModalBody.Font = Value;
@@ -447,11 +564,11 @@ function Modal:_Render(App)
 		end,
 		["HeaderAdjustment"] = function(Value)
 			if(Value == Enumeration.Adjustment.Left)then
-				self._Header.Position = UDim2.new(0);
-				self._Header.AnchorPoint = Vector2.new(0);
+				Header.Position = UDim2.new(0);
+				Header.AnchorPoint = Vector2.new(0);
 			else
-				self._Header.Position = UDim2.fromScale(.5,0);
-				self._Header.AnchorPoint = Vector2.new(.5);
+				Header.Position = UDim2.fromScale(.5,0);
+				Header.AnchorPoint = Vector2.new(.5);
 			end
 		end,
 		["ButtonsAdjustment"] = function(Value)
@@ -464,28 +581,29 @@ function Modal:_Render(App)
 			end;
 		end,
 		["Visible"] = function(Value)
-			self._MainFrame.Visible = Value;
+			MainFrame.Visible = Value;
 		end;
 		_Components = {
 			_Appender = Center;	
-			FatherComponent = self._MainFrame:GetGUIRef();
+			FatherComponent = MainFrame:GetGUIRef();
 			Bottom = Bottom;
 			Bottom_List = Bottom_List;
 			Top = Top;
-			Header = self._Header;
+			Header = Header;
 			Center = Center;
 			CloseButton = CloseButton;
-			Wrapper = self._MainFrame;
+			Wrapper = MainFrame;
 			ModalContainer = ModalContainer;
-			Modal = self._MainFrame;
+			Modal = MainFrame;
 		};
 		_Mapping = {
-			[self._MainFrame] = {
+			[MainFrame] = {
 				"BackgroundColor3","BackgroundTransparency","Size","Position",
 				"AnchorPoint","Roundness","StrokeColor3","StrokeTransparency","StrokeThickness"
 			}
 		};
 	};
+	]]
 end;
 
 

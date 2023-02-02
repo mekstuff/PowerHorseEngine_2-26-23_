@@ -1,6 +1,4 @@
 local Theme = require(script.Parent.Parent.Parent.Theme);
-local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
-local ROBLOXTextService = game:GetService("TextService");
 local IsClient = game:GetService("RunService"):IsClient();
 local SmartTextService;
 
@@ -11,7 +9,7 @@ local Text = {
 	Font = Theme.getCurrentTheme().Font or Enum.Font.Gotham;
 	LineHeight = 1;
 	RichText = false;
-	Text = "Text";
+	Text = "";
 	--TextAdjustment = Enumeration.Adjustment.
 	TextColor3 = Theme.getCurrentTheme().Text;
 	TextScaled = false;

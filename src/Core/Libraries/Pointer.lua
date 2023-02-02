@@ -49,6 +49,14 @@ local function createComponent(class)
 	end);
 end;
 
+--[=[
+	@class Pointer
+]=]
+
+--[=[
+	@prop Pointer (instance:Instance,Parent:any)
+	@within Pointer
+]=]
 return function(instance,Parent)
 	local targetClassName = instance:GetAttribute("ClassName");
 	if(not targetClassName)then

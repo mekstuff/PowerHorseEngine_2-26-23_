@@ -673,7 +673,7 @@ local function createPseudoObject(Object:{[any]:any}, DirectParent:Instance?, Di
 					assert(typeof(components) == "table", ("table expected from useComponents hook, got %s"):format(typeof(components)));
 					for name,value in pairs(components) do
 						if Pseudo._Components[name] then 
-							warn(("useComponents effect caught overwrite on %s"):format(name));
+							warn(("useComponents effect caught overwrite on \"%s\". %s / %s"):format(name,Pseudo.Name,Pseudo.ClassName));
 						end;
 						Pseudo._Components[name] = value;
 					end;

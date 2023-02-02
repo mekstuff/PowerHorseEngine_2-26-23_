@@ -1,7 +1,5 @@
 local Theme = require(script.Parent.Parent.Parent.Theme);
 local Enumeration = require(script.Parent.Parent.Parent.Enumeration);
-local Core = require(script.Parent.Parent.Parent);
---local Erro
 local IsClient = game:GetService("RunService"):IsClient();
 local TweenService = game:GetService("TweenService");
 
@@ -16,20 +14,12 @@ local Prompt = {
 	Name = "Prompt";
 	ClassName = "Prompt";
 	Level = 1;
-	--ModalSize = Vector2.new(350,300);
-	--Blurred = true;
-	--Highlighted = true;
 	Header = "Prompt";
 	StartPosition = UDim2.fromScale(.5,.5);
 	StartAnchorPoint = Vector2.new(.5,.5);
 	DestroyOnOverride = false;
-	
-	--StandAlone = false;
 	PromptClass = "$main";
-	
-	--Showing = false;
-	--HeaderAdjustment = Enumeration.Adjustment.Left;
-	--Roundness = UDim.new(0);
+	PromptSkin = "**any";
 };
 
 local PromptList = {};
@@ -237,7 +227,7 @@ end
 --//
 function Prompt:_Render(App)
 	local PluginService = App:GetService("PluginService");
-	if(not IsClient)then return {};end;
+	-- if(not IsClient)then return {};end;
 	
 	self._tweenSpeed = .65;
 
@@ -245,7 +235,7 @@ function Prompt:_Render(App)
 		self.ButtonsAdjustment = Enumeration.Adjustment.Right;
 	end
 	--local s = tick();
-	local Modal = App.new("Modal");
+	local Modal = App.new("Modal",nil,self._dev.args);
 	--print("took ", tick()-s)
 	
 	Modal:GetPropertyChangedSignal("Destroying"):Connect(function()
@@ -258,33 +248,6 @@ function Prompt:_Render(App)
 	Modal.Parent = self:GetRef();
 	PromptList[self._dev.__id] = self;
 	self._showing = false;
---[[
-	self._dev._descendantAddedConnectionA = Modal:GET("Center").DescendantAdded:Connect(function(descendant)
-		local PseudoService = App:GetService("PseudoService");
-		if(descendant.Name == "_pseudoid")then
-			local id = descendant.Value;
-			local Pseudo = PseudoService:GetPseudoFromId(id);
-			if(Pseudo and Pseudo:IsA("Text"))then
-				Pseudo.TextColor3 = Theme.getCurrentTheme().ForegroundText;
-				Pseudo.TextSize = self.HeaderTextSize-4;
-			end
-		end
-	end)
-	]]
-	--[[
-	self.ChildAdded:Connect(function(child)
-		--print(child:IsA("Text") and child.Text or "not text");
-		--print(child:IsA("Text"));
-		if(child:IsA("Text"))then
-			child.TextColor3 = Theme.getCurrentTheme().ForegroundText;
-		end
-	end)
-	]]
-	--Modal.Position = self.StartPosition;
-	--Modal.AnchorPoint = self.StartAnchorPoint;
-	
-	--local ModalGUIRef = Modal:GetGUIRef();
-	--ModalGUIRef.Posi
 	
 	self._Components["Modal"] = Modal;
 	
@@ -303,37 +266,18 @@ function Prompt:_Render(App)
 
 	end
 	
-
-	--local ModalContainer = Modal:GET("ModalContainer");
-	--local LineBreakA = App.new("LineBreak");
-	--LineBreakA.Name = "B";
-	--LineBreakA.Parent = ModalContainer;
-	
 	self:AddEventListener("ButtonClicked",true,self:GET("Modal"):GetEventListener("ButtonClicked"));
 	self:AddEventListener("ButtonAdded",true,self:GET("Modal"):GetEventListener("ButtonAdded"));
-	
-	
-	--self:Show();
---[[	
-	self._dev.___propchngsigdes = self:GetPropertyChangedSignal("Destroying"):Connect(function(id)
-		--if(cur)
-		PromptList[id]:Hide()
-		PromptList[id]=nil;
-		--if(CurrentPrompt == self)then
-			--self:Hide();
-		--end
-	end);
-]]	
 
-self:GetRef().AncestryChanged:Connect(function()
-	local hasGameModelAncestry = self:GetRef():FindFirstAncestorOfClass("DataModel");
-	if(hasGameModelAncestry)then
-		if(self.Visible and not self._showing)then self:Show();end;
-	else
-		if(self._showing)then self:Hide();end;
-	end
-end)
-	
+	self:GetRef().AncestryChanged:Connect(function()
+		local hasGameModelAncestry = self:GetRef():FindFirstAncestorOfClass("DataModel");
+		if(hasGameModelAncestry)then
+			if(self.Visible and not self._showing)then self:Show();end;
+		else
+			if(self._showing)then self:Hide();end;
+		end
+	end)
+	--[[
 	Modal._dev._closebuttonconnection:Disconnect();Modal._dev._closebuttonconnection = nil; --< disables modal close button behaviour
 	Modal:GET("CloseButton").Activated:Connect(function() --< Creates a custom close button behaviour for prompts
 		self.ButtonClicked:Fire(Modal:GET("CloseButton"), "close");
@@ -342,7 +286,92 @@ end)
 		elseif(self.CloseButtonBehaviour == Enumeration.CloseButtonBehaviour.Destroy)then
 			self:Destroy();
 		end
-	end)
+	end);
+	]]
+
+
+	return function(Hooks:PseudoHooks)
+		local useEffect,useMapping,useComponents = Hooks.useEffect,Hooks.useMapping,Hooks.useComponents;
+
+		useEffect(function()
+			if(self.Level > MaximumPromptLevel and not self._isPHEPROMPTOBEJ_ECT)then
+				App:GetService("ErrorService").tossWarn("Maximum Prompt level reach "..tostring(MaximumPromptLevel)..". ["..self.Name..".Level = "..tostring(self.Value).."] Failed, Defaulted To ("..MaximumPromptLevel..")")
+				self:_RenderOnStep(function()
+					self.Level = MaximumPromptLevel;
+				end);
+			else
+				if(CurrentPrompt and CurrentPrompt ~= self and self.Parent and self.Visible)then
+					self:Show();
+				end;
+			end;
+		end,{"Level"});
+
+		useEffect(function()
+			if(firstLapse and notVisible)then
+				firstLapse=false;
+				self:Hide();
+				return;
+			end;
+			if(self.Visible)then
+				if(self.Parent and self.Parent:FindFirstAncestorOfClass("DataModel"))then
+					self:Show();
+				end;
+			else
+				self:Hide();
+			end
+		end,{"Visible"});
+
+		useEffect(function()
+			if(self._showing)then
+				self:GET("Modal").Blurred=self.Blurred;
+			end
+		end,{"Blurred"});
+		useEffect(function()
+			if(self._showing)then
+				self:GET("Modal").Highlighted=self.Highlighted;
+			end
+		end,{"Highlighted"});
+
+		if(Modal._dev.args and Modal._dev.args.useSkin)then
+			Modal:_ApplyuseSkinPropertiesToSelf(self) --> so we don't override the skin properties
+		end
+		useMapping({
+			"StrokeTransparency",
+			"StrokeColor3",
+			"StrokeThickness",
+			"BackgroundTransparency",
+			"BackgroundColor3",
+			"Size",
+			"Roundness",
+			"Header","HeaderIconColor3","HeaderIconAdaptsHeaderTextColor","HeaderIconSize",
+			"HeaderIcon","HeaderTextColor3",
+			"HeaderTextSize","BodyTextSize",
+			"ButtonsAdjustment","HeaderAdjustment",
+			"ButtonsScaled",
+			"Body",
+			"CloseButtonBehaviour",
+			"ZIndex"
+		},{Modal});
+
+		useComponents({
+			Modal = Modal;
+			Header = Modal:GET("Header");
+			CloseButton = Modal:GET("CloseButton");
+			_Appender = Modal:GET("_Appender");
+			FatherComponent = Modal:GetGUIRef();
+		})
+		--[[
+		useEffect(function()
+			if(Value and PluginService:IsPluginMode())then
+				local pluginGui = Value:IsA("PluginGui") and Value or Value:FindFirstAncestorOfClass("PluginGui");
+				if(pluginGUi and self.PromptClass == "$main")then
+					self.PromptClass = "$main@"..pluginGui.Title;
+				end;
+			end
+		end,{"Parent"})
+		]]
+	end
+--[[
 	return {
 		["Level"] = function(Value)
 			if(Value > MaximumPromptLevel and not self._isPHEPROMPTOBEJ_ECT)then
@@ -427,7 +456,7 @@ end)
 			}	
 		};
 	}
-	
+	]]
 end;
 
 

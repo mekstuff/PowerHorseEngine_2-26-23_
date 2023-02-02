@@ -38,7 +38,7 @@ function CloseButton:_Render(App)
 		@within CloseButton
 		Fired whenever the CloseButton is clicked
 	]=]
-	self:AddEventListener("Activated",true,CloseBtn:GetEventListener("MouseButton1Down"));
+	self:AddEventListener("Activated",true,CloseBtn:GetEventListener("MouseButton1Click"));
 
 	CloseBtn:RemoveEventListener("MouseButton1Up","MouseButton2Down","MouseButton2Up","MouseEnter","MouseExit");
 	
