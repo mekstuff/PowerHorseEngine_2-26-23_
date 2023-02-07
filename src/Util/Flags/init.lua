@@ -1,16 +1,22 @@
 --[=[
     @class Flags
 
+    To use add flags, in your Config module add ["-flags"] = {
+        ...
+    }
+
     List of flags:
 
     `force-env {game|plugin|misc} -- force the environment that PowerHorseEngine will be built`
     `pseudo-replication {true|false} -- will pseudo's created on the server be replicated to the client? (default true) CustomClasses need to call :Replicate to replicate."
+    `["thirdparty-topbarplus"] = path  -- The path to TopbarPlus Icon inside the datamodel, e.g "ReplicatedStorage.Icon"|"ReplicatedStorage.Modules.Icon"`
 
 ]=]
 
 local Flags = {
     _flags = {
         ["force-env"] = nil;
+        ["thirdparty-topbarplus"] = nil;
         ["pseudo-replication"] = true;
     };
 };
@@ -28,15 +34,19 @@ function Flags:Init()
         return;
     end;
     local flags = Config["-flags"] or Config["-lanzo"] or {};
-    for _,flag in pairs(flags) do
-        local flagname,flagvalue = flag:match("(.*){(.*)}");
-        flagname = flagname:gsub(" ",""):gsub("_","-");
-        self._flags[flagname] = flagvalue;
+    for targetname:string?,flag in pairs(flags) do
+        if(targetname)then
+            self._flags[targetname] = flag;
+        else
+            local flagname,flagvalue = flag:match("(.*){(.*)}");
+            flagname = flagname:gsub(" ",""):gsub("_","-");
+            self._flags[flagname] = flagvalue;
+        end;
     end
 end;
 
 --[=[]=]
-function Flags:GetFlag(FlagName:string):string
+function Flags:GetFlag(FlagName:string):any
     return Flags._flags[FlagName];
 end;
 

@@ -277,6 +277,23 @@ function Prompt:_Render(App)
 			if(self._showing)then self:Hide();end;
 		end
 	end)
+
+	--> Prompts disable the default modal close button behaviour and writes its own
+	if(Modal._dev._closebuttonconnection)then
+		Modal._dev._closebuttonconnection:Disconnect();
+		Modal._dev._closebuttonconnection = nil;
+	end;
+	local CloseButton = Modal:GET("CloseButton");
+	if(CloseButton)then
+		self._dev._closebuttonconnection = (CloseButton:IsA("CloseButton") and CloseButton.Activated or CloseButton.MouseButton1Click):Connect(function()
+			self.ButtonClicked:Fire(CloseButton, "close");
+			if(self.CloseButtonBehaviour == Enumeration.CloseButtonBehaviour.Hide)then
+				self.Visible = false;
+			elseif(self.CloseButtonBehaviour == Enumeration.CloseButtonBehaviour.Destroy)then
+				self:Destroy();
+			end;
+		end)
+	end
 	--[[
 	Modal._dev._closebuttonconnection:Disconnect();Modal._dev._closebuttonconnection = nil; --< disables modal close button behaviour
 	Modal:GET("CloseButton").Activated:Connect(function() --< Creates a custom close button behaviour for prompts

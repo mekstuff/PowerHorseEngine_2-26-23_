@@ -148,7 +148,7 @@ export type App = {
         &((self:any,"PseudoService")->PseudoService)
         &((self:any,"QuickWeldService")->QuickWeldService)
         &((self:any,"RagdollService")->RagdollService)
-        &((self:any,"ReplciationService")->ReplciationService)
+        &((self:any,"ReplicationService")->ReplicationService)
         &((self:any,"SerializationService")->SerializationService)
         &((self:any,"SmartTextService")->SmartTextService)
         &((self:any,"SplashScreenSequence")->SplashScreenSequence)
@@ -276,10 +276,14 @@ export type Servant = Pseudo&{
 export type PHeServant = Servant;
 --> Promises
 export type Promise = Pseudo&{
-    Try: (self:any,handler:(resolve:any,reject:any,cancel:any)->nil) -> Promise,
-    Then: (self:any,handler:(res:any)->nil) -> Promise,
-    Catch: (self:any,handler:(err:any)->nil) -> Promise,
-    Cancel: (self:any,handler:(err:any)->nil) -> Promise,
+    State: string,
+    MAXIMUM_RETRIES: number,
+    Try: (self:any,handler:(resolve:any,reject:any,cancel:any,promise:Promise)->any) -> Promise,
+    WhenThen: (self:any,handler:(res:any,Promise:Promise?)->any) -> Promise,
+    Then: (self:any,handler:(res:any,Promise:Promise?)->any) -> Promise,
+    Catch: (self:any,handler:(err:any,Promise:Promise?)->any) -> Promise,
+    Cancel: (self:any,handler:(err:any,Promise:Promise?)->any) -> Promise,
+    Retry: (self:any) -> nil,
 };
 export type PHePromise = Promise;
 
@@ -1269,7 +1273,10 @@ export type Engine = {
 export type PHeEngine = Engine;
 --> Built in libraries
 
-export type fetchLibrary = (params:{[any]:any})-> Promise;
+export type fetchLibrary = ((params:{[any]:any})-> Promise)&{
+    GET: (url:string,nocache:boolean?,headers:any?) -> Promise,
+    POST: (url:string,data:string,content_type:Enum.HttpContentType?,compress:string?,headers:any?) -> Promise,
+}
 
 export type MathLibrary = {
     oscillate: (min:number,max:number?,Time:number?)->number,
@@ -1326,14 +1333,15 @@ export type PointerLibrary = (Instance:Instance,Parent:any?) -> Pseudo;
 
 export type SillitoLibrary = {
     Start: (self:any)->Promise,
-    PortService: (self:any, Service:any)->SillitoBranch,
-    PortServices: (self:any, ...any)->SillitoBranch?,
-    PortModular: (self:any, Modular:any)->SillitoBranch,
-    PortModulars: (self:any, ...any)->SillitoBranch,
+    PortService: (self:any, Service:any)->SillitoLibrary,
+    PortServices: (self:any, ...any)->SillitoLibrary,
+    PortModular: (self:any, Modular:any)->SillitoLibrary,
+    PortModulars: (self:any, ...any)->SillitoLibrary,
     GetBranch: (self:any, BranchName:string)->SillitoBranch,
     HasBranch: (self:any, BranchName:string)->(boolean,SillitoBranch?),
     GetModular: (self:any,ServiceName:string)->SillitoBranch,
     GetService: (self:any,ServiceName:string)->SillitoBranch,
+    CreateBranch: (self:any,BranchName:string)->SillitoBranch,
 
 }&SillitoBranch;
 

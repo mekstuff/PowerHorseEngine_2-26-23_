@@ -139,13 +139,15 @@ end
     Destroys the Servant, which will intern destroy all tracked instance and disconnect all tracked connections
 ]=]
 function Servant:Destroy()
-    for _,x in pairs(self._dev.activeThreads) do
-        if(x)then
-            coroutine.close(x);
-        end
-    end;
-    self._dev.activeThreads = nil;
-    self:GetRef():Destroy();
+    if(self._dev and self._dev.activeThreads)then
+        for _,x in pairs(self._dev.activeThreads) do
+            if(x)then
+                coroutine.close(x);
+            end
+        end;
+        self._dev.activeThreads = nil;
+        self:GetRef():Destroy();
+    end
 end
 
 

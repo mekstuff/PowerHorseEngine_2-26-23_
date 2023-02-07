@@ -30,13 +30,6 @@ _rankNum.Name = "rank#"
 _rank.Parent = script.PHePanel;
 _rankNum.Parent = script.PHePanel;
 
-local PanelThemesExtender = "PHePanel-";
-local PanelThemes = {
-	Background = Color3.new(255);
-}
-
-PowerHorseEngine:GetGlobal("Theme").extendTheme(PanelThemes,PanelThemesExtender);
-
 --//
 local RankCache = {};
 

@@ -11,9 +11,11 @@ local UtilProvider = {}
 	@private
 	@return UtilProvider
 ]=]
+local Utils = script.Parent.Parent.Parent.Util
 function UtilProvider.LoadUtil(UtilName:string)
-	
-	local targetUtil = script.Parent.Parent.Parent.Util:FindFirstChild(UtilName);
+	return require(Utils:WaitForChild(UtilName));
+	-- print(Utils);
+	-- local targetUtil = Utils:FindFirstChild(UtilName);
 	--[[
 	if(targetUtil)then
 		return require(targetUtil);

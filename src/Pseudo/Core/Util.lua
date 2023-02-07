@@ -234,6 +234,90 @@ local function _getDependencyUID(dependencytable)
 	return str;
 end;
 
+local function _typecheck_check(_type:any,value:any,ClassesAreTypes:boolean?)
+	--[[
+
+	if(not targetValueHasIsA)then
+		print(targetValue);
+		-- print(typeof(targetValue) == typeof(x))
+	else
+		print("Target is an instance")
+		print(x,targetValue);
+		-- if(targetValue:IsA())
+	end
+	print(typeof(targetValue));
+	if(typeof(targetValue) == x)then
+		return true;
+	end;
+	if(ClassesAreTypes and targetValueHasIsA)then
+		if(targetValue:IsA(x))then
+			return true;
+		end
+	end;
+	return false;
+	]]
+	local typeoftype,typeofvalue = typeof(_type),typeof(value);
+	local typeIsInstanceObject,valueIsInstanceObject
+	if(typeoftype == "Instance" or (typeoftype == "table" and _type._dev))then
+		typeIsInstanceObject = true;
+	end;
+	if(typeofvalue == "Instance" or (typeofvalue == "table" and value._dev))then
+		valueIsInstanceObject = true;
+	end;
+	if(not typeIsInstanceObject and not valueIsInstanceObject)then
+		return typeoftype == typeofvalue
+		-- return _type == typeofvalue
+	else
+		--> In the case where Instance = "Instance"
+		if(typeof(_type) == typeof(value) and not valueIsInstanceObject)then
+			return true;
+		end
+		-- print(typeIsInstanceObject,valueIsInstanceObject)
+		if(typeIsInstanceObject)then
+			if(_type:IsA(valueIsInstanceObject and value.ClassName or value))then
+				return true;
+			end
+		else
+			if(value:IsA(_type))then
+				return true;
+			end
+		end
+	end
+end;
+
+local function _typecheck(supportedtypes:{string|Instance|any},targetValue:any,ClassesAreTypes:boolean?)
+	for _,x in ipairs(supportedtypes) do
+		local check = _typecheck_check(x,targetValue,ClassesAreTypes);
+		if(check)then
+			return check;
+		end
+	end
+	return false;
+	--[[
+	local targetValueHasIsA;
+	if(ClassesAreTypes)then
+		if(typeof(targetValue) == "Instance")then
+			targetValueHasIsA = true;
+		elseif(typeof(targetValue) == "table" and targetValue._dev)then
+			targetValueHasIsA = true;
+		end
+	end
+	if(typeof(supportedtypes) == "table")then
+		for _,x in pairs(supportedtypes) do
+			if(_typecheck_check(targetValue,x,targetValueHasIsA))then
+				return true;
+			end
+		end;
+	else
+		print("Here");
+		return _typecheck_check(targetValue,supportedtypes,targetValueHasIsA);
+	end
+
+	return false;
+	]]
+	-- table.find(Pseudo.__typecheckinglist[k], typeof(v))
+end;
+
 local function createPseudoObject(Object:{[any]:any}, DirectParent:Instance?, DirectProps:{[any]:any}?,...:any?):any
 	local Pseudo = {};	
 	local propSheet = {};	
@@ -414,9 +498,16 @@ local function createPseudoObject(Object:{[any]:any}, DirectParent:Instance?, Di
 			
 			--> If the property is not yet set, for example it's still in an "**any" state, it will return nil
 			if(propSheet[k] ~= nil)then
-				if(typeof(propSheet[k]) == "string" and propSheet[k]:match("^%*%*"))then return nil;end;
+				if(typeof(propSheet[k]) == "string" and propSheet[k]:match("^%*%*"))then
+					return;
+				end;
 				return propSheet[k];
 			end;
+
+			--> Same like above but supports **boolean|number
+			if(not propSheet[k] and propSheet.__typecheckinglist and propSheet.__typecheckinglist[k])then
+				return;
+			end
 		
 			--> Checks if the Pseudo has a signal of index 
 			if(propSheet._Signals[k])then
@@ -447,7 +538,7 @@ local function createPseudoObject(Object:{[any]:any}, DirectParent:Instance?, Di
 			if(string.match(k,"^_"))then return propSheet[k];end;
 		
 			--> Errors if the index is not a member
-			error(tostring(k).." is not a valid memmber of "..tostring(propSheet.ClassName).." / "..tostring(propSheet.Name).."$-"..debug.traceback())
+			error(tostring(k).." is not a valid member of "..tostring(propSheet.ClassName).." / "..tostring(propSheet.Name).."\n\n"..debug.traceback())
 		end,
 
 		
@@ -504,7 +595,7 @@ local function createPseudoObject(Object:{[any]:any}, DirectParent:Instance?, Di
 		--> Attempting to assign signal
 			if(propSheet._Signals[k])then
 				warn("PHESignals Cannot Be Assigned. Try AddEventListener(str Listener, bool Creating, signal BindingTo)")
-				return;	
+				return;
 			end;
 			
 		--> If it's a hidden property then set it with no checks.
@@ -533,7 +624,9 @@ local function createPseudoObject(Object:{[any]:any}, DirectParent:Instance?, Di
 			end
 			
 			--> main new index
-			if(propSheet[k] ~= nil)then
+			--> Checks for nil because items can support nil properties, if the item does not exist then the indexer should error.
+			local _t = Pseudo[k]; --> Does check to make sure k is a valid member
+			-- if(Pseudo[k] or Pseudo[k] == nil)then
 				
 				--> Prevent assigning global readOnly properties
 				if(table.find(readOnlyProperties, k))then 
@@ -541,33 +634,38 @@ local function createPseudoObject(Object:{[any]:any}, DirectParent:Instance?, Di
 					return 
 				end;
 				
-				if (typeof(propSheet[k]) ~= typeof(v) and k ~= "Parent" or (typeof(propSheet[k]) == "string" and propSheet[k]:match("^%*%*")))then
-					local allowpass = false;
-					local _afterStr =  ", got "..typeof(v).." ["..tostring(k).."] "..tostring(propSheet.ClassName).." / "..tostring(propSheet.Name);
-					if(typeof(propSheet[k]) == "string" and propSheet[k]:match("^%*%*"))then
-						local type_ = propSheet[k]:gsub("**","");
-						if(typeof(v) == type_ or type_ == "any")then
-							_allowPassForAny[k] = true;
-							allowpass = true;
-						else
-							if(typeof(v) == "table" and v.ClassName)then
-								if(v.ClassName == type_)then
-									allowpass = true;
-								end
-							end
-						end
-					end
-				if(not allowpass and not _allowPassForAny[k])then
-					local typeexpected = typeof(propSheet[k]);
-					if(typeexpected == "string")then
-						if(propSheet[k]:match("^%*%*"))then
-							typeexpected = propSheet[k]:gsub("**","");
-						end
-					end
-					error(typeexpected.." expected".._afterStr.."$-"..debug.traceback());
-					return;
+				--> Check for typechecking x = "**boolean"
+				local hasTypeCheckStr = typeof(propSheet[k]) == "string" and propSheet[k]:match("^%*%*")
+				if(hasTypeCheckStr)then
+					local searchtypecheckinglist = Pseudo.__typecheckinglist;
+					if(not searchtypecheckinglist)then
+						Pseudo.__typecheckinglist = {};
 					end;
+					Pseudo.__typecheckinglist[k] = propSheet[k]:gsub("**",""):split("|");
 				end;
+
+				--> Validate type
+				local isValidType = false;
+				if(Pseudo.__typecheckinglist and Pseudo.__typecheckinglist[k])then
+					if(table.find(Pseudo.__typecheckinglist[k],"any"))then
+						isValidType = true;
+					else
+						if(_typecheck(Pseudo.__typecheckinglist[k],v,true))then
+							isValidType = true;
+						end
+					end;
+				else
+					local t = {propSheet[k]}
+					if(_typecheck(t,v,true))then
+						isValidType = true
+					end;
+					t=nil;
+				end;
+
+				if(not isValidType)then
+					error(("%s expected for \"%s\", got %s(%s). %s / %s"):format((Pseudo.__typecheckinglist and Pseudo.__typecheckinglist[k] and table.concat(Pseudo.__typecheckinglist[k],"|") or typeof(propSheet[k])),k,tostring(v),typeof(v),Pseudo.Name,Pseudo.ClassName).."\n\n"..debug.traceback())
+				end;
+
 
 				--> Updates propsheet
 				propSheet[k]=v;
@@ -597,10 +695,7 @@ local function createPseudoObject(Object:{[any]:any}, DirectParent:Instance?, Di
 					end;
 				end;
 
-			--> Property does not exist, cannot assign 
-			else
-				error(tostring(k).." is not a valid memmber of "..tostring(propSheet.ClassName).." / "..tostring(propSheet.Name).."$-"..debug.traceback())
-			end;
+			-- end;
 			
 			--> Fire Any Signal Property Events;
 			if(propSheet._ChangedSignals["all"])then

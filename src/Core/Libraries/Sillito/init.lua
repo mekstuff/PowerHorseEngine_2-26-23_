@@ -5,7 +5,7 @@ local CustomClassService = App:GetService("CustomClassService");
 local RunService = game:GetService("RunService");
 local IsClient = RunService:IsClient();
 
-local SillitoBrancher = require(script.SillitoBranch);
+local SillitoBranch = require(script.SillitoBranch);
 
 local Engine = App:GetGlobal("Engine");
 local RSStorage = Engine:FetchReplicatedStorage();
@@ -72,7 +72,7 @@ function Sillito:CreateBranch(BranchName:string)
     if(Branches[BranchName])then
         return ErrorService.tossError("Branch \""..BranchName.."\" is already a Sillito Branch")
     end;
-    local Branch = CustomClassService:Create(SillitoBrancher, nil, {
+    local Branch = CustomClassService:Create(SillitoBranch, nil, {
         BranchName = BranchName;
     });
     Branches[BranchName] = Branch;

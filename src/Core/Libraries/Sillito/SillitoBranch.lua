@@ -7,6 +7,7 @@ local IsClient = RunService:IsClient();
 ]=]
 
 local SillitoBranch = {
+    Name = "WTF",
     ClassName = "SillitoBranch";
 };
 
@@ -20,8 +21,8 @@ function SillitoBranch:_Render()
     self._portedModulars = {};
     self._ServiceObjects = {};
     self._ComponentClasses = {};
-    self.Name = args.BranchName;
 
+    self.Name = args.BranchName;
     self.Parent = BranchContainer;
 
     self:_lockProperty("Name", "Branch name cannot be changed after initiation, changing the name may result in unwanted behaviour.")
@@ -190,6 +191,7 @@ function SillitoBranch:_StartClient()
         for _,v in pairs(self._portedModulars) do
             local initRan,initResults = pcall(function()
                 v.Parent = Modulars;
+                --[[
                 --> Dynamics
                 local serverSideProps;
                 if(v.Name:match("^%$"))then
@@ -203,8 +205,8 @@ function SillitoBranch:_StartClient()
                         table.insert(v._dev, clientState); --> Clean up on destroy
                     end;
                 end;
-
-                v:Init(v._RenderHooksPassOn,serverSideProps);
+                ]]
+                v:Init(v._RenderHooksPassOn);
             end);
             if(not initRan)then
                 reject("Failed to :Init a Modular at ["..v.ClassName.."] -> "..initResults);

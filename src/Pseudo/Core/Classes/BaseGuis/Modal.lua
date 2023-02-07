@@ -336,6 +336,7 @@ function Modal:_Render(App)
 		-- self.BackgroundTransparency = useSkin.BackgroundTransparency;
 		MainFrame = useSkin:IsA("Pseudo") and useSkin or App:Import("Pointer")(useSkin);
 		Header = MainFrame:FindFirstChild("Header") or MainFrame:FindFirstChild("$Header",true);
+		CloseButton = MainFrame:FindFirstChild("CloseButton") or MainFrame:FindFirstChild("$CloseButton",true);
 		self.__targetHeader = Header;
 		self:_ApplyuseSkinPropertiesToSelf();
 	end;
@@ -353,15 +354,15 @@ function Modal:_Render(App)
 	self:AddEventListener("ButtonAdded",true);
 
 	if(CloseButton)then
-		self._dev._closebuttonconnection = CloseButton.Activated:Connect(function()
+		self._dev._closebuttonconnection = (CloseButton:IsA("CloseButton") and CloseButton.Activated or CloseButton.MouseButton1Click):Connect(function()
 			self.ButtonClicked:Fire(CloseButton, "close");
 			if(self.CloseButtonBehaviour == Enumeration.CloseButtonBehaviour.Hide)then
 				self.Visible = false;
 			elseif(self.CloseButtonBehaviour == Enumeration.CloseButtonBehaviour.Destroy)then
 				self:Destroy();
-			end
+			end;
 		end)
-	end;
+	end
 
 	return function (Hooks:PseudoHooks)
 		local useEffect,useMapping,useComponents = Hooks.useEffect,Hooks.useMapping,Hooks.useComponents;
@@ -376,16 +377,16 @@ function Modal:_Render(App)
 				self._dev.__HighlightFrame = self.ZIndex-1;
 			end
 		end,{"ZIndex"});
-
-		useEffect(function()
-			if(CloseButton)then				
+		
+		if(CloseButton)then
+			useEffect(function()
 				if(self.CloseButtonBehaviour == Enumeration.CloseButtonBehaviour.None)then
 					CloseButton.Visible = false;
 				else
 					CloseButton.Visible = true;
 				end
-			end
-		end,{"CloseButtonBehaviour"});
+			end,{"CloseButtonBehaviour"});
+		end
 
 		useEffect(function()
 			if(self.Body ~= "")then
