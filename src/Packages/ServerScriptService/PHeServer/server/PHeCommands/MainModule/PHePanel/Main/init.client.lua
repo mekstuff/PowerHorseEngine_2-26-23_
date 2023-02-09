@@ -24,7 +24,6 @@ local Keybind = "RightControl"
 local CommandOutput = require(script.Components.CommandOutput);
 _G.cmd_CommandOutput = CommandOutput;
 
-print("Running");
 
 function OpenWidget()
 	WidgetOpen=true;
@@ -32,8 +31,57 @@ function OpenWidget()
 end;function CloseWidget()
 	WidgetOpen=false;
 	Widget.Enabled = false;
-	
-end
+end;
+
+--[[
+task.spawn(function()
+	local s,r = pcall(function()
+		local Sillito = App:Import("Sillito"):GetBranch("PHeBranch-V1");
+		local TopbarPlusSupport = Sillito:GetModular("TopbarPlusSupport");
+		if(TopbarPlusSupport.Running)then
+			local PanelIcon = TopbarPlusSupport._Icon.new()
+				:setLabel("PHe Panel")
+				:setMenu({
+					TopbarPlusSupport._Icon.new():setLabel("Ban"),
+					TopbarPlusSupport._Icon.new():setLabel("Kick"),
+					TopbarPlusSupport._Icon.new():setLabel("Teleport"):bindEvent("selected",function(self)
+						local t = {};
+						for _,v in pairs(game:GetService("Players"):GetPlayers()) do
+							table.insert(t,TopbarPlusSupport._Icon.new():setLabel(v.Name):setMenu({
+								TopbarPlusSupport._Icon.new():setLabel("To Me"),
+								TopbarPlusSupport._Icon.new():setLabel("To Them"),
+							}));
+						end;
+						self._dropdowns = t;
+						self:setDropdown(t);
+					end):bindEvent("deselected",function(self)
+						if(self._dropdowns)then
+							for _,x in pairs(self._dropdowns) do
+								x:destroy();
+							end
+							self._dropdowns = nil;
+						end;
+						self:setDropdown(nil);
+					end),
+					TopbarPlusSupport._Icon.new():setLabel("Restart Server"):bindEvent("selected",function(self)
+						MainModule.exe("restart server")
+					end),
+				})
+
+			PanelIcon.selected:Connect(function()
+				OpenWidget();
+			end);
+			PanelIcon.deselected:Connect(function()
+				CloseWidget();
+			end);
+			TopbarPlusSupport:AddToDropdown(PanelIcon);
+		end;
+	end);
+	if(not s)then
+		warn("[PHePanel] Could not connect to sillito services -> "..r)
+	end
+end)
+]]
 
 UIS.InputBegan:Connect(function(Input)
 	if(Input.KeyCode.Name == Keybind)then
