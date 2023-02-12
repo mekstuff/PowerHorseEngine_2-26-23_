@@ -106,9 +106,11 @@ export type App = {
 --> States
         &(("State") -> State)
 --> Transitions
-        &(("FadeTransition") -> State)
+        &(("FadeTransition") -> FadeTransition)
         &(("Transition") -> Transition)
-        &(("WipeTransition") -> WipeTransition),
+        &(("WipeTransition") -> WipeTransition)
+--> UIObjects
+        &(("GuiCollider") -> GuiCollider),
 
 	Create: CreateCustomClass,
     GetGlobal: (
@@ -178,7 +180,7 @@ export type App = {
         &((self:any,"Sillito")->SillitoLibrary)
         &((self:any,"Array")->ArrayLibrary)
         &((self:any,"Collector")->CollectorLibrary)
-        &((self:any,"Contextor")->ContextActionService)
+        &((self:any,"Contextor")->ContextorLibrary)
         &((self:any,"fetch")->fetchLibrary)
         &((self:any,"Math")->MathLibrary)
         &((self:any,"Pointer")->PointerLibrary)
@@ -743,8 +745,6 @@ export type Text = {
 };
 export type PHeText = Text;
 
-
-
 export type PHeCloseButton = CloseButton;
 
 export type DropdownButton = {
@@ -752,6 +752,10 @@ export type DropdownButton = {
     Expanded: boolean,
 };
 export type PHeDropdownButton = DropdownButton;
+
+export type GuiCollider = {
+    Adornee: Instance|Pseudo|nil,
+}&Pseudo
 
 --> Providers
 export type LibraryProvider = {
@@ -1405,5 +1409,15 @@ export type CollectorLibrary = Pseudo&{
     GetTagged: (self:any,TagName:string) -> table,
 };
 export type PHeCollectorLibrary = CollectorLibrary;
+
+type ContextorLibrary_supportedMobileButtonsArray = {
+    Title: string|State,
+    Position: string|State,
+    Description: string|State,
+    Image: string|State,
+};
+export type ContextorLibrary = {
+    Bind: (self:any, actionName:string, actionHandler: ()->(()->any??,()->any??,()->any??), mobileButton:boolean|ContextorLibrary_supportedMobileButtonsArray?,...Enum.KeyCode|Enum.UserInputType?) -> any,
+}&Pseudo;
 
 return Types;
