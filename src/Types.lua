@@ -124,6 +124,7 @@ export type App = {
 	-- GetGlobal: (self:any,GlobalName:string)->any,
     GetService: (
         ((self:any,"ClientService")->ClientService)
+        &((self:any,"PluginService")->PluginService)
         &((self:any,"AudioService")->AudioService)
         &((self:any,"BanService")->BanService)
         &((self:any,"ChatTagService")->ChatTagService)
@@ -145,12 +146,13 @@ export type App = {
         &((self:any,"ModalService")->ModalService)
         &((self:any,"NotificationBannerService")->NotificationBannerService)
         &((self:any,"NotificationService")->NotificationService)
+        &((self:any,"PathComputingService")->PathComputingService)
         &((self:any,"PingService")->PingService)
         &((self:any,"PromptService")->PromptService)
         &((self:any,"PseudoService")->PseudoService)
         &((self:any,"QuickWeldService")->QuickWeldService)
         &((self:any,"RagdollService")->RagdollService)
-        &((self:any,"ReplicationService")->ReplicationService)
+        &((self:any,"RelicationService")->ReplicationService)
         &((self:any,"SerializationService")->SerializationService)
         &((self:any,"SmartTextService")->SmartTextService)
         &((self:any,"SplashScreenSequence")->SplashScreenSequence)
@@ -202,6 +204,9 @@ export type PHeApp = App;
 type PseudoRender = (App:App) -> nil
 
 type PHeSignal<T...> = {
+    Wait: (self:any)->any,
+    Destroy: (self:any)->nil,
+    Fire: (self:any,...any)->nil,
     Connect: (self:any, callback:(T...)->())->nil, --> For now we use this because I have no idea how to setup dynamic arguments with types :)
 };
 
@@ -834,9 +839,9 @@ export type PHePluginStudioTool = {
     close: (self:any)->any,
     ProvideAPI: (self:any, APIKEY:string?) -> any,
     _App: PHePluginLibraryObject,
-
+    _mainWidget: DockWidgetPluginGui?,
     [string]: any
-};
+}&Pseudo;
 
 export type PHePluginLibraryObject = Pseudo&{
     onReady: ()->nil,
@@ -1053,6 +1058,31 @@ export type NotificationService = {
     AddNotificationStyle: (self:any, StyleName:string, StyleHandler:()->nil) -> nil,
     HandleNotificationRequest: (self:any, ...any) -> any
 };
+
+export type ComputedPath = {
+    DebugVisualization: boolean,
+    DebugComputationInfo: {[any]:any},
+    AutoMoveToDestination: boolean,
+    Destination: Instance|CFrame|Vector3|nil,
+    AutoMoveAgent: boolean,
+    Agent: Instance|Model|nil,
+    AgentRadius: number,
+    AgentHeight: number,
+    AgentCanJump: boolean,
+    AgentCanClimb: boolean,
+    WaypointSpacing: number,
+    Costs: {[any]:any}|nil,
+    Completed: PHeSignal,
+    WaypointReached: PHeSignal<PathWaypoint>,
+    Blocked: PHeSignal,
+    Failed: PHeSignal<string>,
+    Compute: (self:any) -> any,
+}&Pseudo;
+
+export type PathComputingService = {
+    new: (Agent:Instance,Destination:Instance|CFrame|Vector3?) -> ComputedPath,
+    CalculateNearestDestination: (self:any,Agent:Instance|CFrame|Vector3,Destinations:{Instance|Model|CFrame|Vector3}) -> (Instance|Model|CFrame|Vector3|nil,number)
+}
 
 export type PingReader = Pseudo&{
     Enabled: boolean,
@@ -1343,19 +1373,27 @@ export type SillitoLibrary = {
     PortModulars: (self:any, ...any)->SillitoLibrary,
     GetBranch: (self:any, BranchName:string)->SillitoBranch,
     HasBranch: (self:any, BranchName:string)->(boolean,SillitoBranch?),
-    GetModular: (self:any,ServiceName:string)->SillitoBranch,
+    GetModular: (self:any,ModularName:string)->SillitoBranch,
     GetService: (self:any,ServiceName:string)->SillitoBranch,
     CreateBranch: (self:any,BranchName:string)->SillitoBranch,
 
 }&SillitoBranch;
+
+export type SillitoObject = {
+    GetService: (self:any,ServiceName:string)->SillitoBranch,
+    GetModular: (self:any,ModularName:string)->SillitoBranch,
+    CreateDedicatedScreenGui: (self:any, ScreenGuiProps:{[string]:any}?) -> ScreenGui,
+    getServerSideProps: (self:any) -> {[any]:State|any},
+}&Pseudo
 
 export type SillitoBranch = {
     PortComponentClass: (self:any,ComponentClass:ModuleScript)->SillitoLibrary,
     PortComponentClasses: (self:any,ComponentClasses:Folder|any)->SillitoLibrary,
     GetComponentClass: (self:any,ComponentClassName:string)->any,
     GetService: (self:any,ServiceName:string)->SillitoBranch,
-    GetModular: (self:any,ServiceName:string)->SillitoBranch,
+    GetModular: (self:any,ModularName:string)->SillitoBranch,
     CreateDedicatedScreenGui: (self:any, ScreenGuiProps:{[string]:any}?) -> ScreenGui,
+    getServerSideProps: (self:any) -> {[any]:State|any},
     [any]:any
 }&Pseudo
 
@@ -1382,7 +1420,7 @@ export type DirectionalArrow3DLibrary = {
 export type FrameworkLibraryModular = Pseudo&{
     Init: (self:any)->nil,
     Start: (self:any)->nil,
-    GetModular: (self:any,ServiceName:string)->FrameworkLibraryModular,
+    GetModular: (self:any,ModularName:string)->FrameworkLibraryModular,
     GetComponentClass: (self:any,ComponentClassName:string)->any,
     UseChannel: (self:any, ChannelName:string)->RemoteEvent,
 };
@@ -1395,17 +1433,17 @@ export type FrameworkLibraryClient = {
     PortComponentClasses: (self:any,ComponentClasses:Folder|any)->nil,
     GetComponentClass: (self:any,ComponentClassName:string)->any,
     GetService: (self:any,ServiceName:string)->FrameworkLibraryModular,
-    GetModular: (self:any,ServiceName:string)->FrameworkLibraryModular,
+    GetModular: (self:any,ModularName:string)->FrameworkLibraryModular,
 };
 export type PHeFrameworkLibraryClient = FrameworkLibraryClient;
 
 export type CollectorLibrary = Pseudo&{
-    Bind: (self:any,Tag:string,handler:(Pseudo|Instance)->()?) -> Servant,
+    Bind: (self:any,Tag:string,handler:(Object:Pseudo|Instance,props:{[any]:any})->()?,YieldForProps:boolean?) -> Servant,
     Unbind: (self:any,Binded:Servant) -> nil,
-    Tag: (self:any,Instances:table|Instance|Pseudo,TagName:string) -> nil,
-    AddTag: (self:any,Instances:table|Instance|Pseudo,TagName:string) -> nil,
+    Tag: (self:any,Instances:table|Instance|Pseudo,TagName:string,TagProps:{[any]:any}?) -> nil,
+    AddTag: (self:any,Instances:table|Instance|Pseudo,TagName:string,TagProps:{[any]:any}?) -> nil,
     RemoveTag: (self:any,Instances:table|Instance|Pseudo,TagName:string) -> nil,
-    Has: (self:any,Instance:Pseudo|Instance,TagName:string) -> boolean,
+    HasTag: (self:any,Instance:Pseudo|Instance,TagName:string) -> boolean,
     GetTagged: (self:any,TagName:string) -> table,
 };
 export type PHeCollectorLibrary = CollectorLibrary;
@@ -1418,6 +1456,7 @@ type ContextorLibrary_supportedMobileButtonsArray = {
 };
 export type ContextorLibrary = {
     Bind: (self:any, actionName:string, actionHandler: ()->(()->any??,()->any??,()->any??), mobileButton:boolean|ContextorLibrary_supportedMobileButtonsArray?,...Enum.KeyCode|Enum.UserInputType?) -> any,
+    Unbind: (self:any,actionName:string)->any,
 }&Pseudo;
 
 return Types;

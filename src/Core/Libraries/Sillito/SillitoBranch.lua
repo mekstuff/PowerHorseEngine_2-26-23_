@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local RunService = game:GetService("RunService");
 local Types = require(script.Parent.Parent.Parent.Parent.Types);
 local IsClient = RunService:IsClient();
@@ -174,6 +175,7 @@ function SillitoBranch:PortModular(Modular:any)
     self._portedModulars[Modular.ClassName] = AsClass;
     return self
 end;
+
 --
 function SillitoBranch:_StartClient()
     if(self._startPromise)then
@@ -191,21 +193,6 @@ function SillitoBranch:_StartClient()
         for _,v in pairs(self._portedModulars) do
             local initRan,initResults = pcall(function()
                 v.Parent = Modulars;
-                --[[
-                --> Dynamics
-                local serverSideProps;
-                if(v.Name:match("^%$"))then
-                    local Service = self:GetService(v.Name);
-                    local res = Service:___lanzo_native_fetchServerSideProps_client_request();
-                    for name,value in pairs(res) do
-                        local clientState,setclientState = State(value.value);
-                        clientState.Name = name;
-                        clientState.Parent = v;
-                        print(clientState);
-                        table.insert(v._dev, clientState); --> Clean up on destroy
-                    end;
-                end;
-                ]]
                 v:Init(v._RenderHooksPassOn);
             end);
             if(not initRan)then
@@ -242,6 +229,7 @@ function SillitoBranch:Start()
     end;
     local App = self:_GetAppModule();
     local Engine = App:GetGlobal("Engine");
+    local ErrorService = App:GetService("ErrorService");
     local Promise = App.new("Promise");
     Promise:Try(function(resolve,reject)
         local ServicesFolder = Instance.new("Folder",self:GetRef());
@@ -265,17 +253,78 @@ function SillitoBranch:Start()
                             if(typeof(value) == "function")then
                                 local x = {...};
                                 table.remove(x,1);
-                                -- print(unpack(x));
                                 return v.Shared[name](v,player,unpack(x));
                             end
                             return value;
-                        end;  
+                        end;
                         remotefunc.OnServerInvoke = Invoker;
                         remotefunc.Name = name;
                     end;
                     SharedContainer.Parent = BranchShare;
+                end;
+
+                if(v.props)then
+                    setmetatable(v.props, {
+                       __newindex = function(_,key,value)
+                        if(typeof(key) == "number" and Players:GetPlayerByUserId(key))then
+                            local targetPlayer = Players:GetPlayerByUserId(key);
+                            local proxy = {};
+
+                            --> Set the values to the proxy and set the initial table to an empty one so __newindex and __index works.
+                            for a,b in pairs(value) do
+                                proxy[a] = b;
+                                value[a] = nil;
+                            end;
+
+                            local clientPropsRemoter = v._dev.__SharedContainer:FindFirstChild("$"..key);
+                            local initialListener;
+
+                            if(not clientPropsRemoter)then
+                                clientPropsRemoter = Instance.new("RemoteEvent");
+                                initialListener = clientPropsRemoter.OnServerEvent:Connect(function(Player:Player)
+                                    if(Player == targetPlayer)then
+                                    --> We only listen for OnServerEvent once from the owner client to initiate values
+                                        if(initialListener)then
+                                            initialListener:Disconnect();initialListener = nil;
+                                        end;
+                                     --> Send the server props to the owner client (initial request from client)
+                                        clientPropsRemoter:FireClient(Player,proxy)
+                                    else
+                                        warn(("%s fired an event that they should not have access to, serverSideProps for sillito"):format(Player.Name));
+                                    end
+                                end)
+                                clientPropsRemoter.Name = "$"..key;
+                                clientPropsRemoter.Parent = v._dev.__SharedContainer;
+                            end;
+                            setmetatable(value, {
+                                __newindex = function(_,prop,val)
+                                    proxy[prop] = val;
+                                    clientPropsRemoter:FireClient(targetPlayer, proxy);
+                                end;
+                                __index = function(_,prop)
+                                    return proxy[prop];
+                                end
+                            });
+                        else
+                            ErrorService.tossWarn(("[Sillito] You attempted to set a .prop key to \"%s\", You can only pass UserIds of players currently in this game. Value will not be added"):format(tostring(key)))
+                        --[[
+                        else
+                            --> For props that aren't scoped to player id
+                            rawset(v.props,key,value);
+                            local propsRemoter = v._dev.__SharedContainer:FindFirstChild("$propsRemoter");
+                            if(not propsRemoter)then
+                                propsRemoter = Instance.new("RemoteEvent");
+                                propsRemoter.Name = "$propsRemoter";
+                                propsRemoter.Parent = v._dev.__SharedContainer;
+                            end;
+                            propsRemoter:FireAllClients(v.props);
+                            ]]
+                        end;
+
+                       end
+                    });
                 end
-            end)
+            end);
             --//Init
             local initRan,initResults = pcall(function()
                 v.Parent = ServicesFolder;
@@ -353,37 +402,6 @@ function SillitoBranch:PortService(Service:any)
             -- ErrorService.tossMessage("Sillito: No :Start() method is applied to your service \""..Service.ClassName.."\".");
             return;
         end
-    end;
-
-    if(Service.Name:match("^%$"))then
-        if(not Service.Shared)then
-            ErrorService.tossWarn("[Sillito] A Dynamic Service was found without a .Shared property set, Dynamic Services must be Shared. ["..Service.Name.."]")
-            Service.Shared = {};
-        end;
-        -- local initiatedClient = {} we should check for initiated clients
-        function Service.Shared:___lanzo_native_fetchServerSideProps_client_request(Player:Player)
-            --[=[
-                @prop setDynamicProps (Player) -> {[string]:any}
-                @within SillitoBranch
-            ]=]
-            local props = self:setDynamicProps(Player);
-            if(typeof(props) ~= "table")then
-                return ErrorService.tossError(("setDynamicProps must return a table, got %s. [%s]"):format(typeof(props),self.Name));
-            end;
-            for a,b in pairs(props) do
-                if(typeof(a) ~= "string")then
-                    return ErrorService.tossError(("[setDynamicProps] The key for a dynamic prop must be a string. [%s]"):format(self.Name));
-                end;
-                if not(typeof(b) == "table" and b.IsA and b:IsA("Pseudo") and b:IsA("State"))then
-                     ErrorService.tossError(("[setDynamicProps] Dynamic prop values must be states, to pass static values, create static={} property. [%s] [%s]"):format(a,self.Name));
-                end;
-                props[a] = {
-                    id = b.__id;
-                    value = b();
-                };
-            end;
-            return props; 
-        end;
     end;
 
     local ogSelf = self;
@@ -508,7 +526,7 @@ function SillitoBranch:GetModular(ModularName:string)
     if(not self._clientStarted)then
         return self:_getModularAsync(ModularName);
     end
-    return self._portedModulars[ModularName];   
+    return self._portedModulars[ModularName];
 end
 
 --[=[]=]
@@ -545,6 +563,84 @@ function SillitoBranch:GetService(ServiceName:string)
             end;
             return ContainsChannel:WaitForChild(ChannelName);
             -- return hasShared:FindFirstChild(ChannelName); 
+        end;
+
+        --[=[
+            @within SillitoBranch
+            @client
+            Gets the server side objects within the .prop of the service. Service must have both .shared and .prop
+        ]=]
+        function newServiceObject:getServerSideProps()
+            local State = self:_GetAppModule():Import("State");
+            if(self.__loadedServerSideProps)then
+                return self.__loadedServerSideProps;
+            end;
+            self.Parent = workspace;
+            self.__loadedServerSideProps = {};
+            local function updateServerSideProps(data:{[any]:any})
+                --> Delete any state from a key that the server no longer has
+                --[[
+                for a,_ in pairs(self.__loadedServerSideProps) do
+                    if(data[a] == nil)then
+                        self.__loadedServerSideProps[a]:Destroy();
+                        self.__loadedServerSideProps[a] = nil;
+                    end
+                end
+                ]]
+                --> Set and Create States
+                for key,value in pairs(data) do
+                    local existingState = (self.__loadedServerSideProps[key]);
+                    if(existingState)then
+                        existingState.State = value;
+                    else
+                        local newState = State(value);
+                        newState.Parent = self;
+                        self.__loadedServerSideProps[key] = newState;
+                    end
+                end;
+            end;
+
+            --[[
+            local function updateServerSidePropsFromRemoter(props)
+                if(not self.___loadedServerSideProps_FromRemoter)then
+                    for a,b in pairs(props) do
+                        if not(self.__loadedServerSideProps[a])then
+                            self.__loadedServerSideProps[a] = true;
+                        end
+                    end
+                end;
+                updateServerSideProps(self.__loadedServerSideProps);
+            end;
+            
+            local function connectToserverpropsRemoter(serverpropsRemoter)
+                self._dev.serverpropsRemoter_Connected = serverpropsRemoter.OnClientEvent:Connect(function(props)
+                    updateServerSidePropsFromRemoter(props);
+                end);
+            end;
+            
+            local serverpropsRemoter = hasShared:FindFirstChild("$propsRemoter");
+            if(not serverpropsRemoter)then
+                self._dev.serverpropsRemoterAdded_Connection = hasShared.ChildAdded:Connect(function(c)
+                    if(c.Name == "$propsRemoter")then
+                        self._dev.serverpropsRemoterAdded_Connection:Disconnect();
+                        self._dev.serverpropsRemoterAdded_Connection = nil;
+                        connectToserverpropsRemoter(c);
+                    end;
+                end);
+            else
+                connectToserverpropsRemoter(serverpropsRemoter);
+            end
+            serverpropsRemoter = nil;
+            ]]
+            
+            local coms:RemoteEvent = hasShared:WaitForChild("$"..Players.LocalPlayer.UserId);
+            coms:FireServer() --> Requests initial render request
+            updateServerSideProps(coms.OnClientEvent:Wait()) --> Waits for the server to send back the initial data
+            --> We then connect to the following events
+            self._dev._serverProps_comsConnection = coms.OnClientEvent:Connect(function(data)
+                updateServerSideProps(data);
+            end);
+            return self.__loadedServerSideProps;
         end
     
         for _,x in pairs(hasShared:GetChildren()) do

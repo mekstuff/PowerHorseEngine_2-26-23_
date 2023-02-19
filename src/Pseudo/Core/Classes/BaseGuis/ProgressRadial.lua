@@ -162,6 +162,7 @@ function ProgressRadial:_Render(App)
 			Gradient2 = gradient2;
 			G1Image = g1image;
 			G2Image = g2image;
+			FatherComponent = Radial;
 		};
 		--_Mapping = {};
 	};

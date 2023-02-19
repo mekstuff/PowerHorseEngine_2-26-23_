@@ -99,7 +99,6 @@ local ThemeObject;
 	@private
 ]=]
 function Theme.buildTheme()
-	print("Buolding")
 	if(ThemeObject)then return ThemeObject;end;
 	local App:Types.App = getApp()::any;
 	local CustomClassService = App:GetService("CustomClassService");

@@ -93,6 +93,10 @@ function Contextor:Bind(actionName:string, actionHandler: (actionName:string,Inp
     end;
 end;
 
+function Contextor:Unbind(...:any)
+    return ContextActionService:UnbindAction(...);
+end
+
 -- setmetatable(Contextor, {
 --     __index = ContextActionService;
 -- });

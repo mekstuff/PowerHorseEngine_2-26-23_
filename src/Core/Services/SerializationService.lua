@@ -212,9 +212,7 @@ function SerializationService:DeserializeAsync(ToDeserialize:any,...:any):{[any]
 	local t,end_ = ToDeserialize:match("s-with:(%w+)()");
 	local str = (ToDeserialize:sub(end_+1,#ToDeserialize));
 	if(t == "table")then
-		--print(str);
-		return SerializationService:DeserializeTable(str);
-		
+		return SerializationService:DeserializeTable(str);		
 	end
 end;
 
@@ -307,7 +305,6 @@ local function determineObject(data)
 					]].."\n\n"..data.scriptSrc;
 				end
 			end
-			print(transformedValue)
 		end;
 	elseif(data.type == "EnumItem")then
 		local s = data.value:split(".");
@@ -511,8 +508,10 @@ end
 function SerializationService:fromBinary(str:string):string
 	local fstr = "";
 	for i, Binary in ipairs(str:split(" ")) do
-		local Byte = tonumber(Binary, 2)
-		fstr ..= string.char(Byte)
+		local Byte = tonumber(Binary, 2);
+		if(Byte)then
+			fstr ..= string.char(Byte)
+		end
 	end;
 	return fstr
 end

@@ -265,8 +265,7 @@ local function _typecheck_check(_type:any,value:any,ClassesAreTypes:boolean?)
 		valueIsInstanceObject = true;
 	end;
 	if(not typeIsInstanceObject and not valueIsInstanceObject)then
-		return typeoftype == typeofvalue
-		-- return _type == typeofvalue
+		return typeoftype == typeofvalue or _type == typeofvalue
 	else
 		--> In the case where Instance = "Instance"
 		if(typeof(_type) == typeof(value) and not valueIsInstanceObject)then
@@ -661,7 +660,7 @@ local function createPseudoObject(Object:{[any]:any}, DirectParent:Instance?, Di
 					end;
 					t=nil;
 				end;
-
+				
 				if(not isValidType)then
 					error(("%s expected for \"%s\", got %s(%s). %s / %s"):format((Pseudo.__typecheckinglist and Pseudo.__typecheckinglist[k] and table.concat(Pseudo.__typecheckinglist[k],"|") or typeof(propSheet[k])),k,tostring(v),typeof(v),Pseudo.Name,Pseudo.ClassName).."\n\n"..debug.traceback())
 				end;

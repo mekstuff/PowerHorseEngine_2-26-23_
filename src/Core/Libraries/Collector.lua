@@ -1,12 +1,59 @@
 local CollectionService = game:GetService("CollectionService");
-local Types = require(script.Parent.Parent.Parent.Types);
-local CustomClassService = require(script.Parent.Parent.Services.CustomClassService);
-local PseudoService = require(script.Parent.Parent.Services.PseudoService);
+local ServiceProvider = require(script.Parent.Parent.Providers.ServiceProvider)
+local CustomClassService = ServiceProvider:LoadServiceAsync("CustomClassService");
+local PseudoService = ServiceProvider:LoadServiceAsync("PseudoService");
+local SerializationService = ServiceProvider:LoadServiceAsync("SerializationService");
+local IsClient = game.Players.LocalPlayer and true;
+
+--TOOD: Optimize how we send data from server->client, so it does not serialize and deserialize entire tables every entry.
 
 --[=[
     @class Collector
 ]=]
 
+--[[
+local TagProps = {};
+
+local function filterTagPropsForClientRequest() --TODO: optimize maybe
+    if(not IsClient)then
+        local t = {};
+        local found = false;
+        for instance,x in pairs(TagProps) do
+            for tagname,tagprops in pairs(x) do
+                if(tagprops._scope ~= "server")then
+                    if(not t[instance])then
+                        t[instance] = {};
+                    end;
+                    found = true;
+                    t[instance][tagname] = tagprops;
+                end
+            end
+        end;
+        local res = found and SerializationService:SerializeAsync(t) or t;
+        return res;
+    end
+end;
+
+local CollectorServerCommunicator;
+if(not IsClient)then
+    CollectorServerCommunicator = Instance.new("RemoteEvent");
+    CollectorServerCommunicator.Name = "CollectorServerCommunicator";
+    CollectorServerCommunicator.Parent = require(script.Parent.Parent.Parent):GetGlobal("Engine"):FetchReplicatedStorage();
+    local cacheInitRequests = {};
+    CollectorServerCommunicator.OnServerEvent:Connect(function(player)
+        if(cacheInitRequests[player])then
+            warn("Already sent to them");
+            return;
+        end;
+        cacheInitRequests[player] = true;
+        CollectorServerCommunicator:FireClient(player,filterTagPropsForClientRequest())
+    end);
+    game.Players.PlayerRemoving:Connect(function(player)
+        cacheInitRequests[player] = nil;
+    end)
+end
+
+]]
 local Collector = {
     Name = "Collector",
     ClassName = "Collector",
@@ -23,15 +70,89 @@ function Collector:_GetTagInstanceObject(instance:any)
     return instance;
 end
 
-function Collector:Create()
-    -- return CollectionService:GetTags
+--[[
+--[=[
+    @private
+]=]
+function Collector:_SaveTagProps(instance:any,tagname:any,tagprops:any)
+    if(instance)then
+        if(not TagProps[instance])then
+            TagProps[instance] = {};
+        end;
+        TagProps[instance][tagname] = tagprops;
+    end;
+    if(not IsClient)then
+        print("Fired all clients")
+        CollectorServerCommunicator:FireAllClients(filterTagPropsForClientRequest())
+    end
 end;
 
-function Collector:_Tag(instance:any,tagname:string):nil
+local ServerSentReplicatedTagProps;
+
+--[=[
+    @private
+]=]
+function Collector:_getCollectorServerCommunicator()
+    local App = self:_GetAppModule();
+    local Engine = App:GetGlobal("Engine");
+    local RSStorage = Engine:FetchReplicatedStorage();
+    local Event = RSStorage:FindFirstChild("CollectorServerCommunicator");
+    --TODO: Need to wait if not found
+    return Event;
+end;
+--[=[]=]
+function Collector:_connectToCommunicator()
+    if(not ServerSentReplicatedTagProps)then
+        local Event = self:_getCollectorServerCommunicator();
+        Event:FireServer();
+        local initialRequest = Event.OnClientEvent:Wait();
+        if(not initialRequest)then
+            return;
+        end;
+        if(typeof(initialRequest) == "table")then
+            --> Means that the server has an empty array, so no need to deserialize anything
+            initialRequest = nil;
+        end
+        ServerSentReplicatedTagProps = initialRequest and SerializationService:DeserializeAsync(initialRequest) or {};
+        self._dev._serverCommunicatorConnection = Event.OnClientEvent:Connect(function(serial:string)
+            local deserial = SerializationService:DeserializeAsync(serial);
+            print("Set item");
+            ServerSentReplicatedTagProps = deserial;
+            -- ServerSentReplicatedTagProps = SerializationService:DeserializeAsync(...);
+        end);
+    end
+end
+--[=[
+    @private
+]=]
+function Collector:_GetSavedTagProps(instance:any,tagname:any,yieldForProps)
+    if(TagProps[instance])then
+        local t = TagProps[instance][tagname];
+        if(t)then
+            return t;
+        end;
+    end;
+    if(IsClient)then
+        if(not ServerSentReplicatedTagProps)then
+            self:_connectToCommunicator();
+        end;
+        return ServerSentReplicatedTagProps and ServerSentReplicatedTagProps[instance] and ServerSentReplicatedTagProps[instance][tagname];
+    end
+end
+]]
+
+--[=[
+    @private
+]=]
+function Collector:_Tag(instance:any,tagname:string,tagprops:{[any]:any}?):nil
     instance = self:_GetTagInstanceObject(instance);
+    -- self:_SaveTagProps(instance,tagname,tagprops);
     CollectionService:AddTag(instance,tagname);
 end;
 
+--[=[
+    @private
+]=]
 function Collector:_RemoveTag(instance:any,tagname:string):nil
     instance = self:_GetTagInstanceObject(instance);
     CollectionService:RemoveTag(instance,tagname);
@@ -55,13 +176,13 @@ end;
 --[=[
     @param instances table | Pseudo | Instance
 ]=]
-function Collector:Tag(instances:table|Instance,tagname:string):nil
+function Collector:Tag(instances:table|Instance,tagname:string,tagprops:{[any]:any}?):nil
     if(typeof(instances) == "table" and not instances.IsA)then
         for _,x in pairs(instances) do
-            self:_Tag(x,tagname);
+            self:_Tag(x,tagname,tagprops);
         end;
     else
-        self:_Tag(instances,tagname);
+        self:_Tag(instances,tagname,tagprops);
     end;
 end;
 --[=[]=]
@@ -83,7 +204,7 @@ end;
 --[=[
     @return Servant
 ]=]
-function Collector:Bind(Tag:string,Callback:any):Types.Servant
+function Collector:Bind(Tag:string,Callback:any,yieldForProps:boolean?)
     local App = self:_GetAppModule();
     local BindID = tostring(Callback);
     local BindServant = App.new("Servant");
@@ -93,13 +214,13 @@ function Collector:Bind(Tag:string,Callback:any):Types.Servant
     self._dev.Servants[Callback] = BindServant;
 
     local function handleCallback(x)
-        task.spawn(function()
-            local cleanup = Callback(x,BindServant);
+        coroutine.wrap(function()
+            local cleanup = Callback(x);
+            -- local cleanup = Callback(x,self:_GetSavedTagProps(x,Tag,yieldForProps));
             if(cleanup)then
                 BindServant._dev.Cleanup[x] = cleanup;
             end
-        end)
-        
+        end)();
     end;
 
     BindServant:Connect(CollectionService:GetInstanceAddedSignal(Tag), function(instance)
@@ -130,7 +251,7 @@ end;
 --[=[
     @param Binded Servant
 ]=]
-function Collector:Unbind(Binded:Types.Servant):nil
+function Collector:Unbind(Binded):nil
     Binded:Destroy();
 end
 

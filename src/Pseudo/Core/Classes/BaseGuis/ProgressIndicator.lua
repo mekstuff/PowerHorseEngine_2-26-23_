@@ -112,9 +112,12 @@ function ProgressIndicator:_Render(App)
 		end,
 		_Mapping = {
 			[Loader] = {
-				"Position","AnchorPoint","Color","Visible"
+				"Position","AnchorPoint","Color","Visible","ZIndex"
 			};
 			
+		},
+		_Components = {
+			FatherComponent = Loader:GetGUIRef();
 		}
 	}
 	--[[
