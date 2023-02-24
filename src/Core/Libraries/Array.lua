@@ -140,6 +140,49 @@ function Array.find(self:any,conditional:(key:any,value:any)->any,handler:(key:a
         end;
         toexec = nil;
     end
+end;
+
+--[=[]=]
+function Array.weighChances(self:any,chanceIdentifierFunction:(key:any,value:any)->number?):(any,any)
+    local defaultIdentifierType;
+    local isFirstCheck;
+    chanceIdentifierFunction = chanceIdentifierFunction or function(key,value)
+        local asNumber = tonumber(value);
+        if(not asNumber)then
+            warn(("Array.weighChances default IdentifierFunction tried to use the value of the item, but failed. If value of items aren't numbers, pass a custom chanceIdentifierFunction. %s = %s"):format(tostring(key),tostring(value)))
+            return 0;
+        end;
+        return asNumber;
+    end;
+    local w = 0;
+    local chances_t = {};
+    for a,b in pairs(self) do
+        local chance = chanceIdentifierFunction(a,b);
+        assert(typeof(chance) == "number", ("number expected from .weighChances, got %s"):format(typeof(chance)));
+        chances_t[a] = chance;
+        w+=(chance)
+    end;
+    local rand = math.random(1,w);
+    w = 0;
+    for a,b in pairs(self) do
+        w += (chances_t[a]);
+        if(w >= rand) then
+            return a,b;
+        end
+    end
+end;
+
+--[=[]=]
+function Array.len(self:any,dictionary:boolean?)
+    if(not dictionary)then
+        return #self;
+    else
+        local t = 0;
+        for _,_ in pairs(self) do
+            t+=1;
+        end;
+        return t;
+    end
 end
 
 return Array;

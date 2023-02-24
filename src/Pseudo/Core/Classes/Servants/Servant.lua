@@ -107,7 +107,7 @@ function Servant:Free(instance:any)
         self._dev.keeptrack[instance] = nil;
         -- print("Cleaned tracker");
     end;
-    print(self._dev);
+    -- print(self._dev);
 end;
 --[=[
     Tracks the connection

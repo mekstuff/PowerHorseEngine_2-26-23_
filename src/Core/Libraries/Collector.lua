@@ -11,7 +11,7 @@ local IsClient = game.Players.LocalPlayer and true;
     @class Collector
 ]=]
 
---[[
+
 local TagProps = {};
 
 local function filterTagPropsForClientRequest() --TODO: optimize maybe
@@ -34,6 +34,7 @@ local function filterTagPropsForClientRequest() --TODO: optimize maybe
     end
 end;
 
+--[[
 local CollectorServerCommunicator;
 if(not IsClient)then
     CollectorServerCommunicator = Instance.new("RemoteEvent");
@@ -52,8 +53,8 @@ if(not IsClient)then
         cacheInitRequests[player] = nil;
     end)
 end
-
 ]]
+
 local Collector = {
     Name = "Collector",
     ClassName = "Collector",
@@ -70,7 +71,6 @@ function Collector:_GetTagInstanceObject(instance:any)
     return instance;
 end
 
---[[
 --[=[
     @private
 ]=]
@@ -81,10 +81,12 @@ function Collector:_SaveTagProps(instance:any,tagname:any,tagprops:any)
         end;
         TagProps[instance][tagname] = tagprops;
     end;
+    --[[
     if(not IsClient)then
         print("Fired all clients")
         CollectorServerCommunicator:FireAllClients(filterTagPropsForClientRequest())
     end
+    ]]
 end;
 
 local ServerSentReplicatedTagProps;
@@ -133,20 +135,22 @@ function Collector:_GetSavedTagProps(instance:any,tagname:any,yieldForProps)
         end;
     end;
     if(IsClient)then
+        --[[
         if(not ServerSentReplicatedTagProps)then
             self:_connectToCommunicator();
         end;
+        ]]
         return ServerSentReplicatedTagProps and ServerSentReplicatedTagProps[instance] and ServerSentReplicatedTagProps[instance][tagname];
     end
 end
-]]
+
 
 --[=[
     @private
 ]=]
 function Collector:_Tag(instance:any,tagname:string,tagprops:{[any]:any}?):nil
     instance = self:_GetTagInstanceObject(instance);
-    -- self:_SaveTagProps(instance,tagname,tagprops);
+    self:_SaveTagProps(instance,tagname,tagprops);
     CollectionService:AddTag(instance,tagname);
 end;
 
@@ -215,8 +219,8 @@ function Collector:Bind(Tag:string,Callback:any,yieldForProps:boolean?)
 
     local function handleCallback(x)
         coroutine.wrap(function()
-            local cleanup = Callback(x);
-            -- local cleanup = Callback(x,self:_GetSavedTagProps(x,Tag,yieldForProps));
+            -- local cleanup = Callback(x);
+            local cleanup = Callback(x,self:_GetSavedTagProps(x,Tag,yieldForProps));
             if(cleanup)then
                 BindServant._dev.Cleanup[x] = cleanup;
             end

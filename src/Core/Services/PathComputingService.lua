@@ -19,12 +19,14 @@ local ComputedPath = {
     Destination = "**Instance|CFrame|Vector3|nil",
     AutoMoveAgent = true,
     Agent = "**Instance|nil",
-    AgentRadius = 2,
-    AgentHeight = 5,
-    AgentCanJump = true,
-    AgentCanClimb = false,
+    AgentData = {
+        AgentRadius = 2,
+        AgentHeight = 5,
+        AgentCanJump = true,
+        AgentCanClimb = false,
+        Costs = nil,
+    },
     WaypointSpacing = 4,
-    Costs = "**table|nil",
     AgentTweenInfo = TweenInfo.new(.1,Enum.EasingStyle.Linear);
 };
 --[=[
@@ -167,8 +169,9 @@ function ComputedPath:Compute()
                 if(reached and self._nextWaypointIndex < #waypoints-1) then
                     self._nextWaypointIndex+=1;
                     self:DoMoveToAgent(waypoints[self._nextWaypointIndex].Position);
-                    self:GetEventListener("WaypointReached"):Fire(reached);
+                    self:GetEventListener("WaypointReached"):Fire(waypoints[self._nextWaypointIndex],reached);
                 else
+                    self.DebugComputationInfo = {};
                     self._dev.reachedConnection:Disconnect();
                     self._dev.blockedConnection:Disconnect();
                     self:GetEventListener("Completed"):Fire(reached);
@@ -189,7 +192,7 @@ function ComputedPath:_Render()
     ]=]
     self:AddEventListener("Completed", true);
     --[=[
-        @prop WaypointReached PHeSignal<PathWaypoint>
+        @prop WaypointReached PHeSignal<PathWaypoint, waypointReached>
         @within ComputedPath
     ]=]
     self:AddEventListener("WaypointReached", true);
@@ -231,14 +234,18 @@ function ComputedPath:_Render()
                 local debugFolder = Instance.new("Folder");
                 debugFolder.Name = self.Name.."->DebugVisualization->"..self.__id;
                 debugFolder.Parent = workspace;
-                local debugColor = BrickColor.random();
+                local debugColor = self._debugColor;
+                if(not debugColor)then
+                    self._debugColor = BrickColor.random();
+                    debugColor = self._debugColor;
+                end
                 local debugSelectionBox = Instance.new("SelectionBox",debugFolder);
                 debugSelectionBox.Color3 = debugColor.Color;
                 debugSelectionBox.SurfaceColor3 = debugSelectionBox.Color3;
                 debugSelectionBox.SurfaceTransparency = .7;
                 debugSelectionBox.Adornee = self.Agent;
                 for _,x in pairs(self.DebugComputationInfo) do
-                    local debugPart = Instance.new("Part");
+                    local debugPart = Instance.new("Part",debugFolder);
                     debugPart.BrickColor = debugColor;
                     debugPart.Transparency = .5;
                     debugPart.Material = Enum.Material.SmoothPlastic;
@@ -246,7 +253,6 @@ function ComputedPath:_Render()
                     debugPart.Anchored = true;
                     debugPart.CanCollide = false;
                     debugPart.Size = Vector3.new(1,1,1)
-                    debugPart.Parent = debugFolder;
                 end;
                 return function ()
                     debugFolder:Destroy();
@@ -258,14 +264,15 @@ function ComputedPath:_Render()
             if(self._dev.mainPath)then
                 self._dev.mainPath:Destroy();
             end
-            self._dev.mainPath = PathfindingService:CreatePath({
-                AgentRadius = self.AgentRadius,
-                AgentHeight = self.AgentHeight,
-                AgentCanJump = self.AgentCanJump,
-                AgentCanClimb = self.AgentCanClimb,
-                Costs = self.Costs;
-            });
-        end,{"AgentRadius","AgentHeight","AgentCanJump","AgentCanClimb","Costs"})
+            self._dev.mainPath = PathfindingService:CreatePath(self.AgentData)
+            -- self._dev.mainPath = PathfindingService:CreatePath({
+            --     AgentRadius = self.AgentRadius,
+            --     AgentHeight = self.AgentHeight,
+            --     AgentCanJump = self.AgentCanJump,
+            --     AgentCanClimb = self.AgentCanClimb,
+            --     Costs = self.Costs;
+            -- });
+        end,{"AgentData"})
     end;
 end
 
