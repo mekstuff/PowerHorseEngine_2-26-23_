@@ -143,7 +143,24 @@ function Promise:Try(handler:(resolve:any,reject:any,cancel:any,promise:any)->an
     task.spawn(executionThread);
     return self;
 end;
-
+--[=[
+    Alias for :Then, syntax from other promise libraries
+]=]
+function Promise:andThen(...)
+    return self:Then(...);
+end
+--[=[]=]
+function Promise:await()
+    local s,r;
+    self:WhenThen(function(...)
+        s = true;
+        r = ...;
+    end):Catch(function(...)
+        s = false;
+        r = ...;
+    end);
+    return s,r;
+end
 --[=[]=]
 function Promise:WhenThen(...:any)
     local App = self:_GetAppModule();
@@ -174,7 +191,12 @@ function Promise:Then(callback:(...any)->any)
     end;
     return self;
 end;
-
+--[=[
+    Alias for :Catch, syntax from other promise libraries
+]=]
+function Promise:catch(...)
+    return self:Catch(...);
+end
 --[=[]=]
 function Promise:Catch(callback:(...any)->any)
     if(self.State == "rejected")then
@@ -188,6 +210,12 @@ function Promise:Catch(callback:(...any)->any)
     return self;
 end;
 
+--[=[
+    Alias for :Cancel, syntax from other promise libraries
+]=]
+function Promise:cancel(...)
+    return self:Catch(...);
+end
 --[=[]=]
 function Promise:Cancel(callback:(...any)->any)
     if(self.State == "cancelled")then

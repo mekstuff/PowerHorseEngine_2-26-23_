@@ -607,7 +607,7 @@ local function createPseudoObject(Object:{[any]:any}, DirectParent:Instance?, Di
 			if(propSheet.____useRawsets)then
 				if(propSheet.____useRawsets[k])then
 					for _,x in pairs(propSheet.____useRawsets[k]) do
-						local res = x(v);
+						local res = x(v,k);
 						if(res)then
 							Pseudo[k] = res;
 							return;
@@ -833,7 +833,7 @@ local function createPseudoObject(Object:{[any]:any}, DirectParent:Instance?, Di
 				--[=[
 					@function useRawset
 					@within useRawset
-					@param callback ()
+					@param callback (value:any,key:any)
 					@param dependency string
 
 					Whenever a pseudo property is set to change, given the dependency your handler will be called.

@@ -289,9 +289,13 @@ export type Promise = Pseudo&{
     Try: (self:any,handler:(resolve:any,reject:any,cancel:any,promise:Promise)->any) -> Promise,
     WhenThen: (self:any,handler:(res:any,Promise:Promise?)->any) -> Promise,
     Then: (self:any,handler:(res:any,Promise:Promise?)->any) -> Promise,
+    andThen: (self:any,handler:(res:any,Promise:Promise?)->any) -> Promise,
     Catch: (self:any,handler:(err:any,Promise:Promise?)->any) -> Promise,
+    catch: (self:any,handler:(err:any,Promise:Promise?)->any) -> Promise,
     Cancel: (self:any,handler:(err:any,Promise:Promise?)->any) -> Promise,
+    cancel: (self:any,handler:(err:any,Promise:Promise?)->any) -> Promise,
     Retry: (self:any) -> nil,
+    await: (self:any) -> (boolean,any)
 };
 export type PHePromise = Promise;
 
